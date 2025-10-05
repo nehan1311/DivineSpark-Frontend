@@ -40,16 +40,16 @@ const Donation = () => {
             </div>
           </div>
           
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight font-sans">
             Support Our Mission
           </h2>
           
-          <p className="text-xl md:text-2xl text-gray-800 mb-8 leading-relaxed font-medium">
+          <p className="text-xl md:text-2xl text-gray-800 mb-8 leading-relaxed font-medium font-sans">
             Join us in creating a world where inner peace, spiritual growth, and divine connection 
             are accessible to everyone, everywhere.
           </p>
           
-          <p className="text-lg text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed font-sans">
             Your generous contribution helps us provide free sessions to those in need, 
             support our spiritual guides, and build a global community of seekers on their journey to enlightenment.
           </p>
@@ -61,7 +61,7 @@ const Donation = () => {
               whileTap={{ scale: 0.95 }}
             >
               <Link to="/donation">
-                <button className="group relative px-10 py-4 bg-gradient-to-r from-orange-500 via-red-500 to-pink-600 text-white font-bold text-lg rounded-full shadow-2xl hover:shadow-orange-500/40 transform transition-all duration-300 overflow-hidden">
+                <button className="group relative px-10 py-4 bg-gradient-to-r from-orange-500 via-red-500 to-pink-600 text-white font-bold text-lg rounded-full shadow-2xl hover:shadow-orange-500/40 transform transition-all duration-300 overflow-hidden" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}>
                   <div className="absolute inset-0 bg-gradient-to-r from-red-600 via-pink-600 to-orange-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
                   <span className="relative flex items-center gap-2">
@@ -77,7 +77,7 @@ const Donation = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <button className="px-8 py-4 bg-white/80 backdrop-blur-sm text-purple-700 font-semibold text-lg rounded-full border-2 border-purple-200 shadow-lg hover:shadow-xl hover:bg-white/90 hover:border-purple-300 transition-all duration-300">
+              <button className="px-8 py-4 bg-white/80 backdrop-blur-sm text-purple-700 font-semibold text-lg rounded-full border-2 border-purple-200 shadow-lg hover:shadow-xl hover:bg-white/90 hover:border-purple-300 transition-all duration-300" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}>
                 Learn More
               </button>
             </motion.div>
@@ -98,8 +98,8 @@ const Donation = () => {
                 <Shield className="h-8 w-8 text-green-600" />
               </div>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Secure Payments</h3>
-            <p className="text-gray-800 text-sm font-medium">Your donations are protected with bank-level security and SSL encryption.</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-2" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}>Secure Payments</h3>
+            <p className="text-gray-800 text-sm font-medium" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}>Your donations are protected with bank-level security and SSL encryption.</p>
           </div>
           
           <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20">
@@ -108,8 +108,8 @@ const Donation = () => {
                 <Award className="h-8 w-8 text-blue-600" />
               </div>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">NGO Verified</h3>
-            <p className="text-gray-800 text-sm font-medium">Registered non-profit organization with full transparency and accountability.</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-2" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}>NGO Verified</h3>
+            <p className="text-gray-800 text-sm font-medium" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}>Registered non-profit organization with full transparency and accountability.</p>
           </div>
           
           <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20">
@@ -118,8 +118,8 @@ const Donation = () => {
                 <Users className="h-8 w-8 text-purple-600" />
               </div>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">10,000+ Lives Touched</h3>
-            <p className="text-gray-800 text-sm font-medium">Join thousands of supporters making a real difference in spiritual wellness.</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-2" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}>10,000+ Lives Touched</h3>
+            <p className="text-gray-800 text-sm font-medium" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}>Join thousands of supporters making a real difference in spiritual wellness.</p>
           </div>
         </motion.div>
 
@@ -131,8 +131,8 @@ const Donation = () => {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="max-w-2xl mx-auto text-center p-8 bg-white/70 backdrop-blur-lg rounded-3xl shadow-xl border border-white/30"
         >
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Stay Connected</h3>
-          <p className="text-gray-800 mb-6 font-medium">Receive updates on our mission, upcoming sessions, and spiritual insights.</p>
+          <h3 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}>Stay Connected</h3>
+          <p className="text-gray-800 mb-6 font-medium" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}>Receive updates on our mission, upcoming sessions, and spiritual insights.</p>
           
           <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4">
             <input
@@ -141,11 +141,13 @@ const Donation = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address"
               className="flex-1 px-6 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+              style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}
               required
             />
             <button
               type="submit"
               className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-200"
+              style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}
             >
               Subscribe
             </button>

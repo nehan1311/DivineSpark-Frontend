@@ -161,21 +161,43 @@
     
 
     const handleOtpSubmit = async (e) => {
-      e.preventDefault()
-      if (!validateOtp()) return
+      e.preventDefault();
+      if (!validateOtp()) return;
     
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        const otpString = formData.otp.join('')
-        await authAPI.verifyOTP(formData.email, otpString)
-        setCurrentStep(3)
+        const otpString = formData.otp.join('');
+        const res = await authAPI.verifyOTP(formData.email, otpString);
+    
+        console.log("OTP verified:", res.data);
+        setCurrentStep(3);
       } catch (error) {
-        console.error('Error verifying OTP:', error)
-        setErrors({ otp: 'Invalid OTP. Please try again.' })
+        console.error("Error verifying OTP:", error);
+    
+        if (error.response) {
+          // Server responded with a status other than 2xx
+          const status = error.response.status;
+          const message = error.response.data?.message || "Verification failed";
+    
+          if (status === 400) {
+            setErrors({ otp: "Invalid or expired OTP. Please try again." });
+          } else if (status === 500) {
+            setErrors({ otp: "Server error. Please try again later." });
+          } else {
+            setErrors({ otp: message });
+          }
+        } else if (error.request) {
+          // No response received
+          setErrors({ otp: "No response from server. Please check your connection." });
+        } else {
+          // Something else happened
+          setErrors({ otp: "Unexpected error occurred. Please try again." });
+        }
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
+    
     
 
     const handleRegistrationSubmit = async (e) => {
