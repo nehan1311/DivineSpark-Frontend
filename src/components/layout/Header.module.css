@@ -1,0 +1,136 @@
+.header {
+    height: 90px;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scrolled {
+    background-color: rgba(227, 233, 223, 0.9);
+    /* color-bg-main with opacity */
+    backdrop-filter: blur(12px);
+    height: 70px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+}
+
+.headerContainer {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Logo */
+.logo {
+    /* Container if needed */
+}
+
+.brandLink {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.logoImage {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 4px;
+}
+
+.brandName {
+    font-family: var(--font-family-heading);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+    font-weight: 700;
+}
+
+/* Nav */
+.nav {
+    display: none;
+    gap: var(--space-8);
+}
+
+.navLink {
+    color: var(--color-text-body);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+    position: relative;
+}
+
+.navLink:hover {
+    color: var(--color-text-primary);
+}
+
+.navLink::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: var(--color-text-primary);
+    transition: width 0.3s ease;
+}
+
+.navLink:hover::after {
+    width: 100%;
+}
+
+/* Actions */
+.actions {
+    display: flex;
+    gap: var(--space-4);
+}
+
+.loginBtn {
+    border-radius: var(--radius-full);
+    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+    /* Less padding right for avatar */
+    font-family: var(--font-family-body);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    background-color: #fff;
+    /* White pill for contrast on sage bg */
+    color: var(--color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.loginBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.userIcon {
+    width: 24px;
+    height: 24px;
+    background-image: url('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?fit=facearea&facepad=2&w=100&h=100&q=80');
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@media (min-width: 768px) {
+    .nav {
+        display: flex;
+    }
+}

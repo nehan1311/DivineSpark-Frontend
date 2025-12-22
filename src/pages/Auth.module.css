@@ -1,0 +1,95 @@
+.pageContainer {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: var(--color-bg-dark);
+    /* Fallback/Base color */
+    padding: var(--space-4);
+}
+
+.videoBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+    /* Video slightly transparent */
+    z-index: 0;
+    pointer-events: none;
+}
+
+.authBox {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 420px;
+    background-color: rgba(242, 245, 241, 0.95);
+    /* surface color with slight transparency */
+    backdrop-filter: blur(8px);
+    padding: 2.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    animation: fadeIn 0.6s ease-out;
+}
+
+.title {
+    font-family: var(--font-family-heading);
+    font-size: 2rem;
+    color: var(--color-text-primary);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.input {
+    padding: 0.875rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    font-family: var(--font-family-body);
+    font-size: 1rem;
+    background: white;
+    transition: all 0.2s;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(26, 60, 52, 0.1);
+}
+
+.footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-body);
+}
+
+.link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: underline;
+    margin-left: 0.5rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

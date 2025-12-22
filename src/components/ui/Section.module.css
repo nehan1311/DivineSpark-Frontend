@@ -1,0 +1,23 @@
+.section {
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+    position: relative;
+}
+
+.default {
+    background-color: var(--color-bg-main);
+}
+
+.surface {
+    background-color: var(--color-bg-surface);
+}
+
+.dark {
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-inverse);
+}
+
+.accent {
+    background-color: #F0F4F2;
+    /* Very light green tint for accent sections */
+}

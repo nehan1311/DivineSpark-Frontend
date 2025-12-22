@@ -1,0 +1,74 @@
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    border-radius: var(--radius-full);
+    /* Modern pill shape */
+    transition: all 0.3s ease;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+}
+
+.button:active {
+    transform: scale(0.98);
+}
+
+/* Variants */
+.primary {
+    background-color: var(--color-primary);
+    color: #fff;
+}
+
+.primary:hover {
+    background-color: var(--color-primary-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.secondary {
+    background-color: var(--color-secondary);
+    color: var(--color-text-primary);
+}
+
+.secondary:hover {
+    filter: brightness(0.95);
+}
+
+.outline {
+    background: transparent;
+    border: 1px solid currentColor;
+    color: currentColor;
+}
+
+.outline:hover {
+    opacity: 0.7;
+}
+
+.inverse {
+    background-color: var(--color-text-primary);
+    color: var(--color-bg-surface);
+}
+
+.inverse:hover {
+    filter: brightness(0.9);
+}
+
+/* Sizes */
+.sm {
+    padding: 0.5rem 1rem;
+    font-size: var(--font-size-sm);
+}
+
+.md {
+    padding: 0.75rem 1.5rem;
+    font-size: var(--font-size-md);
+}
+
+.lg {
+    padding: 1rem 2rem;
+    font-size: var(--font-size-lg);
+}
+
+.fullWidth {
+    width: 100%;
+}
