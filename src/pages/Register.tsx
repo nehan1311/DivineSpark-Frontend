@@ -5,12 +5,15 @@ import styles from './Auth.module.css';
 import bgVideo from '../assets/Website_Video_for_Healing_and_Spirituality.mp4';
 import { requestOtp, verifyOtp, register } from '../api/auth.api';
 import { useAuth } from '../context/AuthContext';
-import { setToken } from '../utils/authStorage';
+
 import type { AxiosError } from 'axios';
+
+import { useToast } from '../context/ToastContext';
 
 const Register: React.FC = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
+    const { showToast } = useToast();
 
     const [step, setStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
@@ -27,11 +30,14 @@ const Register: React.FC = () => {
         setError(null);
         setIsLoading(true);
         try {
-            await requestOtp({ email });
+            await requestOtp({ email, purpose: 'VERIFY_EMAIL' });
+            showToast('OTP sent to your email', 'success');
             setStep(2);
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
-            setError(error.response?.data?.message || 'Failed to request OTP');
+            const errorMessage = error.response?.data?.message || 'Failed to request OTP';
+            setError(errorMessage);
+            showToast(errorMessage, 'error');
         } finally {
             setIsLoading(false);
         }
@@ -44,11 +50,14 @@ const Register: React.FC = () => {
         try {
             // Assuming verifyOtp returns success but doesn't log you in yet, 
             // or returns a token if it was a login. Here it validates OTP for registration flow.
-            await verifyOtp({ email, otp });
+            await verifyOtp({ email, otp, purpose: 'VERIFY_EMAIL' });
+            showToast('Email verified successfully', 'success');
             setStep(3);
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
-            setError(error.response?.data?.message || 'Invalid OTP');
+            const errorMessage = error.response?.data?.message || 'Invalid OTP';
+            setError(errorMessage);
+            showToast(errorMessage, 'error');
         } finally {
             setIsLoading(false);
         }
@@ -60,12 +69,14 @@ const Register: React.FC = () => {
         setIsLoading(true);
         try {
             const response = await register({ email, fullName, password });
-            setToken(response.token);
-            login();
+            login(response.token);
+            showToast('Registration successful! Welcome.', 'success');
             navigate('/sessions'); // Or wherever you want to send them
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
-            setError(error.response?.data?.message || 'Registration failed');
+            const errorMessage = error.response?.data?.message || 'Registration failed';
+            setError(errorMessage);
+            showToast(errorMessage, 'error');
         } finally {
             setIsLoading(false);
         }

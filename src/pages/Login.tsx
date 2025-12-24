@@ -5,11 +5,14 @@ import styles from './Auth.module.css';
 import bgVideo from '../assets/Website_Video_for_Healing_and_Spirituality.mp4';
 import { useAuth } from '../context/AuthContext';
 import { login as loginApi } from '../api/auth.api';
-import { setToken } from '../utils/authStorage';
+
 import type { AxiosError } from 'axios';
+
+import { useToast } from '../context/ToastContext';
 
 const Login: React.FC = () => {
     const { login } = useAuth();
+    const { showToast } = useToast();
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || "/sessions";
@@ -26,12 +29,13 @@ const Login: React.FC = () => {
 
         try {
             const response = await loginApi({ email, password });
-            setToken(response.token);
-            login(); // Update context state
+            login(response.token); // Update context state
             navigate(from, { replace: true });
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
-            setError(error.response?.data?.message || 'Invalid email or password');
+            const errorMessage = error.response?.data?.message || 'Invalid email or password';
+            setError(errorMessage);
+            showToast(errorMessage, 'error');
         } finally {
             setIsLoading(false);
         }

@@ -1,10 +1,14 @@
+export type OtpPurpose = 'VERIFY_EMAIL' | 'FORGOT_PASSWORD';
+
 export interface RequestOtpPayload {
     email: string; // or phoneNumber depending on requirements
+    purpose: OtpPurpose;
 }
 
 export interface VerifyOtpPayload {
     email: string;
     otp: string;
+    purpose: OtpPurpose;
 }
 
 export interface RegisterPayload {
