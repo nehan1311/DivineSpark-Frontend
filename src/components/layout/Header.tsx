@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import Button from '../ui/Button';
 import styles from './Header.module.css';
 import logoImg from '../../assets/divinespark logo.jpeg';
+import { ConfirmationModal } from '../../components/ui/Modal';
+
 const Header: React.FC = () => {
     const navigate = useNavigate();
+    const { isAuthenticated, logout } = useAuth();
     const [scrolled, setScrolled] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -32,17 +43,70 @@ const Header: React.FC = () => {
                 </nav>
 
                 <div className={styles.actions}>
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => navigate('/login')}
-                        className={styles.loginBtn}
-                    >
-                        Log in
-                        <span className={styles.userIcon} />
-                    </Button>
+                    {isAuthenticated ? (
+                        <div className={styles.userMenu}>
+                            <button
+                                className={styles.userMenuTrigger}
+                                onClick={() => setMenuOpen(!menuOpen)}
+                                aria-label="User menu"
+                            >
+                                <div
+                                    className={styles.userIcon}
+                                    role="img"
+                                    aria-label="User Avatar"
+                                />
+                            </button>
+
+                            {menuOpen && (
+                                <div className={styles.dropdown}>
+                                    <div className={styles.dropdownItem} onClick={() => {
+                                        setMenuOpen(false);
+                                        // Placeholder for profile
+                                        navigate('/settings');
+                                    }}>
+                                        Profile
+                                    </div>
+                                    <div className={styles.dropdownItem} onClick={() => {
+                                        setMenuOpen(false);
+                                        navigate('/settings');
+                                    }}>
+                                        Settings
+                                    </div>
+                                    <div className={styles.dropdownDivider} />
+                                    <div className={styles.dropdownItem} onClick={() => {
+                                        setMenuOpen(false);
+                                        setLogoutModalOpen(true);
+                                    }}>
+                                        Log out
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => navigate('/login')}
+                            className={styles.loginBtn}
+                        >
+                            Log in
+                            <span className={styles.userIcon} />
+                        </Button>
+                    )}
                 </div>
             </div>
+
+            <ConfirmationModal
+                isOpen={logoutModalOpen}
+                onClose={() => setLogoutModalOpen(false)}
+                onConfirm={() => {
+                    handleLogout();
+                    setLogoutModalOpen(false);
+                }}
+                title="Log Out"
+                message="Are you sure you want to log out?"
+                confirmText="Log Out"
+            />
         </header>
     );
 };

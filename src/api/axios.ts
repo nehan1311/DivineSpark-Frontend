@@ -32,11 +32,11 @@ axiosInstance.interceptors.response.use(
     (error: AxiosError) => {
         if (error.response) {
             const status = error.response.status;
-            if (status === 401 || status === 403) {
-                // Token might be invalid or expired
+            if (status === 401) {
+                // Token is invalid or expired
                 removeToken();
-                // Optional: Redirect to login or dispatch a global logout event
-                // window.location.href = '/login'; 
+                // Dispatch event so AuthProvider can handle the UI transition/state clearing
+                window.dispatchEvent(new CustomEvent('auth:unauthorized'));
             }
         }
         return Promise.reject(error);

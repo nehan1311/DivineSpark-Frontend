@@ -5,8 +5,10 @@ import Home from '../pages/Home';
 import Sessions from '../pages/Sessions';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import Settings from '../pages/Settings';
 
 import ProtectedRoute from './ProtectedRoute';
+import PublicRoute from './PublicRoute';
 
 const AppRoutes: React.FC = () => {
     return (
@@ -18,8 +20,21 @@ const AppRoutes: React.FC = () => {
                         <Sessions />
                     </ProtectedRoute>
                 } />
-                <Route path="login" element={<Login />} />
-                <Route path="register" element={<Register />} />
+                <Route path="settings" element={
+                    <ProtectedRoute>
+                        <Settings />
+                    </ProtectedRoute>
+                } />
+                <Route path="login" element={
+                    <PublicRoute>
+                        <Login />
+                    </PublicRoute>
+                } />
+                <Route path="register" element={
+                    <PublicRoute>
+                        <Register />
+                    </PublicRoute>
+                } />
             </Route>
         </Routes>
     );

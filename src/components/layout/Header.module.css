@@ -43,7 +43,8 @@
 }
 
 .logoImage {
-    height: 32px;
+    height: 50px;
+    /* Increased size */
     width: auto;
     object-fit: contain;
     margin-bottom: 4px;
@@ -51,7 +52,8 @@
 
 .brandName {
     font-family: var(--font-family-heading);
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    /* Increased size */
     letter-spacing: 0.05em;
     text-transform: uppercase;
     color: var(--color-text-primary);
@@ -132,5 +134,73 @@
 @media (min-width: 768px) {
     .nav {
         display: flex;
+    }
+}
+
+/* User Dropdown */
+.userMenu {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.userMenuTrigger {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+
+.userMenuTrigger:hover {
+    transform: scale(1.05);
+}
+
+.dropdown {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background-color: #fff;
+    min-width: 180px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 0.5rem 0;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dropdownItem {
+    padding: 0.75rem 1rem;
+    color: var(--color-text-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-align: left;
+}
+
+.dropdownItem:hover {
+    background-color: var(--color-bg-surface);
+    color: var(--color-primary);
+}
+
+.dropdownDivider {
+    height: 1px;
+    background-color: var(--color-border);
+    margin: 0.5rem 0;
+    opacity: 0.5;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

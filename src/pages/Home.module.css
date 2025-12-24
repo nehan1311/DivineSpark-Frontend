@@ -1,57 +1,115 @@
+/* Background Image Container */
+.meshContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: url('../assets/home_bg.jpg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.3;
+    /* Make background subtle */
+    /* Optional: Overlay if text contrast is needed, but user asked for transparent bg */
+    overflow: hidden;
+}
+
+/* Mask for text reveal */
+.mask {
+    overflow: hidden;
+    display: block;
+    padding: 0.2em;
+    margin: -0.2em;
+    margin-bottom: 0.1em;
+}
+
+.maskedText {
+    display: inline-block;
+    will-change: transform;
+}
+
+
 .hero {
+    height: 100vh;
     min-height: 100vh;
     display: flex;
     align-items: center;
-    background-color: var(--color-bg-main);
+    background-color: transparent;
     position: relative;
     overflow: hidden;
-    padding-top: 100px;
-    /* Header clearance */
-    padding-bottom: var(--space-12);
+    padding-top: 80px;
+    /* Header clearance only */
+    padding-bottom: 0;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(13, 31, 26, 0.3), rgba(13, 31, 26, 0));
+    z-index: 1;
+    pointer-events: none;
 }
 
 .heroWrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-8);
+    gap: 4vw;
+    /* Responsive gap */
     width: 100%;
+    height: 100%;
+    max-height: 100%;
+    /* Prevent vertical overflow */
 }
 
 .heroContent {
     flex: 1;
-    max-width: 600px;
+    max-width: 50%;
     position: relative;
     z-index: 10;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* Center children horizontally */
+    /* Center align items */
     text-align: center;
-    /* Center text */
+    /* Center align text */
+    min-width: 0;
+    padding-left: 2%;
+    /* Slight optical center offset */
 }
 
 .heroTitle {
-    font-size: 4.25rem;
-    margin-bottom: var(--space-4);
+    font-size: clamp(3rem, 5vw, 4.75rem);
+    margin-bottom: var(--space-6);
     color: var(--color-text-primary);
     line-height: 1.1;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.04em;
 }
 
 .heroTitle em {
-    font-family: var(--font-family-heading);
+    font-family: serif;
+    /* fallback to ensure distinct italic style */
     font-style: italic;
     font-weight: 400;
     display: block;
+    margin: 0.15em 0;
+    color: #1a2e29;
 }
 
 .heroSubtitle {
-    font-size: 1.125rem;
-    color: var(--color-text-body);
+    font-size: clamp(1rem, 1.2vw, 1.125rem);
+    color: #4a554a;
+    /* Dark mossy grey/green */
+    font-weight: 500;
     margin-bottom: var(--space-8);
-    max-width: 100%;
+    max-width: 450px;
+    /* Narrower line length */
     line-height: 1.6;
     opacity: 0.9;
 }
@@ -59,23 +117,33 @@
 .heroActions {
     display: flex;
     align-items: center;
-    gap: var(--space-4);
+    gap: var(--space-6);
+    justify-content: center;
+    /* Center buttons */
 }
 
 .heroImageWrapper {
-    flex: 1.2;
+    flex: 1;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     position: relative;
+    height: 100%;
+    max-width: 55%;
 }
 
 .heroImage {
+    display: block;
+    height: 85vh;
+    /* Tall and immersive */
     width: 100%;
-    max-width: 700px;
-    height: auto;
-    border-radius: 60px 0 60px 0;
+    max-width: 100%;
     object-fit: cover;
-    box-shadow: var(--shadow-xl);
+    /* Fill the area nicely */
+    border-radius: 120px 0 0 120px;
+    /* Large rounded left edge to match screenshot */
+    box-shadow: -20px 20px 60px rgba(0, 0, 0, 0.1);
+    margin-left: auto;
 }
 
 /* Stats Section */
@@ -221,8 +289,52 @@
 }
 
 @media (max-width: 1024px) {
+    .hero {
+        height: auto;
+        /* Allow scroll on mobile */
+        min-height: 100vh;
+        padding-top: 100px;
+    }
+
     .heroWrapper {
         flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        gap: var(--space-8);
+    }
+
+    .heroContent {
+        max-width: 100%;
+        align-items: center;
+        text-align: center;
+        order: 2;
+        /* Image on top? Or text on top? Usually Image on top for visual apps, but Text for conversion. Let's keep Text top (default order). */
+        padding: 0 var(--space-4);
+    }
+
+    .heroActions {
+        justify-content: center;
+    }
+
+    .heroImageWrapper {
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+        justify-content: center;
+        margin-top: var(--space-4);
+        order: 1;
+        /* Image first on mobile? Or second? User didn't specify. Standard is Text first. */
+        order: 2;
+    }
+
+    .heroContent {
+        order: 1;
+    }
+
+    .heroImage {
+        max-height: 40vh;
+        /* Smaller on mobile */
+        border-radius: 40px 0 40px 0;
     }
 
     .servicesGrid {
