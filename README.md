@@ -1,134 +1,115 @@
-🌿 DivineSpark – Frontend
+# DivineSpark Frontend
 
-DivineSpark is a modern wellness platform designed to help users transform their body, mind, and soul through yoga, fitness sessions, and holistic wellness programs.
-This repository contains the frontend application built with React + TypeScript, focusing on a calm, elegant, and responsive user experience.
+DivineSpark is a wellness platform frontend built using React and TypeScript.
+This application focuses on user authentication, clean UI design, and a calm,
+modern user experience suitable for a yoga and wellness product.
 
-✨ Features
-🔐 Authentication
+This repository contains only the frontend code.
 
-Email-based registration with OTP verification
+---
 
-Secure login using email & password
+## Current Features
 
-Token-based authentication (JWT)
+- Home page with responsive hero section
+- User registration with OTP verification
+- User login using email and password
+- JWT-based authentication handling
+- Protected routes for authenticated users
+- Logout functionality with confirmation
+- Toast notifications for success and errors
+- Settings page (basic UI only)
+- Responsive layout for desktop and mobile
+- Smooth UI animations using Framer Motion
 
-Protected routes for authenticated users
+---
 
-🧘 User Experience
+## Tech Stack
 
-Smooth animations using Framer Motion
+- React
+- TypeScript
+- Vite
+- CSS Modules
+- Framer Motion
+- Axios
+- React Router
+- Context API
 
-Responsive hero section with parallax effects
+---
 
-Magnetic button interactions
+## Project Structure
 
-Toast notifications for success & error states
-
-Modal confirmations (logout, actions)
-
-🧭 Navigation
-
-Public & protected route handling
-
-Dynamic header with profile icon
-
-Login / Logout flow with session persistence
-
-⚙️ User Utilities
-
-Settings page
-
-Logout confirmation
-
-Session handling
-
-🛠 Tech Stack
-Category	Technology
-Framework	React 18
-Language	TypeScript
-Build Tool	Vite
-Styling	CSS Modules
-Animations	Framer Motion
-HTTP Client	Axios
-Routing	React Router
-State	React Context API
-Linting	ESLint
-📁 Project Structure
 divinespark-frontend/
 │
 ├── src/
-│   ├── api/            # Axios setup & API calls
-│   ├── assets/         # Images, videos, backgrounds
-│   ├── components/     # Reusable UI components
-│   ├── context/        # Auth & Toast context
-│   ├── pages/          # Home, Login, Register, Sessions, Settings
-│   ├── routes/         # Public & protected routes
-│   ├── styles/         # Global styles & tokens
-│   ├── types/          # TypeScript types
-│   └── utils/          # Local storage helpers
+│   ├── api/            API calls and axios configuration
+│   ├── assets/         Images and static files
+│   ├── components/     Reusable UI components
+│   ├── context/        Authentication and toast context
+│   ├── pages/          Application pages
+│   ├── routes/         Routing logic
+│   ├── types/          TypeScript types
+│   └── utils/          Helper utilities
 │
 ├── public/
 ├── package.json
-├── vite.config.ts
-└── README.md
+└── vite.config.ts
 
-🔗 Backend Integration
+---
 
-The frontend communicates with the DivineSpark Backend using REST APIs.
+## Backend Integration
 
-Base API URL
+The frontend connects to a Spring Boot backend using REST APIs.
 
+Base API URL:
 http://localhost:8080/api/v1
 
+Authentication APIs used:
+- POST /auth/request-otp
+- POST /auth/verify-otp
+- POST /auth/register
+- POST /auth/login
 
-Integrated Auth Endpoints
+---
 
-POST /auth/request-otp
+## Getting Started
 
-POST /auth/verify-otp
+1. Clone the repository
 
-POST /auth/register
-
-POST /auth/login
-
-🚀 Getting Started
-1️⃣ Clone the Repository
 git clone https://github.com/<your-username>/divinespark-frontend.git
-cd divinespark-frontend
 
-2️⃣ Install Dependencies
+2. Install dependencies
+
 npm install
 
-3️⃣ Start Development Server
+3. Start development server
+
 npm run dev
 
-
-App will run at:
-
+Application runs at:
 http://localhost:5173
 
-🔒 Environment Variables
+---
+
+## Environment Variables
 
 Create a .env file if required:
 
 VITE_API_BASE_URL=http://localhost:8080/api/v1
 
-🧪 Scripts
-Command	Description
-npm run dev	Start dev server
-npm run build	Production build
-npm run preview	Preview build
-npm run lint	Run ESLint
-📌 Best Practices Followed
+---
 
-Component-based architecture
+## Scripts
 
-Clean separation of concerns
+npm run dev       Start development server
+npm run build     Build for production
+npm run preview   Preview production build
+npm run lint      Run linting
 
-Secure token handling
+---
 
-Mobile-first responsive design
+## Notes
 
-Scalable folder structure
+- node_modules and dist folders are ignored via .gitignore
+- This project is under active development
+- UI and features will be enhanced incrementally
 
-Production-ready Git hygiene
