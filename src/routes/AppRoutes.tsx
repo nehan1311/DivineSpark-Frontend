@@ -6,6 +6,7 @@ import Sessions from '../pages/Sessions';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Settings from '../pages/Settings';
+import SessionDetails from '../pages/SessionDetails';
 
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
@@ -15,11 +16,8 @@ const AppRoutes: React.FC = () => {
         <Routes>
             <Route path="/" element={<MainLayout />}>
                 <Route index element={<Home />} />
-                <Route path="sessions" element={
-                    <ProtectedRoute>
-                        <Sessions />
-                    </ProtectedRoute>
-                } />
+                <Route path="sessions" element={<Sessions />} />
+                <Route path="sessions/:sessionId" element={<SessionDetails />} />
                 <Route path="settings" element={
                     <ProtectedRoute>
                         <Settings />
