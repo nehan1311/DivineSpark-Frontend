@@ -1,0 +1,125 @@
+.container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #0a0a0a;
+    color: #e0e0e0;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.sidebar {
+    width: 260px;
+    background-color: #111;
+    border-right: 1px solid #222;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #d4af37;
+    margin-bottom: 3rem;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.navLink {
+    text-decoration: none;
+    color: #888;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.navLink:hover,
+.activeLink {
+    background-color: rgba(212, 175, 55, 0.1);
+    color: #d4af37;
+}
+
+.logoutBtn {
+    margin-top: auto;
+    background: transparent;
+    border: 1px solid #333;
+    color: #888;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.logoutBtn:hover {
+    border-color: #d4af37;
+    color: #d4af37;
+}
+
+.main {
+    flex: 1;
+    padding: 2.5rem 3rem;
+    overflow-y: auto;
+}
+
+.header {
+    margin-bottom: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pageTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.statCard {
+    background: #161616;
+    border: 1px solid #222;
+    padding: 1.5rem;
+    border-radius: 12px;
+    transition: transform 0.2s;
+}
+
+.statCard:hover {
+    transform: translateY(-2px);
+    border-color: #333;
+}
+
+.statLabel {
+    color: #666;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.statValue {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.welcomeSection {
+    background: linear-gradient(45deg, rgba(212, 175, 55, 0.05), transparent);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+}

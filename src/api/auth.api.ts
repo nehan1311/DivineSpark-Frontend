@@ -34,7 +34,14 @@ export const register = async (payload: RegisterPayload): Promise<AuthResponse> 
 /**
  * Login an existing user (standard password flow).
  */
-export const login = async (payload: LoginPayload): Promise<AuthResponse> => {
-    const response = await axiosInstance.post<AuthResponse>(AUTH_ENDPOINTS.LOGIN, payload);
-    return response.data;
+export const login = async (payload: LoginPayload) => {
+    const response = await axiosInstance.post(AUTH_ENDPOINTS.LOGIN, payload);
+
+    const token =
+        response.data.token ||
+        response.data.accessToken ||
+        response.data.jwt ||
+        response.data; // fallback if backend returns raw string
+
+    return { token };
 };
