@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import styles from './SessionDetails.module.css';
 import { formatDate, formatCurrency } from '../utils/format';
+import { razorpayService } from '../services/razorpay.service';
 
 const SessionDetails: React.FC = () => {
     const { sessionId } = useParams<{ sessionId: string }>();
@@ -53,12 +54,43 @@ const SessionDetails: React.FC = () => {
                 await sessionApi.joinSession(session.id);
                 showToast(`Successfully joined "${session.title}"`, 'success');
             } else {
-                await sessionApi.payForSession(session.id);
-                showToast(`Payment successful for "${session.title}"`, 'success');
+                // Load Razorpay script first
+                const isLoaded = await razorpayService.loadRazorpay();
+                if (!isLoaded) {
+                    showToast('Razorpay SDK failed to load. Are you online?', 'error');
+                    return;
+                }
+
+                // 1. Create Order
+                const orderData = await sessionApi.payForSession(session.id);
+
+                // 2. Open Payment Modal
+                razorpayService.initializePayment(
+                    orderData,
+                    session,
+                    async (response) => {
+                        // 3. Verify Payment
+                        try {
+                            await sessionApi.verifyPayment({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                                sessionId: session.id
+                            });
+                            showToast(`Payment successful for "${session.title}"`, 'success');
+                            navigate('/sessions'); // or refresh
+                        } catch (err: any) {
+                            showToast('Payment verification failed', 'error');
+                        }
+                    },
+                    (errorMsg) => {
+                        showToast(errorMsg || 'Payment failed', 'error');
+                    }
+                );
             }
-            // Optionally refresh session or user state?
         } catch (error: any) {
-            const msg = error.response?.data?.message || 'Action failed. Please try again.';
+            console.error('Payment Action Failed:', error);
+            const msg = error.response?.data?.message || error.message || 'Action failed. Please try again.';
             showToast(msg, 'error');
         } finally {
             setActionLoading(false);
@@ -121,11 +153,14 @@ const SessionDetails: React.FC = () => {
                     onClick={handleAction}
                     disabled={actionLoading || isExpired}
                 >
-                    {isExpired ? 'Session Expired' : (isFree ? 'Join Free' : 'Book Now')}
+                    {/* Temporarily showing button for testing even if expired */}
+                    {isFree ? 'Join Free' : 'Pay For Session'}
                 </Button>
             </div>
-        </Section>
+        </Section >
     );
 };
 
 export default SessionDetails;
+
+
