@@ -5,6 +5,19 @@ import type { Session, SessionsResponse, SessionFilters } from '../types/session
 import { getToken } from '../utils/authStorage';
 
 export const sessionApi = {
+    // Helper to build auth headers only when token exists
+    _authHeaders: () => {
+        const token = getToken();
+        return token ? { Authorization: `Bearer ${token}` } : {};
+    },
+    // Ensure token exists, otherwise throw a structured error similar to axios error
+    _ensureAuth: () => {
+        const token = getToken();
+        if (!token) {
+            throw { response: { data: { message: 'Authentication required. Please login.' } } };
+        }
+        return token;
+    },
     // Get Upcoming Sessions
     getSessions: async (filters: SessionFilters = {}): Promise<SessionsResponse> => {
         const { page = 0, size = 10, type } = filters;
@@ -23,21 +36,16 @@ export const sessionApi = {
 
     // Join Free Session
     joinSession: async (sessionId: string): Promise<void> => {
-        await axiosInstance.post(`${SESSION_ENDPOINTS.BASE}/${sessionId}/join`);
+        sessionApi._ensureAuth();
+        const headers = sessionApi._authHeaders();
+        await axiosInstance.post(`${SESSION_ENDPOINTS.BASE}/${sessionId}/join`, {}, { headers });
     },
 
     // Pay for Paid Session - Returns Razorpay Order Details
     payForSession: async (sessionId: string): Promise<{ id: string; amount: number; currency: string; key?: string }> => {
-        const token = getToken();
-        const response = await axiosInstance.post(
-            `${SESSION_ENDPOINTS.BASE}/${sessionId}/pay`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        );
+        sessionApi._ensureAuth();
+        const headers = sessionApi._authHeaders();
+        const response = await axiosInstance.post(`${SESSION_ENDPOINTS.BASE}/${sessionId}/pay`, {}, { headers });
         console.log('Backend Pay Response:', response.data);
 
         return {
@@ -54,6 +62,8 @@ export const sessionApi = {
         razorpay_signature: string;
         sessionId: string; // passing sessionId if needed by backend URL
     }): Promise<void> => {
-        await axiosInstance.post(`${SESSION_ENDPOINTS.BASE}/${paymentData.sessionId}/verify`, paymentData);
+        sessionApi._ensureAuth();
+        const headers = sessionApi._authHeaders();
+        await axiosInstance.post(`${SESSION_ENDPOINTS.BASE}/${paymentData.sessionId}/verify`, paymentData, { headers });
     }
 };
