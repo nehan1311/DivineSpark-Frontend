@@ -29,7 +29,19 @@ const Login: React.FC = () => {
 
         try {
             const response = await loginApi({ email, password });
-            login(response.token); // Update context state
+            // Accept token as plain string or within an object
+            let token: string | undefined;
+            if (!response) token = undefined;
+            else if (typeof response === 'string') token = response;
+            else token = (response as any).token || (response as any).accessToken || (response as any).access_token;
+
+            if (!token) {
+                const msg = 'Login succeeded but no token returned from server';
+                showToast(msg, 'error');
+                setError(msg);
+                return;
+            }
+            login(token); // Update context state
             navigate(from, { replace: true });
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
