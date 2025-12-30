@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Sessions.module.css';
 import Button from '../components/ui/Button'; // Assuming we can use UI button or style generic ones
 import { formatDate, formatCurrency } from '../utils/format';
+import { razorpayService } from '../services/razorpay.service';
 
 // Fallback images if session image is missing
 const FALLBACK_BG = 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1920';
@@ -84,13 +85,45 @@ const Sessions: React.FC = () => {
             if (session.type === 'FREE') {
                 await sessionApi.joinSession(session.id);
                 showToast(`Successfully joined "${session.title}"`, 'success');
+                navigate(`/sessions/${session.id}`);
             } else {
-                await sessionApi.payForSession(session.id);
-                showToast(`Payment successful for "${session.title}"`, 'success');
+                // Load Razorpay script first
+                const isLoaded = await razorpayService.loadRazorpay();
+                if (!isLoaded) {
+                    showToast('Razorpay SDK failed to load. Are you online?', 'error');
+                    return;
+                }
+
+                // 1. Create Order
+                const orderData = await sessionApi.payForSession(session.id);
+
+                // 2. Open Payment Modal
+                razorpayService.initializePayment(
+                    orderData,
+                    session,
+                    async (response) => {
+                        // 3. Verify Payment
+                        try {
+                            await sessionApi.verifyPayment({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                                sessionId: session.id
+                            });
+                            showToast(`Payment successful for "${session.title}"`, 'success');
+                            navigate(`/sessions/${session.id}`);
+                        } catch (err: any) {
+                            showToast('Payment verification failed', 'error');
+                        }
+                    },
+                    (errorMsg) => {
+                        showToast(errorMsg || 'Payment failed', 'error');
+                    }
+                );
             }
-            navigate(`/sessions/${session.id}`);
         } catch (error: any) {
-            const msg = error.response?.data?.message || 'Action failed. Please try again.';
+            console.error('List Action Failed:', error);
+            const msg = error.response?.data?.message || error.message || 'Action failed. Please try again.';
             showToast(msg, 'error');
         } finally {
             setActionLoading(null);
@@ -175,7 +208,8 @@ const Sessions: React.FC = () => {
                                     disabled={actionLoading === session.id || isExpired}
                                     style={{ borderColor: 'white', color: 'white' }}
                                 >
-                                    {isExpired ? 'Session Expired' : (isFree ? 'Join Now' : 'Book Experience')}
+                                    {/* Temporarily showing button for testing even if expired */}
+                                    {isFree ? 'Join Now' : 'Pay For Session'}
                                 </Button>
 
                                 <Button
@@ -203,7 +237,7 @@ const Sessions: React.FC = () => {
                     />
                 ))}
             </div>
-        </div>
+        </div >
     );
 };
 

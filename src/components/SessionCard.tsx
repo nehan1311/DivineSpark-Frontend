@@ -16,7 +16,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onAction, loading = 
     const isExpired = new Date(session.startTime) < new Date();
 
     // Status text logic could be improved, but relying on isExpired for now
-    const ctaLabel = isExpired ? 'Expired' : (isFree ? 'Join Free' : 'Book Now');
+    const ctaLabel = isExpired ? 'Expired' : (isFree ? 'Join Free' : 'Pay For Session');
     const badgeClass = isFree ? styles.free : styles.paid;
 
     return (

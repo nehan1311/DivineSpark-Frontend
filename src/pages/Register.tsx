@@ -69,7 +69,19 @@ const Register: React.FC = () => {
         setIsLoading(true);
         try {
             const response = await register({ email, fullName, password });
-            login(response.token);
+            // Accept token as plain string or within an object
+            let token: string | undefined;
+            if (!response) token = undefined;
+            else if (typeof response === 'string') token = response;
+            else token = (response as any).token || (response as any).accessToken || (response as any).access_token;
+
+            if (!token) {
+                const msg = 'Registration succeeded but no token returned from server';
+                showToast(msg, 'error');
+                setError(msg);
+                return;
+            }
+            login(token);
             showToast('Registration successful! Welcome.', 'success');
             navigate('/sessions'); // Or wherever you want to send them
         } catch (err) {
