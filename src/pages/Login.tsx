@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import Button from '../components/ui/Button';
 import styles from './Auth.module.css';
 import bgVideo from '../assets/Website_Video_for_Healing_and_Spirituality.mp4';
@@ -41,8 +42,31 @@ const Login: React.FC = () => {
                 setError(msg);
                 return;
             }
+
+            // Decode token to check role
+            let role = 'USER';
+            try {
+                const decoded: any = jwtDecode(token);
+                if (
+                    decoded.role === 'ADMIN' ||
+                    decoded.role === 'ROLE_ADMIN' ||
+                    (Array.isArray(decoded.authorities) && decoded.authorities.includes('ROLE_ADMIN')) ||
+                    (Array.isArray(decoded.roles) && decoded.roles.includes('ADMIN'))
+                ) {
+                    role = 'ADMIN';
+                }
+            } catch (e) {
+                console.warn("Failed to decode token", e);
+            }
+
             login(token); // Update context state
-            navigate(from, { replace: true });
+
+            if (role === 'ADMIN') {
+                navigate('/admin/dashboard', { replace: true });
+            } else {
+                navigate(from, { replace: true });
+            }
+
         } catch (err) {
             const error = err as AxiosError<{ message: string }>;
             const errorMessage = error.response?.data?.message || 'Invalid email or password';
