@@ -2,13 +2,17 @@ import React, { createContext, useContext, useState, useEffect, useCallback, typ
 import { getToken, setToken, removeToken } from '../utils/authStorage';
 import { jwtDecode } from 'jwt-decode';
 import { useToast } from './ToastContext';
-
+import axiosInstance from '../api/axios';
+import { AUTH_ENDPOINTS } from '../api/endpoints';
+import type { User } from '../types/auth.types';
 
 interface AuthContextType {
     isAuthenticated: boolean;
     role: string | null;
+    user: User | null;
     login: (token: string) => void;
     logout: (showFeedback?: boolean) => void;
+    refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,13 +56,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Initialize state synchronously
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => !!getToken());
     const [role, setRole] = useState<string | null>(() => getRoleFromToken(getToken()));
+    const [user, setUser] = useState<User | null>(null);
 
-
+    const fetchUserProfile = useCallback(async () => {
+        try {
+            const response = await axiosInstance.get<User>(AUTH_ENDPOINTS.GET_PROFILE);
+            setUser(response.data);
+        } catch (error) {
+            console.error("Failed to fetch user profile", error);
+            // Optional: don't logout immediately on profile fetch fail, just log it
+        }
+    }, []);
 
     const logout = useCallback((showFeedback = true) => {
         removeToken();
         setIsAuthenticated(false);
         setRole(null);
+        setUser(null);
         if (showFeedback) {
             showToast('Logged out successfully', 'success');
         }
@@ -72,6 +86,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const userRole = getRoleFromToken(token);
         console.log("ROLE FROM TOKEN:", userRole);
         setRole(userRole);
+
+        // Fetch profile immediately
+        fetchUserProfile();
+
         showToast('Welcome back!', 'success');
     };
 
@@ -85,11 +103,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
     }, [logout, showToast]);
 
-    console.log("AUTH STATE →", { isAuthenticated, role });
+    // Fetch profile on mount if authenticated
+    useEffect(() => {
+        if (isAuthenticated && !user) {
+            fetchUserProfile();
+        }
+    }, [isAuthenticated, user, fetchUserProfile]);
+
+    console.log("AUTH STATE →", { isAuthenticated, role, user });
 
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, role, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, role, user, login, logout, refreshProfile: fetchUserProfile }}>
             {children}
         </AuthContext.Provider>
     );

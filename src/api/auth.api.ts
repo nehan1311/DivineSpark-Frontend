@@ -45,3 +45,19 @@ export const login = async (payload: LoginPayload) => {
 
     return { token };
 };
+
+/**
+ * Login with Google Authorization Code.
+ */
+export const googleLogin = async (code: string) => {
+    const response = await axiosInstance.post(`${AUTH_ENDPOINTS.GOOGLE_LOGIN}?code=${code}`);
+
+    // Accommodate different potential response structures
+    const token =
+        response.data.token ||
+        response.data.accessToken ||
+        response.data.jwt ||
+        response.data;
+
+    return { token };
+};
