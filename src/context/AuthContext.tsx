@@ -66,7 +66,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const login = (token: string) => {
         setToken(token);
-        console.log("TOKEN AFTER SAVE:", localStorage.getItem("jwt_token"));
+        console.log("TOKEN SAVED IN MEMORY");
 
         setIsAuthenticated(true);
         const userRole = getRoleFromToken(token);

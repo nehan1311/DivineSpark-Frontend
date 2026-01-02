@@ -1,23 +1,24 @@
-const TOKEN_KEY = 'jwt_token';
+let token: string | null = null;
 
 /**
- * Retrieves the JWT token from local storage.
+ * Retrieves the JWT token from memory.
  */
 export const getToken = (): string | null => {
-    return localStorage.getItem(TOKEN_KEY);
+    return token;
 };
 
 /**
- * Stores the JWT token in local storage.
- * @param token The JWT token to store
+ * Stores the JWT token in memory.
+ * @param newToken The JWT token to store
  */
-export const setToken = (token: string): void => {
-    localStorage.setItem(TOKEN_KEY, token);
+export const setToken = (newToken: string): void => {
+    token = newToken;
 };
 
 /**
- * Removes the JWT token from local storage.
+ * Removes the JWT token from memory.
  */
 export const removeToken = (): void => {
-    localStorage.removeItem(TOKEN_KEY);
+    token = null;
 };
+
