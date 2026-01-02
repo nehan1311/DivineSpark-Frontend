@@ -64,8 +64,17 @@ const Sessions: React.FC = () => {
     const fetchSessions = async () => {
         try {
             setLoading(true);
-            const data = await sessionApi.getSessions({ page: 0, size: 20 });
-            setSessions(data.sessions);
+            const data: any = await sessionApi.getSessions({ page: 0, size: 20 });
+
+            if (Array.isArray(data)) {
+                setSessions(data);
+            } else if (data?.sessions) {
+                setSessions(data.sessions);
+            } else if (data?.content) {
+                setSessions(data.content);
+            } else {
+                setSessions([]);
+            }
         } catch (error) {
             showToast('Failed to load upcoming sessions', 'error');
         } finally {

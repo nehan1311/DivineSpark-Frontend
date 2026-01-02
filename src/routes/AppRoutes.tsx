@@ -9,6 +9,7 @@ import Settings from '../pages/Settings';
 import SessionDetails from '../pages/SessionDetails';
 import AdminLogin from '../pages/admin/AdminLogin';
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import OAuthSuccess from '../pages/OAuthSuccess';
 
 import UserRoute from './UserRoute';
 import PublicRoute from './PublicRoute';
@@ -25,6 +26,7 @@ const AppRoutes: React.FC = () => {
                 <Route element={<PublicRoute />}>
                     <Route path="login" element={<Login />} />
                     <Route path="register" element={<Register />} />
+                    <Route path="oauth-success" element={<OAuthSuccess />} />
                     <Route path="admin/login" element={<AdminLogin />} />
                 </Route>
 

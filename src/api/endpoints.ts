@@ -5,6 +5,8 @@ export const AUTH_ENDPOINTS = {
     VERIFY_OTP: '/auth/verify-otp',
     REGISTER: '/auth/register',
     LOGIN: '/auth/login',
+    GOOGLE_LOGIN: '/auth/google',
+    GET_PROFILE: '/users/profile',
 };
 
 export const SESSION_ENDPOINTS = {
