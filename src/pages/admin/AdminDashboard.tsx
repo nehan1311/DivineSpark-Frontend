@@ -34,6 +34,19 @@ const StatCard: React.FC<{ label: string; value: string | number; icon: string }
     </div>
 );
 
+
+const filterSessions = (sessions: AdminSession[], filter: 'Upcoming' | 'Past') => {
+    if (!Array.isArray(sessions)) return [];
+
+    return sessions.filter(s => {
+        if (filter === 'Upcoming') {
+            return s.status === 'UPCOMING';
+        } else {
+            return s.status === 'CANCELLED' || s.status === 'COMPLETED';
+        }
+    });
+};
+
 const SessionsTable: React.FC<{
     sessions: AdminSession[];
     onAction: (action: string, item: any) => void;
@@ -41,12 +54,8 @@ const SessionsTable: React.FC<{
 }> = ({ sessions, onAction, isLoading }) => {
     const [filter, setFilter] = useState<'Upcoming' | 'Past'>('Upcoming');
 
-    // Simple filter logic
-    const filteredSessions = sessions.filter(s => {
-        const isPast = new Date(s.startTime).getTime() < Date.now();
-        if (filter === 'Upcoming') return !isPast;
-        return isPast;
-    });
+    // Use helper for clean, guard-protected logic
+    const filteredSessions = filterSessions(sessions, filter);
 
     if (isLoading) {
         return <div className={styles.loadingState}>Loading sessions...</div>;
@@ -79,33 +88,49 @@ const SessionsTable: React.FC<{
                             <th>Title</th>
                             <th>Type</th>
                             <th>Date & Time</th>
-                            <th>Seats</th>
+                            <th>Seats (Avail/Max)</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredSessions.map(session => (
-                            <tr key={session.id}>
-                                <td>{session.title}</td>
-                                <td>
-                                    <span className={`${styles.badge} ${session.type === 'FREE' ? styles.badgeSuccess : styles.badgeWarning}`}>
-                                        {session.type}
-                                    </span>
-                                </td>
-                                <td>{new Date(session.startTime).toLocaleString()}</td>
-                                <td>{session.currentParticipants}/{session.maxParticipants}</td>
-                                <td>
-                                    <span className={`${styles.badge} ${styles.badgeNeutral}`}>
-                                        {session.status || 'SCHEDULED'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button className={styles.actionBtn} onClick={() => onAction('view_session', session)}>View</button>
-                                    <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => onAction('cancel_session', session)}>Cancel</button>
-                                </td>
-                            </tr>
-                        ))}
+                        {filteredSessions.map(session => {
+                            const { availableSeats, maxSeats } = session;
+                            const isSeatsValid = typeof availableSeats === 'number' && typeof maxSeats === 'number';
+
+                            const isFinished = session.status === 'CANCELLED' || session.status === 'COMPLETED';
+
+                            return (
+                                <tr key={session.id}>
+                                    <td>{session.title}</td>
+                                    <td>
+                                        <span className={`${styles.badge} ${session.type === 'FREE' ? styles.badgeSuccess : styles.badgeWarning}`}>
+                                            {session.type}
+                                        </span>
+                                    </td>
+                                    <td>{new Date(session.startTime).toLocaleString()}</td>
+                                    <td>
+                                        {isSeatsValid ? `${availableSeats} / ${maxSeats}` : '—'}
+                                    </td>
+                                    <td>
+                                        <span className={`${styles.badge} ${styles.badgeNeutral}`}>
+                                            {session.status || 'SCHEDULED'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button className={styles.actionBtn} onClick={() => onAction('view_session', session)}>View</button>
+                                        {!isFinished && (
+                                            <button
+                                                className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                                                onClick={() => onAction('cancel_session', session)}
+                                            >
+                                                Cancel
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             ) : (
@@ -114,6 +139,7 @@ const SessionsTable: React.FC<{
         </div>
     );
 };
+
 
 const UsersTable: React.FC<{
     users: AdminUser[];
@@ -230,6 +256,12 @@ const AdminDashboard: React.FC = () => {
     const [sessions, setSessions] = useState<AdminSession[]>([]);
     const [users, setUsers] = useState<AdminUser[]>([]);
     const [revenue, setRevenue] = useState<RevenueStats | null>(null);
+    const [pagination, setPagination] = useState({
+        page: 0,
+        size: 10,
+        totalElements: 0,
+        totalPages: 0
+    });
     const [isLoading, setIsLoading] = useState(false);
 
     // Modals state
@@ -258,15 +290,27 @@ const AdminDashboard: React.FC = () => {
         setIsLoading(true);
         try {
             if (activeView === 'dashboard') {
-                const [statsData, sessionsData] = await Promise.all([
+                const [statsData, sessionsResponse] = await Promise.all([
                     getDashboardStats(),
                     getAdminSessions()
                 ]);
                 setStats(statsData);
-                setSessions(sessionsData);
+                setSessions(sessionsResponse.sessions || []);
+                setPagination({
+                    page: sessionsResponse.page,
+                    size: sessionsResponse.size,
+                    totalElements: sessionsResponse.totalElements,
+                    totalPages: sessionsResponse.totalPages
+                });
             } else if (activeView === 'sessions') {
-                const data = await getAdminSessions();
-                setSessions(data);
+                const response = await getAdminSessions();
+                setSessions(response.sessions || []);
+                setPagination({
+                    page: response.page,
+                    size: response.size,
+                    totalElements: response.totalElements,
+                    totalPages: response.totalPages
+                });
             } else if (activeView === 'users') {
                 const data = await getAdminUsers();
                 setUsers(data);

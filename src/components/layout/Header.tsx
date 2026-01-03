@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../ui/Button';
 import styles from './Header.module.css';
@@ -8,6 +8,7 @@ import { ConfirmationModal } from '../../components/ui/Modal';
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { isAuthenticated, logout } = useAuth();
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -37,7 +38,18 @@ const Header: React.FC = () => {
                 </div>
 
                 <nav className={styles.nav}>
-                    <Link to="/sessions" className={styles.navLink}>Book a Session</Link>
+                    <Link
+                        to="/"
+                        className={`${styles.navLink} ${location.pathname === '/' ? styles.active : ''}`}
+                    >
+                        Home
+                    </Link>
+                    <Link
+                        to="/sessions"
+                        className={`${styles.navLink} ${location.pathname === '/sessions' ? styles.active : ''}`}
+                    >
+                        Book a Session
+                    </Link>
                     <Link to="#" className={styles.navLink}>Donate</Link>
                     <Link to="#" className={styles.navLink}>About Us</Link>
                 </nav>

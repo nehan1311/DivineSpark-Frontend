@@ -89,8 +89,13 @@
     transition: width 0.3s ease;
 }
 
-.navLink:hover::after {
+.navLink:hover::after,
+.navLink.active::after {
     width: 100%;
+}
+
+.navLink.active {
+    color: var(--color-text-primary);
 }
 
 /* Actions */
