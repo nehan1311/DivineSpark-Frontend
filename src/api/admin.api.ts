@@ -4,7 +4,8 @@ import type {
     DashboardStats,
     AdminUser,
     RevenueStats,
-    AdminSession
+    AdminSession,
+    PaginatedSessionsResponse
 } from '../types/admin.types';
 
 // --- DASHBOARD STATS ---
@@ -39,8 +40,8 @@ export const unblockUser = async (userId: string): Promise<void> => {
 /**
  * List all sessions with optional filters
  */
-export const getAdminSessions = async (filters?: { page?: number; size?: number; type?: string; status?: string }): Promise<AdminSession[]> => {
-    const response = await axiosInstance.get<AdminSession[]>(ADMIN_ENDPOINTS.SESSIONS, { params: filters });
+export const getAdminSessions = async (filters?: { page?: number; size?: number; type?: string; status?: string }): Promise<PaginatedSessionsResponse> => {
+    const response = await axiosInstance.get<PaginatedSessionsResponse>(ADMIN_ENDPOINTS.SESSIONS, { params: filters });
     return response.data;
 };
 

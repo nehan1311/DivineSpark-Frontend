@@ -31,5 +31,14 @@ export interface Transaction {
 }
 
 export interface AdminSession extends Session {
-    // any extra admin specific fields if needed
+    availableSeats?: number;
+    maxSeats?: number;
+}
+
+export interface PaginatedSessionsResponse {
+    sessions: AdminSession[];
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
 }
