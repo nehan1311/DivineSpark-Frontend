@@ -111,7 +111,7 @@ const Register: React.FC = () => {
                 </Button>
             </form>
 
-            <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', margin: '0.05rem 0' }}>
                 <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.2)' }}></div>
                 <span style={{ padding: '0 10px', color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem' }}>OR</span>
                 <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.2)' }}></div>

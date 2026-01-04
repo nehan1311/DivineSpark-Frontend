@@ -5,12 +5,17 @@ import styles from './Admin.module.css';
 import Button from '../../components/ui/Button';
 import { useToast } from '../../context/ToastContext';
 import { ConfirmationModal } from '../../components/ui/Modal';
+import SessionModal from './SessionModal';
 import {
     getDashboardStats,
     getAdminSessions,
+    getPastSessions,
+    createSession,
+    updateSession,
+    cancelSession as cancelSessionApi, // Using alias to avoid conflict
+    deleteSession,
     getAdminUsers,
     getRevenueStats,
-    cancelSession,
     blockUser,
     unblockUser
 } from '../../api/admin.api';
@@ -34,28 +39,19 @@ const StatCard: React.FC<{ label: string; value: string | number; icon: string }
     </div>
 );
 
-
-const filterSessions = (sessions: AdminSession[], filter: 'Upcoming' | 'Past') => {
-    if (!Array.isArray(sessions)) return [];
-
-    return sessions.filter(s => {
-        if (filter === 'Upcoming') {
-            return s.status === 'UPCOMING';
-        } else {
-            return s.status === 'CANCELLED' || s.status === 'COMPLETED';
-        }
-    });
-};
-
 const SessionsTable: React.FC<{
     sessions: AdminSession[];
     onAction: (action: string, item: any) => void;
     isLoading: boolean;
-}> = ({ sessions, onAction, isLoading }) => {
-    const [filter, setFilter] = useState<'Upcoming' | 'Past'>('Upcoming');
+    activeTab: 'Upcoming' | 'Past';
+    onTabChange: (tab: 'Upcoming' | 'Past') => void;
+}> = ({ sessions, onAction, isLoading, activeTab, onTabChange }) => {
+    const [typeFilter, setTypeFilter] = useState<'ALL' | 'FREE' | 'PAID'>('ALL');
 
-    // Use helper for clean, guard-protected logic
-    const filteredSessions = filterSessions(sessions, filter);
+    const filteredSessions = sessions.filter(s => {
+        if (typeFilter === 'ALL') return true;
+        return s.type === typeFilter;
+    });
 
     if (isLoading) {
         return <div className={styles.loadingState}>Loading sessions...</div>;
@@ -65,19 +61,33 @@ const SessionsTable: React.FC<{
         <div className={styles.section}>
             <div className={styles.sectionHeader}>
                 <h3 className={styles.sectionTitle}>Sessions Overview</h3>
-                <div className={styles.tabs}>
-                    <button
-                        className={`${styles.tabBtn} ${filter === 'Upcoming' ? styles.activeTab : ''}`}
-                        onClick={() => setFilter('Upcoming')}
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    {/* Type Filter */}
+                    <select
+                        value={typeFilter}
+                        onChange={(e) => setTypeFilter(e.target.value as any)}
+                        className={styles.filterSelect}
                     >
-                        Upcoming
-                    </button>
-                    <button
-                        className={`${styles.tabBtn} ${filter === 'Past' ? styles.activeTab : ''}`}
-                        onClick={() => setFilter('Past')}
-                    >
-                        Past
-                    </button>
+                        <option value="ALL">All Types</option>
+                        <option value="FREE">Free</option>
+                        <option value="PAID">Paid</option>
+                    </select>
+
+                    {/* Tabs */}
+                    <div className={styles.tabs}>
+                        <button
+                            className={`${styles.tabBtn} ${activeTab === 'Upcoming' ? styles.activeTab : ''}`}
+                            onClick={() => onTabChange('Upcoming')}
+                        >
+                            Upcoming
+                        </button>
+                        <button
+                            className={`${styles.tabBtn} ${activeTab === 'Past' ? styles.activeTab : ''}`}
+                            onClick={() => onTabChange('Past')}
+                        >
+                            Past
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -97,8 +107,11 @@ const SessionsTable: React.FC<{
                         {filteredSessions.map(session => {
                             const { availableSeats, maxSeats } = session;
                             const isSeatsValid = typeof availableSeats === 'number' && typeof maxSeats === 'number';
+                            // "Finished" means we probably shouldn't edit/cancel lightly, but update is allowed.
+                            // The user said "Delete... delete/cancel session".
+                            // If status is cancelled, maybe hide cancel button.
 
-                            const isFinished = session.status === 'CANCELLED' || session.status === 'COMPLETED';
+                            const isCancelled = session.status === 'CANCELLED';
 
                             return (
                                 <tr key={session.id}>
@@ -118,8 +131,8 @@ const SessionsTable: React.FC<{
                                         </span>
                                     </td>
                                     <td>
-                                        <button className={styles.actionBtn} onClick={() => onAction('view_session', session)}>View</button>
-                                        {!isFinished && (
+                                        <button className={styles.actionBtn} onClick={() => onAction('edit_session', session)}>Edit</button>
+                                        {!isCancelled && (
                                             <button
                                                 className={`${styles.actionBtn} ${styles.deleteBtn}`}
                                                 onClick={() => onAction('cancel_session', session)}
@@ -127,6 +140,8 @@ const SessionsTable: React.FC<{
                                                 Cancel
                                             </button>
                                         )}
+                                        {/* Optional Delete button if API supports hard delete */}
+                                        {/* <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => onAction('delete_session', session)}>Delete</button> */}
                                     </td>
                                 </tr>
                             );
@@ -134,7 +149,7 @@ const SessionsTable: React.FC<{
                     </tbody>
                 </table>
             ) : (
-                <div className={styles.emptyState}>No {filter.toLowerCase()} sessions found.</div>
+                <div className={styles.emptyState}>No {activeTab.toLowerCase()} sessions found.</div>
             )}
         </div>
     );
@@ -243,6 +258,146 @@ const PaymentsTable: React.FC<{
     );
 };
 
+const DashboardWidgets: React.FC<{
+    sessions: AdminSession[];
+    navigate: (path: string) => void;
+    openCreateModal: () => void;
+}> = ({ sessions, navigate, openCreateModal }) => {
+    const now = new Date();
+    const next24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+    // 1. Today / Next 24h
+    const todaySessions = sessions
+        .filter(s => {
+            if (s.status !== 'UPCOMING') return false;
+            const start = new Date(s.startTime);
+            return start >= now && start <= next24h;
+        })
+        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+        .slice(0, 3);
+
+    // 2. Alerts
+    // Buckets for prioritization: Cancelled > Starting Soon > Low Seats
+    const cancelledAlerts: { id: string; type: 'urgent' | 'warning' | 'info'; message: string }[] = [];
+    const soonAlerts: { id: string; type: 'urgent' | 'warning' | 'info'; message: string }[] = [];
+    const seatsAlerts: { id: string; type: 'urgent' | 'warning' | 'info'; message: string }[] = [];
+
+    sessions.forEach(s => {
+        if (s.status === 'CANCELLED') {
+            cancelledAlerts.push({
+                id: `${s.id}-cancelled`,
+                type: 'urgent',
+                message: `Session "${s.title}" is CANCELLED.`
+            });
+        } else if (s.status === 'UPCOMING') {
+            const start = new Date(s.startTime);
+            // Starting soon: startTime <= now + 30 minutes
+            // We interpret this as "Starts within the next 30 mins" or "Overdue but still upcoming"
+            // Condition: start <= now + 30m. (And logically start could be > now, or filtered by API)
+            // If start is way in the past, it might be stale, but rule says <= now + 30m.
+            const timeDiffMins = (start.getTime() - now.getTime()) / (1000 * 60);
+
+            if (timeDiffMins <= 30) {
+                // For display nicety: if diff is negative, it started X mins ago. If positive, starts in X mins.
+                const timeMsg = timeDiffMins < 0
+                    ? `started ${Math.abs(Math.round(timeDiffMins))} mins ago`
+                    : `starts in ${Math.round(timeDiffMins)} mins`;
+
+                soonAlerts.push({
+                    id: `${s.id}-soon`,
+                    type: 'urgent',
+                    message: `Session "${s.title}" ${timeMsg}.`
+                });
+            }
+
+            // Low seats: availableSeats <= 5
+            if (typeof s.availableSeats === 'number' && s.availableSeats <= 5) {
+                seatsAlerts.push({
+                    id: `${s.id}-seats`,
+                    type: 'warning',
+                    message: `Low seats (${s.availableSeats}) for "${s.title}".`
+                });
+            }
+        }
+    });
+
+    const alerts = [...cancelledAlerts, ...soonAlerts, ...seatsAlerts];
+
+    return (
+        <>
+            {/* Quick Actions Bar */}
+            <div className={styles.quickActionsSection}>
+                <div className={styles.quickActionsTitle}>
+                    <span>🚀</span> Quick Actions
+                </div>
+                <div className={styles.quickActionsBar}>
+                    <button className={styles.actionCardBtn} onClick={openCreateModal}>
+                        <span>➕</span> Create Session
+                    </button>
+                    <button className={styles.actionCardBtn} onClick={() => navigate('/admin/sessions')}>
+                        <span>🧘</span> Manage Sessions
+                    </button>
+                    <button className={styles.actionCardBtn} onClick={() => navigate('/admin/users')}>
+                        <span>👥</span> View Users
+                    </button>
+                    <button className={styles.actionCardBtn} onClick={() => navigate('/admin/payments')}>
+                        <span>💳</span> View Payments
+                    </button>
+                </div>
+            </div>
+
+            <div className={styles.dashboardWidgetsGrid}>
+                {/* Today's Sessions */}
+                <div className={styles.widgetCard}>
+                    <div className={styles.widgetTitle}>
+                        <span>📅</span> Today / Next 24h
+                    </div>
+                    <div className={styles.widgetContent}>
+                        {todaySessions.length > 0 ? (
+                            todaySessions.map(s => (
+                                <div key={s.id} className={styles.sessionItem}>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ fontWeight: 500 }}>{s.title}</span>
+                                        <span style={{ fontSize: '0.8rem', color: '#666' }}>{s.guideName}</span>
+                                    </div>
+                                    <span className={styles.sessionTime}>
+                                        {new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                </div>
+                            ))
+                        ) : (
+                            <div style={{ color: '#666', fontSize: '0.9rem', textAlign: 'center', marginTop: '1rem' }}>
+                                No sessions in the next 24 hours.
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Alerts */}
+                <div className={styles.widgetCard}>
+                    <div className={styles.widgetTitle}>
+                        <span>⚠️</span> Session Alerts
+                    </div>
+                    <div className={styles.widgetContent} style={{ overflowY: 'auto', maxHeight: '200px' }}>
+                        {alerts.length > 0 ? (
+                            alerts.map(alert => (
+                                <div key={alert.id} className={`${styles.alertItem} ${alert.type === 'urgent' ? styles.urgent : ''}`}>
+                                    <span className={styles.alertIcon}>{alert.type === 'urgent' ? '🔴' : '🟠'}</span>
+                                    <div>{alert.message}</div>
+                                </div>
+                            ))
+                        ) : (
+                            <div style={{ color: '#666', fontSize: '0.9rem', textAlign: 'center', marginTop: '1rem' }}>
+                                No active alerts.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+};
+
 // --- MAIN PAGE ---
 
 const AdminDashboard: React.FC = () => {
@@ -262,10 +417,16 @@ const AdminDashboard: React.FC = () => {
         totalElements: 0,
         totalPages: 0
     });
+
+    // UI State
+    const [sessionTab, setSessionTab] = useState<'Upcoming' | 'Past'>('Upcoming');
     const [isLoading, setIsLoading] = useState(false);
 
     // Modals state
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+
+    const [sessionModalOpen, setSessionModalOpen] = useState(false);
+    const [editingSession, setEditingSession] = useState<AdminSession | null>(null);
 
     // Generic confirmation state
     const [confirmModal, setConfirmModal] = useState<{
@@ -292,19 +453,23 @@ const AdminDashboard: React.FC = () => {
             if (activeView === 'dashboard') {
                 const [statsData, sessionsResponse] = await Promise.all([
                     getDashboardStats(),
-                    getAdminSessions()
+                    getAdminSessions({ size: 100 })
                 ]);
                 setStats(statsData);
                 setSessions(sessionsResponse.sessions || []);
-                setPagination({
-                    page: sessionsResponse.page,
-                    size: sessionsResponse.size,
-                    totalElements: sessionsResponse.totalElements,
-                    totalPages: sessionsResponse.totalPages
-                });
             } else if (activeView === 'sessions') {
-                const response = await getAdminSessions();
-                setSessions(response.sessions || []);
+                // Fetch All Sessions and filter client-side to strictly enforce tab rules
+                // This ensures Cancelled/Completed appear ONLY in Past, and Upcoming ONLY in Upcoming.
+                const response = await getAdminSessions({ size: 100 }); // Fetching a larger batch to facilitate client filtering
+                const allSessions = response.sessions || [];
+
+                if (sessionTab === 'Upcoming') {
+                    setSessions(allSessions.filter(s => s.status === 'UPCOMING' || !s.status));
+                } else {
+                    // Past Tab: Completed or Cancelled
+                    setSessions(allSessions.filter(s => s.status === 'COMPLETED' || s.status === 'CANCELLED'));
+                }
+
                 setPagination({
                     page: response.page,
                     size: response.size,
@@ -321,14 +486,13 @@ const AdminDashboard: React.FC = () => {
         } catch (error) {
             console.error(error);
             showToast('Failed to fetch admin data', 'error');
-            // Ensure UI doesn't break by setting defaults where appropriate
             if (activeView === 'dashboard') {
                 setStats({ totalSessions: 0, upcomingSessions: 0, totalUsers: 0, totalBookings: 0 });
             }
         } finally {
             setIsLoading(false);
         }
-    }, [activeView, showToast]);
+    }, [activeView, sessionTab, showToast]);
 
     useEffect(() => {
         fetchData();
@@ -340,6 +504,25 @@ const AdminDashboard: React.FC = () => {
         setLogoutModalOpen(false);
     };
 
+    const handleSaveSession = async (sessionData: Partial<AdminSession>) => {
+        try {
+            if (editingSession) {
+                await updateSession(editingSession.id, sessionData);
+                showToast('Session updated successfully', 'success');
+            } else {
+                await createSession(sessionData);
+                showToast('Session created successfully', 'success');
+            }
+            fetchData();
+            setSessionModalOpen(false);
+            setEditingSession(null);
+        } catch (error: any) {
+            const msg = error.response?.data?.message || 'Failed to save session';
+            showToast(msg, 'error');
+            throw error;
+        }
+    };
+
     const handleAction = (action: string, item: any) => {
         if (action === 'cancel_session') {
             setConfirmModal({
@@ -349,15 +532,19 @@ const AdminDashboard: React.FC = () => {
                 variant: 'danger',
                 onConfirm: async () => {
                     try {
-                        await cancelSession(item.id);
+                        await cancelSessionApi(item.id);
                         showToast(`Session "${item.title}" cancelled.`, 'success');
-                        fetchData(); // Refresh data
+                        fetchData();
                         setConfirmModal(prev => ({ ...prev, isOpen: false }));
                     } catch (e) {
                         showToast('Failed to cancel session', 'error');
                     }
                 }
             });
+        }
+        else if (action === 'edit_session') {
+            setEditingSession(item);
+            setSessionModalOpen(true);
         }
         else if (action === 'toggle_block_user') {
             const isBlocking = item.status !== 'BLOCKED';
@@ -382,13 +569,11 @@ const AdminDashboard: React.FC = () => {
                 }
             });
         }
-        else if (action === 'view_session') {
-            // Placeholder: could open a modal or navigate to details
-            console.log('View session', item);
-        }
-        else {
-            console.log("Action:", action, item);
-        }
+    };
+
+    const openCreateModal = () => {
+        setEditingSession(null);
+        setSessionModalOpen(true);
     };
 
     const navItems = [
@@ -446,7 +631,9 @@ const AdminDashboard: React.FC = () => {
                         </p>
                     </div>
                     <div className={styles.headerActions}>
-                        {activeView === 'sessions' && <Button>+ Create Session</Button>}
+                        {activeView === 'sessions' && (
+                            <Button onClick={openCreateModal}>+ Create Session</Button>
+                        )}
                     </div>
                 </header>
 
@@ -464,12 +651,23 @@ const AdminDashboard: React.FC = () => {
                                 <div>Loading stats...</div>
                             )}
                         </div>
-                        <SessionsTable sessions={sessions} onAction={handleAction} isLoading={isLoading} />
+
+                        <DashboardWidgets
+                            sessions={sessions}
+                            navigate={navigate}
+                            openCreateModal={openCreateModal}
+                        />
                     </>
                 )}
 
                 {activeView === 'sessions' && (
-                    <SessionsTable sessions={sessions} onAction={handleAction} isLoading={isLoading} />
+                    <SessionsTable
+                        sessions={sessions}
+                        onAction={handleAction}
+                        isLoading={isLoading}
+                        activeTab={sessionTab}
+                        onTabChange={setSessionTab}
+                    />
                 )}
 
                 {activeView === 'users' && (
@@ -482,6 +680,13 @@ const AdminDashboard: React.FC = () => {
             </main>
 
             {/* Modals */}
+            <SessionModal
+                isOpen={sessionModalOpen}
+                onClose={() => setSessionModalOpen(false)}
+                onSave={handleSaveSession}
+                session={editingSession}
+            />
+
             <ConfirmationModal
                 isOpen={logoutModalOpen}
                 onClose={() => setLogoutModalOpen(false)}
