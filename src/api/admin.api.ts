@@ -48,8 +48,8 @@ export const getAdminSessions = async (filters?: { page?: number; size?: number;
 /**
  * List past sessions
  */
-export const getPastSessions = async (): Promise<AdminSession[]> => {
-    const response = await axiosInstance.get<AdminSession[]>(ADMIN_ENDPOINTS.PAST_SESSIONS);
+export const getPastSessions = async (page: number = 0, size: number = 20): Promise<PaginatedSessionsResponse> => {
+    const response = await axiosInstance.get<PaginatedSessionsResponse>(ADMIN_ENDPOINTS.PAST_SESSIONS, { params: { page, size } });
     return response.data;
 };
 
