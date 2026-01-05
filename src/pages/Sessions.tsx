@@ -108,27 +108,26 @@ const Sessions: React.FC = () => {
 
                 // 2. Open Payment Modal
                 razorpayService.initializePayment(
-                    orderData,
+                    {
+                        orderId: orderData.orderId,
+                        amount: orderData.amount,
+                        currency: orderData.currency
+                    },
                     session,
-                    async (response) => {
-                        // 3. Verify Payment
-                        try {
-                            await sessionApi.verifyPayment({
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_signature: response.razorpay_signature,
-                                sessionId: session.id
-                            });
-                            showToast(`Payment successful for "${session.title}"`, 'success');
-                            navigate(`/sessions/${session.id}`);
-                        } catch (err: any) {
-                            showToast('Payment verification failed', 'error');
-                        }
+                    () => {
+                        // ✅ UI-only success
+                        showToast(
+                            `Payment successful! You will receive session details shortly.`,
+                            'success'
+                        );
+
+                        navigate(`/sessions/${session.id}`);
                     },
                     (errorMsg) => {
                         showToast(errorMsg || 'Payment failed', 'error');
                     }
                 );
+
             }
         } catch (error: any) {
             console.error('List Action Failed:', error);

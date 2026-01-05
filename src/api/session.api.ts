@@ -42,14 +42,14 @@ export const sessionApi = {
     },
 
     // Pay for Paid Session - Returns Razorpay Order Details
-    payForSession: async (sessionId: string): Promise<{ id: string; amount: number; currency: string; key?: string }> => {
+    payForSession: async (sessionId: string): Promise<{ orderId: string; amount: number; currency: string; key?: string }> => {
         sessionApi._ensureAuth();
         const headers = sessionApi._authHeaders();
         const response = await axiosInstance.post(`${SESSION_ENDPOINTS.BASE}/${sessionId}/pay`, {}, { headers });
         console.log('Backend Pay Response:', response.data);
 
         return {
-            id: response.data.orderId,
+            orderId: response.data.orderId,
             amount: response.data.amount * 100,
             currency: response.data.currency
         };

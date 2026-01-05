@@ -50,52 +50,60 @@ const SessionDetails: React.FC = () => {
 
         try {
             setActionLoading(true);
+
             if (session.type === 'FREE') {
                 await sessionApi.joinSession(session.id);
                 showToast(`Successfully joined "${session.title}"`, 'success');
-            } else {
-                // Load Razorpay script first
-                const isLoaded = await razorpayService.loadRazorpay();
-                if (!isLoaded) {
-                    showToast('Razorpay SDK failed to load. Are you online?', 'error');
-                    return;
-                }
-
-                // 1. Create Order
-                const orderData = await sessionApi.payForSession(session.id);
-
-                // 2. Open Payment Modal
-                razorpayService.initializePayment(
-                    orderData,
-                    session,
-                    async (response) => {
-                        // 3. Verify Payment
-                        try {
-                            await sessionApi.verifyPayment({
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_signature: response.razorpay_signature,
-                                sessionId: session.id
-                            });
-                            showToast(`Payment successful for "${session.title}"`, 'success');
-                            navigate('/sessions'); // or refresh
-                        } catch (err: any) {
-                            showToast('Payment verification failed', 'error');
-                        }
-                    },
-                    (errorMsg) => {
-                        showToast(errorMsg || 'Payment failed', 'error');
-                    }
-                );
+                return;
             }
+
+            // ---- PAID SESSION FLOW ----
+
+            // Load Razorpay SDK
+            const isLoaded = await razorpayService.loadRazorpay();
+            if (!isLoaded) {
+                showToast('Razorpay SDK failed to load. Are you online?', 'error');
+                return;
+            }
+
+            //Create Razorpay order (backend)
+            const orderData = await sessionApi.payForSession(session.id);
+
+            //Open Razorpay checkout
+            razorpayService.initializePayment(
+                {
+                    orderId: orderData.orderId,
+                    amount: orderData.amount,
+                    currency: orderData.currency
+                },
+                session,
+                () => {
+
+                    showToast(
+                        'Payment successful! You will receive session details shortly.',
+                        'success'
+                    );
+
+                    // Webhook will confirm booking
+                    navigate('/sessions');
+                },
+                (errorMsg) => {
+                    showToast(errorMsg || 'Payment failed', 'error');
+                }
+            );
+
         } catch (error: any) {
             console.error('Payment Action Failed:', error);
-            const msg = error.response?.data?.message || error.message || 'Action failed. Please try again.';
+            const msg =
+                error.response?.data?.message ||
+                error.message ||
+                'Action failed. Please try again.';
             showToast(msg, 'error');
         } finally {
             setActionLoading(false);
         }
     };
+
 
     const getDuration = (start: string, end: string) => {
         const s = new Date(start).getTime();
@@ -121,7 +129,7 @@ const SessionDetails: React.FC = () => {
         <Section className={styles.container}>
             <div className={styles.header}>
                 <h1 className={styles.title}>{session.title}</h1>
-                <p className={styles.instructor}>with {session.instructorName}</p>
+                <p className={styles.instructor}>with {session.guideName}</p>
             </div>
 
             <div className={styles.meta}>

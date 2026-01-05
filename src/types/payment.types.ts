@@ -1,8 +1,6 @@
 export interface PaymentInitiateResponse {
-    razorpayKey: string;
+    bookingId: number;
     orderId: string;
     amount: number;
     currency: string;
-    sessionId: string;
-    bookingId: string;
 }

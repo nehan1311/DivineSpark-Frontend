@@ -32,3 +32,9 @@ export const ADMIN_ENDPOINTS = {
     SESSION_BOOKINGS: (id: string) => `/admin/sessions/${id}/bookings`, // GET
     PAST_SESSIONS: '/admin/sessions/past', // GET
 };
+export const PAYMENT_ENDPOINTS = {
+    INITIATE: (sessionId: number) =>
+        `/api/v1/sessions/${sessionId}/pay`,
+
+    CALLBACK: '/api/v1/payments/verify'
+};
