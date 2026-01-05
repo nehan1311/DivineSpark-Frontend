@@ -31,6 +31,9 @@ export const ADMIN_ENDPOINTS = {
     SESSION_USERS: (id: string) => `/admin/sessions/${id}/users`, // GET
     SESSION_BOOKINGS: (id: string) => `/admin/sessions/${id}/bookings`, // GET
     PAST_SESSIONS: '/admin/sessions/past', // GET
+
+    // Payment Management
+    PAYMENTS: '/admin/payments', // GET (list with pagination)
 };
 export const PAYMENT_ENDPOINTS = {
     INITIATE: (sessionId: number) =>

@@ -5,7 +5,10 @@ import type {
     AdminUser,
     RevenueStats,
     AdminSession,
-    PaginatedSessionsResponse
+    PaginatedSessionsResponse,
+    AdminSessionBookingResponse,
+    AdminPayment,
+    PaginatedPaymentsResponse
 } from '../types/admin.types';
 
 // --- DASHBOARD STATS ---
@@ -94,8 +97,8 @@ export const getSessionUsers = async (sessionId: string): Promise<AdminUser[]> =
 /**
  * Get bookings for a session
  */
-export const getSessionBookings = async (sessionId: string): Promise<any[]> => {
-    const response = await axiosInstance.get<any[]>(ADMIN_ENDPOINTS.SESSION_BOOKINGS(sessionId));
+export const getSessionBookings = async (sessionId: string): Promise<AdminSessionBookingResponse[]> => {
+    const response = await axiosInstance.get<AdminSessionBookingResponse[]>(ADMIN_ENDPOINTS.SESSION_BOOKINGS(sessionId));
     return response.data;
 };
 
@@ -118,4 +121,18 @@ export const uploadSessionResources = async (sessionId: string, formData: FormDa
 export const cancelSession = async (sessionId: string): Promise<void> => {
     // Mapping old cancel behavior to new status update endpoint
     await updateSessionStatus(sessionId, 'CANCELLED');
+};
+
+// --- PAYMENT MANAGEMENT ---
+
+/**
+ * Get all payments with optional pagination and status filter
+ */
+export const getAdminPayments = async (filters?: { 
+    page?: number; 
+    size?: number; 
+    status?: 'SUCCESS' | 'FAILED' | 'REFUNDED' 
+}): Promise<PaginatedPaymentsResponse> => {
+    const response = await axiosInstance.get<PaginatedPaymentsResponse>(ADMIN_ENDPOINTS.PAYMENTS, { params: filters });
+    return response.data;
 };
