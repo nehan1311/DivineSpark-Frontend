@@ -4,27 +4,25 @@ import { useAuth } from '../../context/AuthContext';
 import styles from './Admin.module.css';
 import Button from '../../components/ui/Button';
 import { useToast } from '../../context/ToastContext';
-import { ConfirmationModal } from '../../components/ui/Modal';
+import { ConfirmationModal, Modal } from '../../components/ui/Modal';
 import SessionModal from './SessionModal';
 import {
     getDashboardStats,
     getAdminSessions,
-    getPastSessions,
     createSession,
     updateSession,
     cancelSession as cancelSessionApi, // Using alias to avoid conflict
-    deleteSession,
-    getAdminUsers,
-    getRevenueStats,
     blockUser,
-    unblockUser
+    unblockUser,
+    getSessionBookings,
+    getAdminPayments
 } from '../../api/admin.api';
 import type {
     DashboardStats,
-    AdminUser,
-    RevenueStats,
     AdminSession,
-    Transaction
+    SessionUser,
+    AdminSessionBookingResponse,
+    AdminPayment
 } from '../../types/admin.types';
 
 // --- COMPONENTS ---
@@ -156,105 +154,478 @@ const SessionsTable: React.FC<{
 };
 
 
-const UsersTable: React.FC<{
-    users: AdminUser[];
-    onAction: (action: string, item: any) => void;
-    isLoading: boolean;
-}> = ({ users, onAction, isLoading }) => {
+const SessionParticipants: React.FC = () => {
+    const { showToast } = useToast();
+    const [sessions, setSessions] = useState<AdminSession[]>([]);
+    const [selectedSessionId, setSelectedSessionId] = useState<string>('');
+    const [sessionUsers, setSessionUsers] = useState<SessionUser[]>([]);
+    const [isLoadingSessions, setIsLoadingSessions] = useState(false);
+    const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    if (isLoading) {
-        return <div className={styles.loadingState}>Loading users...</div>;
-    }
+    // Fetch sessions on mount
+    useEffect(() => {
+        fetchSessions();
+    }, []);
+
+    // Fetch users when session is selected
+    useEffect(() => {
+        if (selectedSessionId) {
+            fetchSessionUsers(selectedSessionId);
+        } else {
+            setSessionUsers([]);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedSessionId]);
+
+    const fetchSessions = async () => {
+        setIsLoadingSessions(true);
+        setError(null);
+        try {
+            const response = await getAdminSessions({ page: 0, size: 100 });
+            setSessions(response.sessions || []);
+        } catch (err: any) {
+            const msg = err.response?.data?.message || 'Failed to load sessions';
+            setError(msg);
+            showToast(msg, 'error');
+        } finally {
+            setIsLoadingSessions(false);
+        }
+    };
+
+    const fetchSessionUsers = async (sessionId: string) => {
+        setIsLoadingUsers(true);
+        setError(null);
+        try {
+            const bookingsData = await getSessionBookings(sessionId);
+
+            // Map users with booking information
+            const usersWithBookings: SessionUser[] = bookingsData.map((booking: AdminSessionBookingResponse) => {
+                const selectedSession = sessions.find(s => s.id === sessionId);
+
+                return {
+                    id: booking.id,
+                    name: booking.username,
+                    email: booking.email,
+                    bookingType: booking.bookingType || (selectedSession?.type === 'FREE' ? 'FREE' : 'PAID'),
+                    bookingStatus: booking.bookingStatus,
+                    joinedDate: booking.bookedAt
+                };
+            });
+
+            setSessionUsers(usersWithBookings);
+        } catch (err: any) {
+            const msg = err.response?.data?.message || 'Failed to load session participants';
+            setError(msg);
+            showToast(msg, 'error');
+            setSessionUsers([]);
+        } finally {
+            setIsLoadingUsers(false);
+        }
+    };
+
+    const formatDateTime = (dateString: string) => {
+        return new Date(dateString).toLocaleString(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
     return (
         <div className={styles.section}>
             <div className={styles.sectionHeader}>
-                <h3 className={styles.sectionTitle}>User Management</h3>
+                <h3 className={styles.sectionTitle}>Session Participants</h3>
             </div>
-            {users.length > 0 ? (
-                <table className={styles.table}>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map(user => (
-                            <tr key={user.id}>
-                                <td>{user.name}</td>
-                                <td>{user.email}</td>
-                                <td>{user.role}</td>
-                                <td>
-                                    <span className={`${styles.badge} ${user.status === 'ACTIVE' ? styles.badgeSuccess : styles.badgeError}`}>
-                                        {user.status}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button className={styles.actionBtn} onClick={() => onAction('view_user', user)}>View</button>
-                                    <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => onAction('toggle_block_user', user)}>
-                                        {user.status === 'BLOCKED' ? 'Unblock' : 'Block'}
-                                    </button>
-                                </td>
+
+            {/* Session Selector */}
+            {/* Session Card Selector */}
+            <h4 style={{ marginBottom: '1rem', color: 'var(--color-text-body)' }}>Select Session</h4>
+            <div className={styles.sessionListContainer}>
+                {sessions.map(session => (
+                    <div
+                        key={session.id}
+                        className={`${styles.sessionCard} ${selectedSessionId === session.id ? styles.sessionCardActive : ''}`}
+                        onClick={() => setSelectedSessionId(session.id)}
+                    >
+                        <div className={styles.cardHeader}>
+                            <div className={styles.cardTitle} title={session.title}>{session.title}</div>
+                            <span className={`${styles.badge} ${session.type === 'FREE' ? styles.badgeSuccess : styles.badgeWarning}`}>
+                                {session.type}
+                            </span>
+                        </div>
+                        <div className={styles.cardDateTime}>
+                            <span>📅</span> {formatDateTime(session.startTime)}
+                        </div>
+                    </div>
+                ))}
+
+                {sessions.length === 0 && !isLoadingSessions && (
+                    <div className={styles.emptyState} style={{ minWidth: '300px' }}>No sessions available.</div>
+                )}
+            </div>
+
+            {/* Error State */}
+            {error && !isLoadingUsers && (
+                <div className={styles.emptyState} style={{ color: '#dc3545' }}>
+                    <p>Error: {error}</p>
+                    <button
+                        onClick={() => selectedSessionId ? fetchSessionUsers(selectedSessionId) : fetchSessions()}
+                        className={styles.actionBtn}
+                        style={{ marginTop: '1rem' }}
+                    >
+                        Retry
+                    </button>
+                </div>
+            )}
+
+            {/* Loading State */}
+            {isLoadingUsers && (
+                <div className={styles.loadingState}>Loading participants...</div>
+            )}
+
+            {/* Users Table */}
+            {!isLoadingUsers && !error && selectedSessionId && (
+                sessionUsers.length > 0 ? (
+                    <table className={styles.table}>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Booking Type</th>
+                                <th>Booking Status</th>
+                                <th>Joined Date</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            ) : (
-                <div className={styles.emptyState}>No users found.</div>
+                        </thead>
+                        <tbody>
+                            {sessionUsers.map(user => (
+                                <tr key={user.id}>
+                                    <td>{user.name}</td>
+                                    <td>{user.email}</td>
+                                    <td>
+                                        <span className={`${styles.badge} ${user.bookingType === 'FREE' ? styles.badgeSuccess : styles.badgeWarning}`}>
+                                            {user.bookingType}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span className={`${styles.badge} ${user.bookingStatus === 'CONFIRMED' ? styles.badgeSuccess :
+                                            user.bookingStatus === 'CANCELLED' ? styles.badgeError :
+                                                styles.badgeWarning
+                                            }`}>
+                                            {user.bookingStatus}
+                                        </span>
+                                    </td>
+                                    <td>{formatDateTime(user.joinedDate)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <div className={styles.emptyState}>
+                        No users enrolled for this session.
+                    </div>
+                )
+            )}
+
+            {/* No Session Selected */}
+            {!selectedSessionId && !isLoadingUsers && !error && (
+                <div className={styles.emptyState}>
+                    Please select a session to view participants.
+                </div>
             )}
         </div>
     );
 };
 
-const PaymentsTable: React.FC<{
-    transactions: Transaction[];
-    isLoading: boolean;
-}> = ({ transactions, isLoading }) => {
+const PaymentsTable: React.FC = () => {
+    const { showToast } = useToast();
+    const [payments, setPayments] = useState<AdminPayment[]>([]);
+    const [isLoading, setIsLoading] = useState(true); // Start with loading true
+    const [error, setError] = useState<string | null>(null);
+    const [statusFilter, setStatusFilter] = useState<'ALL' | 'SUCCESS' | 'FAILED' | 'REFUNDED'>('ALL');
+    const [selectedPayment, setSelectedPayment] = useState<AdminPayment | null>(null);
+    const [pagination, setPagination] = useState({
+        page: 0,
+        size: 20,
+        totalElements: 0,
+        totalPages: 0
+    });
 
-    if (isLoading) {
-        return <div className={styles.loadingState}>Loading transactions...</div>;
-    }
+    const fetchPayments = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await getAdminPayments({
+                page: pagination.page,
+                size: pagination.size,
+                status: statusFilter !== 'ALL' ? statusFilter : undefined
+            });
+
+            // Handle different possible response structures
+            const paymentsList = Array.isArray(response)
+                ? response
+                : (response.payments || []);
+
+            setPayments(paymentsList);
+
+            // Handle pagination if available
+            if (response && typeof response === 'object' && !Array.isArray(response)) {
+                setPagination(prev => ({
+                    ...prev,
+                    totalElements: response.totalElements || paymentsList.length,
+                    totalPages: response.totalPages || Math.ceil((response.totalElements || paymentsList.length) / pagination.size)
+                }));
+            } else {
+                setPagination(prev => ({
+                    ...prev,
+                    totalElements: paymentsList.length,
+                    totalPages: 1
+                }));
+            }
+        } catch (err: any) {
+            console.error('Error fetching payments:', err);
+            const msg = err.response?.data?.message || err.message || 'Failed to load payments';
+            setError(msg);
+            showToast(msg, 'error');
+            setPayments([]);
+            setPagination(prev => ({
+                ...prev,
+                totalElements: 0,
+                totalPages: 0
+            }));
+        } finally {
+            setIsLoading(false);
+        }
+    }, [statusFilter, pagination.page, pagination.size, showToast]);
+
+    useEffect(() => {
+        fetchPayments();
+    }, [fetchPayments]);
+
+    const formatDateTime = (dateString?: string) => {
+        if (!dateString) return '—';
+        return new Date(dateString + 'Z').toLocaleString(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    const formatCurrency = (amount: number, currency: string = 'INR') => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: currency,
+        }).format(amount);
+    };
+
+    const handleRowClick = (payment: AdminPayment) => {
+        setSelectedPayment(payment);
+    };
+
+    const handlePageChange = (newPage: number) => {
+        setPagination(prev => ({ ...prev, page: newPage }));
+    };
 
     return (
-        <div className={styles.section}>
-            <div className={styles.sectionHeader}>
-                <h3 className={styles.sectionTitle}>Recent Transactions</h3>
+        <>
+            <div className={styles.section}>
+                <div className={styles.sectionHeader}>
+                    <h3 className={styles.sectionTitle}>Payments</h3>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        {/* Status Filter */}
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => {
+                                setStatusFilter(e.target.value as any);
+                                setPagination(prev => ({ ...prev, page: 0 }));
+                            }}
+                            className={styles.filterSelect}
+                        >
+                            <option value="ALL">All</option>
+                            <option value="SUCCESS">Success</option>
+                            <option value="FAILED">Failed</option>
+                            <option value="REFUNDED">Refunded</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Error State */}
+                {error && !isLoading && (
+                    <div className={styles.emptyState} style={{ color: '#dc3545' }}>
+                        <p>Error: {error}</p>
+                        <button
+                            onClick={fetchPayments}
+                            className={styles.actionBtn}
+                            style={{ marginTop: '1rem' }}
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
+
+                {/* Loading State */}
+                {isLoading && (
+                    <div className={styles.loadingState}>Loading payments...</div>
+                )}
+
+                {/* Payments Table */}
+                {!isLoading && !error && (
+                    payments.length > 0 ? (
+                        <>
+                            <table className={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th>Payment ID / Order ID</th>
+                                        <th>User Email</th>
+                                        <th>Session Title</th>
+                                        <th>Amount</th>
+                                        <th>Payment Status</th>
+                                        <th>Paid On</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {payments.filter(p => statusFilter === 'ALL' || p.status === statusFilter).map(payment => (
+                                        <tr
+                                            key={payment.id || payment.paymentId}
+                                            onClick={() => handleRowClick(payment)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            <td style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                                                {payment.orderId || payment.paymentId || payment.id}
+                                            </td>
+                                            <td>{payment.userEmail}</td>
+                                            <td>{payment.sessionTitle}</td>
+                                            <td>{formatCurrency(payment.amount, payment.currency)}</td>
+                                            <td>
+                                                <span className={`${styles.badge} ${payment.status === 'SUCCESS' ? styles.badgeSuccess :
+                                                    payment.status === 'FAILED' ? styles.badgeError :
+                                                        styles.badgeWarning
+                                                    }`}>
+                                                    {payment.status}
+                                                </span>
+                                            </td>
+                                            <td>{formatDateTime(payment.createdAt)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+
+                            {/* Pagination */}
+                            {pagination.totalPages > 1 && (
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginTop: '1.5rem',
+                                    paddingTop: '1.5rem',
+                                    borderTop: '1px solid var(--color-border)'
+                                }}>
+                                    <div style={{ color: 'var(--color-text-body)', fontSize: '0.9rem' }}>
+                                        Showing {pagination.page * pagination.size + 1} to {Math.min((pagination.page + 1) * pagination.size, pagination.totalElements)} of {pagination.totalElements} payments
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <button
+                                            className={styles.actionBtn}
+                                            onClick={() => handlePageChange(pagination.page - 1)}
+                                            disabled={pagination.page === 0}
+                                        >
+                                            Previous
+                                        </button>
+                                        <button
+                                            className={styles.actionBtn}
+                                            onClick={() => handlePageChange(pagination.page + 1)}
+                                            disabled={pagination.page >= pagination.totalPages - 1}
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className={styles.emptyState}>No payments found.</div>
+                    )
+                )}
             </div>
-            {transactions && transactions.length > 0 ? (
-                <table className={styles.table}>
-                    <thead>
-                        <tr>
-                            <th>Transaction ID</th>
-                            <th>User</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {transactions.map(txn => (
-                            <tr key={txn.id}>
-                                <td style={{ fontFamily: 'monospace' }}>{txn.id}</td>
-                                <td>{txn.userEmail}</td>
-                                <td>${txn.amount.toFixed(2)}</td>
-                                <td>{new Date(txn.date).toLocaleDateString()}</td>
-                                <td>
-                                    <span className={`${styles.badge} ${txn.status === 'PAID' ? styles.badgeSuccess : styles.badgeWarning}`}>
-                                        {txn.status}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            ) : (
-                <div className={styles.emptyState}>No transactions found.</div>
+
+            {/* Payment Details Modal */}
+            {selectedPayment && (
+                <Modal
+                    isOpen={!!selectedPayment}
+                    onClose={() => setSelectedPayment(null)}
+                    title="Payment Details"
+                >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div>
+                            <strong>Payment ID:</strong>
+                            <div style={{ fontFamily: 'monospace', marginTop: '0.25rem' }}>{selectedPayment.id}</div>
+                        </div>
+                        {selectedPayment.orderId && (
+                            <div>
+                                <strong>Order ID:</strong>
+                                <div style={{ fontFamily: 'monospace', marginTop: '0.25rem' }}>{selectedPayment.orderId}</div>
+                            </div>
+                        )}
+                        {selectedPayment.paymentId && (
+                            <div>
+                                <strong>Payment ID:</strong>
+                                <div style={{ fontFamily: 'monospace', marginTop: '0.25rem' }}>{selectedPayment.paymentId}</div>
+                            </div>
+                        )}
+                        <div>
+                            <strong>User Email:</strong>
+                            <div style={{ marginTop: '0.25rem' }}>{selectedPayment.userEmail}</div>
+                        </div>
+                        <div>
+                            <strong>Session:</strong>
+                            <div style={{ marginTop: '0.25rem' }}>{selectedPayment.sessionTitle}</div>
+                        </div>
+                        <div>
+                            <strong>Amount:</strong>
+                            <div style={{ marginTop: '0.25rem' }}>{formatCurrency(selectedPayment.amount, selectedPayment.currency)}</div>
+                        </div>
+                        <div>
+                            <strong>Status:</strong>
+                            <div style={{ marginTop: '0.25rem' }}>
+                                <span className={`${styles.badge} ${selectedPayment.status === 'SUCCESS' ? styles.badgeSuccess :
+                                    selectedPayment.status === 'FAILED' ? styles.badgeError :
+                                        styles.badgeWarning
+                                    }`}>
+                                    {selectedPayment.status}
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <strong>Paid On:</strong>
+                            <div style={{ marginTop: '0.25rem' }}>{formatDateTime(selectedPayment.createdAt)}</div>
+                        </div>
+                        {selectedPayment.razorpayOrderId && (
+                            <div>
+                                <strong>Razorpay Order ID:</strong>
+                                <div style={{ fontFamily: 'monospace', marginTop: '0.25rem' }}>{selectedPayment.razorpayOrderId}</div>
+                            </div>
+                        )}
+                        {selectedPayment.razorpayPaymentId && (
+                            <div>
+                                <strong>Razorpay Payment ID:</strong>
+                                <div style={{ fontFamily: 'monospace', marginTop: '0.25rem' }}>{selectedPayment.razorpayPaymentId}</div>
+                            </div>
+                        )}
+
+                        {selectedPayment.updatedAt && (
+                            <div>
+                                <strong>Updated At:</strong>
+                                <div style={{ marginTop: '0.25rem' }}>{formatDateTime(selectedPayment.updatedAt)}</div>
+                            </div>
+                        )}
+                    </div>
+                </Modal>
             )}
-        </div>
+        </>
     );
 };
 
@@ -409,14 +780,6 @@ const AdminDashboard: React.FC = () => {
     // Data State
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [sessions, setSessions] = useState<AdminSession[]>([]);
-    const [users, setUsers] = useState<AdminUser[]>([]);
-    const [revenue, setRevenue] = useState<RevenueStats | null>(null);
-    const [pagination, setPagination] = useState({
-        page: 0,
-        size: 10,
-        totalElements: 0,
-        totalPages: 0
-    });
 
     // UI State
     const [sessionTab, setSessionTab] = useState<'Upcoming' | 'Past'>('Upcoming');
@@ -470,18 +833,12 @@ const AdminDashboard: React.FC = () => {
                     setSessions(allSessions.filter(s => s.status === 'COMPLETED' || s.status === 'CANCELLED'));
                 }
 
-                setPagination({
-                    page: response.page,
-                    size: response.size,
-                    totalElements: response.totalElements,
-                    totalPages: response.totalPages
-                });
             } else if (activeView === 'users') {
-                const data = await getAdminUsers();
-                setUsers(data);
+                // Session participants are now fetched by the SessionParticipants component
+                // No need to fetch here
             } else if (activeView === 'payments') {
-                const data = await getRevenueStats();
-                setRevenue(data);
+                // Payments are now fetched by the PaymentsTable component
+                // No need to fetch here
             }
         } catch (error) {
             console.error(error);
@@ -620,13 +977,13 @@ const AdminDashboard: React.FC = () => {
                         <h1>
                             {activeView === 'dashboard' && 'Dashboard Overview'}
                             {activeView === 'sessions' && 'Manage Sessions'}
-                            {activeView === 'users' && 'User Directory'}
+                            {activeView === 'users' && 'Session Participants'}
                             {activeView === 'payments' && 'Financial Overview'}
                         </h1>
                         <p className={styles.headerSubtitle}>
                             {activeView === 'dashboard' && 'Welcome back to your command center.'}
                             {activeView === 'sessions' && 'Create, edit, and oversee all healing sessions.'}
-                            {activeView === 'users' && 'View and manage registered members.'}
+                            {activeView === 'users' && 'View participants enrolled in each session.'}
                             {activeView === 'payments' && 'Track revenue and transaction history.'}
                         </p>
                     </div>
@@ -671,11 +1028,11 @@ const AdminDashboard: React.FC = () => {
                 )}
 
                 {activeView === 'users' && (
-                    <UsersTable users={users} onAction={handleAction} isLoading={isLoading} />
+                    <SessionParticipants />
                 )}
 
                 {activeView === 'payments' && (
-                    <PaymentsTable transactions={revenue?.recentTransactions || []} isLoading={isLoading} />
+                    <PaymentsTable />
                 )}
             </main>
 
