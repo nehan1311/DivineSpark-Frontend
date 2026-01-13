@@ -1,5 +1,5 @@
 import axiosInstance from './axios';
-import { ADMIN_ENDPOINTS } from './endpoints';
+import { ADMIN_ENDPOINTS, ADMIN_DONATION_ENDPOINTS } from './endpoints';
 import type {
     DashboardStats,
     AdminUser,
@@ -8,8 +8,11 @@ import type {
     PaginatedSessionsResponse,
     AdminSessionBookingResponse,
     AdminPayment,
-    PaginatedPaymentsResponse
+    PaginatedPaymentsResponse,
+    AdminDonation,
+    DonationStats
 } from '../types/admin.types';
+
 
 // --- DASHBOARD STATS ---
 
@@ -128,11 +131,24 @@ export const cancelSession = async (sessionId: string): Promise<void> => {
 /**
  * Get all payments with optional pagination and status filter
  */
-export const getAdminPayments = async (filters?: { 
-    page?: number; 
-    size?: number; 
-    status?: 'SUCCESS' | 'FAILED' | 'REFUNDED' 
+export const getAdminPayments = async (filters?: {
+    page?: number;
+    size?: number;
+    status?: 'SUCCESS' | 'FAILED' | 'REFUNDED'
 }): Promise<PaginatedPaymentsResponse> => {
     const response = await axiosInstance.get<PaginatedPaymentsResponse>(ADMIN_ENDPOINTS.PAYMENTS, { params: filters });
     return response.data;
 };
+
+// --- DONATION MANAGEMENT ---
+
+export const getAdminDonations = async (): Promise<AdminDonation[]> => {
+    const response = await axiosInstance.get<AdminDonation[]>(ADMIN_DONATION_ENDPOINTS.LIST);
+    return response.data;
+};
+
+export const getDonationStats = async (): Promise<DonationStats> => {
+    const response = await axiosInstance.get<DonationStats>(ADMIN_DONATION_ENDPOINTS.STATS);
+    return response.data;
+};
+

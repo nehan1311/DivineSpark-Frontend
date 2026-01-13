@@ -5,6 +5,7 @@ import Button from '../ui/Button';
 import styles from './Header.module.css';
 import logoImg from '../../assets/divinespark logo.jpeg';
 import { ConfirmationModal } from '../../components/ui/Modal';
+import DonateModal from '../payment/DonateModal';
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
@@ -13,6 +14,8 @@ const Header: React.FC = () => {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+    const [donateModalOpen, setDonateModalOpen] = useState(false);
+
 
     const handleLogout = () => {
         logout();
@@ -44,18 +47,32 @@ const Header: React.FC = () => {
                     >
                         Home
                     </Link>
+
                     <Link
                         to="/sessions"
                         className={`${styles.navLink} ${location.pathname === '/sessions' ? styles.active : ''}`}
                     >
                         Book a Session
                     </Link>
-                    <Link to="#" className={styles.navLink}>Donate</Link>
+                    <button
+                        className={styles.navLink}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}
+                        onClick={() => {
+                            if (!isAuthenticated) {
+                                navigate('/login');
+                            } else {
+                                setDonateModalOpen(true);
+                            }
+                        }}
+                    >
+                        Donate
+                    </button>
                     <Link to="#" className={styles.navLink}>About Us</Link>
                 </nav>
 
                 <div className={styles.actions}>
                     {isAuthenticated ? (
+
                         <div className={styles.userMenu}>
                             <button
                                 className={styles.userMenuTrigger}
@@ -108,8 +125,15 @@ const Header: React.FC = () => {
                 </div>
             </div>
 
+            {/* Donate Modal */}
+            <DonateModal
+                isOpen={donateModalOpen}
+                onClose={() => setDonateModalOpen(false)}
+            />
+
             <ConfirmationModal
                 isOpen={logoutModalOpen}
+
                 onClose={() => setLogoutModalOpen(false)}
                 onConfirm={() => {
                     handleLogout();

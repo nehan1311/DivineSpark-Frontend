@@ -39,5 +39,16 @@ export const PAYMENT_ENDPOINTS = {
     INITIATE: (sessionId: number) =>
         `/api/v1/sessions/${sessionId}/pay`,
 
+
     CALLBACK: '/api/v1/payments/verify'
 };
+
+export const DONATION_ENDPOINTS = {
+    INITIATE: '/donations', // POST { amount, note }
+};
+
+export const ADMIN_DONATION_ENDPOINTS = {
+    LIST: '/admin/donations', // GET
+    STATS: '/admin/donations/stats', // GET
+};
+

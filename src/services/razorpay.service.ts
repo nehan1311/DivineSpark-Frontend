@@ -29,17 +29,21 @@ export const razorpayService = {
             amount: number;
             currency: string;
         },
-        session: Session,
+        details: Session | string,
         onSuccess: (response: any) => void,
         onError: (error: any) => void
     ) => {
+        const description = typeof details === 'string'
+            ? details
+            : `Payment for ${details.title}`;
+
         const options = {
             key: import.meta.env.VITE_RAZORPAY_KEY_ID,
             amount: order.amount,
             currency: order.currency,
             order_id: order.orderId,
             name: 'DivineSpark',
-            description: `Payment for ${session.title}`,
+            description: description,
             handler: onSuccess,
             modal: {
                 ondismiss: () => onError('Payment cancelled')
@@ -49,5 +53,6 @@ export const razorpayService = {
         const rzp = new window.Razorpay(options);
         rzp.open();
     }
+
 
 };
