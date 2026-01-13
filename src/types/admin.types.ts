@@ -89,3 +89,22 @@ export interface PaginatedPaymentsResponse {
     totalPages: number;
 }
 
+
+export interface AdminDonation {
+    id: string;
+    orderId: string;
+    paymentId?: string;
+    userId: string;
+    userName: string;
+    userEmail: string;
+    amount: number;
+    currency: string;
+    status: 'SUCCESS' | 'PENDING' | 'FAILED';
+    note?: string;
+    createdAt: string;
+}
+
+export interface DonationStats {
+    totalAmount: number;
+    count: number;
+}

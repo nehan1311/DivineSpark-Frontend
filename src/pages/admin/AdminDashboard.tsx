@@ -6,8 +6,10 @@ import Button from '../../components/ui/Button';
 import { useToast } from '../../context/ToastContext';
 import { ConfirmationModal, Modal } from '../../components/ui/Modal';
 import SessionModal from './SessionModal';
+import DonationsTable from './DonationsTable';
 import {
     getDashboardStats,
+
     getAdminSessions,
     createSession,
     updateSession,
@@ -808,7 +810,8 @@ const AdminDashboard: React.FC = () => {
 
     // Determine active view based on path
     const path = location.pathname.split('/').pop() || 'dashboard';
-    const activeView = ['dashboard', 'sessions', 'users', 'payments'].includes(path) ? path : 'dashboard';
+    const activeView = ['dashboard', 'sessions', 'users', 'payments', 'donations'].includes(path) ? path : 'dashboard';
+
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
@@ -839,8 +842,11 @@ const AdminDashboard: React.FC = () => {
             } else if (activeView === 'payments') {
                 // Payments are now fetched by the PaymentsTable component
                 // No need to fetch here
+            } else if (activeView === 'donations') {
+                // Donations are fetched by DonationsTable
             }
         } catch (error) {
+
             console.error(error);
             showToast('Failed to fetch admin data', 'error');
             if (activeView === 'dashboard') {
@@ -938,7 +944,9 @@ const AdminDashboard: React.FC = () => {
         { label: 'Sessions', path: '/admin/sessions', icon: '🧘' },
         { label: 'Users', path: '/admin/users', icon: '👥' },
         { label: 'Payments', path: '/admin/payments', icon: '💳' },
+        { label: 'Donations', path: '/admin/donations', icon: '❤️' },
     ];
+
 
     return (
         <div className={styles.container}>
@@ -979,13 +987,17 @@ const AdminDashboard: React.FC = () => {
                             {activeView === 'sessions' && 'Manage Sessions'}
                             {activeView === 'users' && 'Session Participants'}
                             {activeView === 'payments' && 'Financial Overview'}
+                            {activeView === 'donations' && 'Donations Overview'}
                         </h1>
+
                         <p className={styles.headerSubtitle}>
                             {activeView === 'dashboard' && 'Welcome back to your command center.'}
                             {activeView === 'sessions' && 'Create, edit, and oversee all healing sessions.'}
                             {activeView === 'users' && 'View participants enrolled in each session.'}
                             {activeView === 'payments' && 'Track revenue and transaction history.'}
+                            {activeView === 'donations' && 'Track all donations and donor details.'}
                         </p>
+
                     </div>
                     <div className={styles.headerActions}>
                         {activeView === 'sessions' && (
@@ -1034,7 +1046,12 @@ const AdminDashboard: React.FC = () => {
                 {activeView === 'payments' && (
                     <PaymentsTable />
                 )}
+
+                {activeView === 'donations' && (
+                    <DonationsTable />
+                )}
             </main>
+
 
             {/* Modals */}
             <SessionModal
