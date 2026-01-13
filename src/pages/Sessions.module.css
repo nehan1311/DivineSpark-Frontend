@@ -1,7 +1,18 @@
+/* Page Wrapper allowing vertical scroll */
+.pageWrapper {
+    width: 100%;
+    overflow-x: hidden;
+    background-color: var(--color-bg-main);
+}
+
 /* Full-screen horizontal scroll container */
-.container {
-    width: 100vw;
-    height: 100vh;
+.horizontalSection {
+    width: calc(100vw - 3rem);
+    height: 75vh;
+    /* Rectangular aspect ratio */
+    margin: 1rem auto 0;
+    /* Centered with top spacing */
+    border-radius: var(--radius-lg);
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
@@ -12,18 +23,22 @@
     /* Firefox */
     position: relative;
     background: #000;
+    box-shadow: var(--shadow-xl);
 }
 
-.container::-webkit-scrollbar {
+.horizontalSection::-webkit-scrollbar {
     display: none;
     /* Chrome, Safari */
 }
 
 /* Individual Slide */
 .slide {
-    flex: 0 0 100vw;
-    height: 100vh;
-    scroll-snap-align: start;
+    flex: 0 0 100%;
+    /* Fit the container, not the viewport width */
+    height: 100%;
+    margin: 0;
+    scroll-snap-align: center;
+    /* Center snap */
     position: relative;
     display: flex;
     align-items: center;

@@ -1,0 +1,124 @@
+/* Section Container */
+.section {
+    position: relative;
+    padding: 8rem 2rem;
+    background: var(--color-bg-main);
+    /* Match global bg */
+    overflow: hidden;
+}
+
+.inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Alternating Blocks */
+.pblock {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    margin-bottom: 8rem;
+}
+
+.pblock:last-child {
+    margin-bottom: 0;
+}
+
+/* Alternate order: Even children swap image/text positions */
+.pblock:nth-child(even) .textContent {
+    order: 2;
+}
+
+.pblock:nth-child(even) .imageWrapper {
+    order: 1;
+}
+
+/* Text Content */
+.textContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Typography */
+.title {
+    font-family: var(--font-family-heading);
+    font-size: clamp(2rem, 3vw, 3rem);
+    color: var(--color-text-primary);
+    line-height: 1.1;
+}
+
+.subtitle {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--color-text-body);
+    font-style: italic;
+    font-weight: 300;
+}
+
+.author {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-primary);
+    margin-top: 0.5rem;
+    font-weight: 600;
+}
+
+/* Image */
+.imageWrapper {
+    position: relative;
+    height: 500px;
+    width: 100%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+}
+
+.imageWrapper:hover .image {
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .pblock {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-bottom: 5rem;
+    }
+
+    /* Reset order for mobile so image is always first or second? 
+       Usually image first looks good, or text first. 
+       Let's stack Text -> Image for better reading flow, 
+       OR Image -> Text. 
+       User request: "mobile: stack image above text" */
+
+    .pblock,
+    .pblock:nth-child(even) {
+        display: flex;
+        flex-direction: column;
+        /* Image first? Column puts first child on top. */
+    }
+
+    .imageWrapper {
+        order: -1 !important;
+        /* Force image to top */
+        height: 300px;
+    }
+
+    .textContent {
+        order: 1 !important;
+    }
+
+    .section {
+        padding: 4rem 1.5rem;
+    }
+}
