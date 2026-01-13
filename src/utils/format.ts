@@ -10,11 +10,17 @@ export const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-export const formatCurrency = (amount?: number, currency: string = 'USD'): string => {
+export const formatCurrency = (amount?: number, currency: string = 'INR'): string => {
     if (amount === undefined) return 'FREE';
     if (amount === 0) return 'FREE';
-    return new Intl.NumberFormat('en-US', {
+
+    // Fallback to INR if currency is explicitly null/undefined in call but not handled by default param
+    const safeCurrency = currency || 'INR';
+
+    return new Intl.NumberFormat('en-IN', {
         style: 'currency',
-        currency: currency,
+        currency: safeCurrency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
     }).format(amount);
 };

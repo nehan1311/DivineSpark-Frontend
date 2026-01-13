@@ -8,6 +8,7 @@ import styles from './Sessions.module.css';
 import Button from '../components/ui/Button'; // Assuming we can use UI button or style generic ones
 import { formatDate, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
+import RetreatContentSection from '../components/sessions/RetreatContentSection';
 
 // Fallback images if session image is missing
 const FALLBACK_BG = 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1920';
@@ -17,6 +18,7 @@ const Sessions: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [activeIndex, setActiveIndex] = useState(0); // Track active slide for animations
+    const [isPaused, setIsPaused] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const observerRef = useRef<IntersectionObserver | null>(null);
@@ -94,7 +96,7 @@ const Sessions: React.FC = () => {
             if (session.type === 'FREE') {
                 await sessionApi.joinSession(session.id);
                 showToast(`Successfully joined "${session.title}"`, 'success');
-                navigate(`/sessions/${session.id}`);
+                navigate(`/sessions/${session.id}`, { state: { session } });
             } else {
                 // Load Razorpay script first
                 const isLoaded = await razorpayService.loadRazorpay();
@@ -121,7 +123,7 @@ const Sessions: React.FC = () => {
                             'success'
                         );
 
-                        navigate(`/sessions/${session.id}`);
+                        navigate(`/sessions/${session.id}`, { state: { session } });
                     },
                     (errorMsg) => {
                         showToast(errorMsg || 'Payment failed', 'error');
@@ -145,6 +147,18 @@ const Sessions: React.FC = () => {
         }
     };
 
+    // Auto-scroll logic
+    useEffect(() => {
+        if (loading || sessions.length <= 1 || isPaused) return;
+
+        const interval = setInterval(() => {
+            const nextIndex = (activeIndex + 1) % sessions.length;
+            handleNavigation(nextIndex);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [activeIndex, sessions.length, loading, isPaused]);
+
     if (loading) {
         return (
             <div className={styles.emptyState}>
@@ -163,89 +177,97 @@ const Sessions: React.FC = () => {
     }
 
     return (
-        <div className={styles.container} ref={containerRef}>
-            {sessions.map((session, index) => {
-                const isActive = index === activeIndex;
-                const isFree = session.type === 'FREE';
-                const isExpired = new Date(session.startTime) < new Date();
+        <div className={styles.pageWrapper}>
+            <div
+                className={styles.horizontalSection}
+                ref={containerRef}
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+            >
+                {sessions.map((session, index) => {
+                    const isActive = index === activeIndex;
+                    const isFree = session.type === 'FREE';
+                    const isExpired = new Date(session.startTime) < new Date();
 
-                return (
-                    <div
-                        key={session.id}
-                        className={`${styles.slide} ${isActive ? styles.active : ''}`}
-                        data-index={index}
-                    >
-                        {/* Background */}
-                        <div className={styles.background}>
-                            <img
-                                src={session.imageUrl || FALLBACK_BG}
-                                alt={session.title}
-                                className={styles.bgImage}
-                            />
-                            <div className={styles.overlay} />
-                        </div>
+                    return (
+                        <div
+                            key={session.id}
+                            className={`${styles.slide} ${isActive ? styles.active : ''}`}
+                            data-index={index}
+                        >
+                            {/* Background */}
+                            <div className={styles.background}>
+                                <img
+                                    src={session.imageUrl || FALLBACK_BG}
+                                    alt={session.title}
+                                    className={styles.bgImage}
+                                />
+                                <div className={styles.overlay} />
+                            </div>
 
-                        {/* Content */}
-                        <div className={styles.content}>
+                            {/* Content */}
+                            <div className={styles.content}>
 
-                            <h1 className={styles.title}>{session.title}</h1>
-                            <p className={styles.description}>{session.description}</p>
+                                <h1 className={styles.title}>{session.title}</h1>
+                                <p className={styles.description}>{session.description}</p>
 
-                            <div className={styles.meta}>
-                                <div className={styles.metaItem}>
-                                    <span className={styles.metaLabel}>Instructor</span>
-                                    <span className={styles.metaValue}>{session.guideName}</span>
-                                </div>
-                                <div className={styles.metaItem}>
-                                    <span className={styles.metaLabel}>Date</span>
-                                    <span className={styles.metaValue}>{formatDate(session.startTime)}</span>
-                                </div>
-                                {!isFree && (
+                                <div className={styles.meta}>
                                     <div className={styles.metaItem}>
-                                        <span className={styles.metaLabel}>Price</span>
-                                        <span className={styles.metaValue}>{formatCurrency(session.price, session.currency)}</span>
+                                        <span className={styles.metaLabel}>Instructor</span>
+                                        <span className={styles.metaValue}>{session.guideName}</span>
                                     </div>
-                                )}
-                            </div>
+                                    <div className={styles.metaItem}>
+                                        <span className={styles.metaLabel}>Date</span>
+                                        <span className={styles.metaValue}>{formatDate(session.startTime)}</span>
+                                    </div>
+                                    {!isFree && (
+                                        <div className={styles.metaItem}>
+                                            <span className={styles.metaLabel}>Price</span>
+                                            <span className={styles.metaValue}>{formatCurrency(session.price, session.currency)}</span>
+                                        </div>
+                                    )}
+                                </div>
 
-                            <div className={styles.actions}>
-                                <Button
-                                    size="lg"
-                                    variant={isFree ? 'outline' : 'primary'}
-                                    onClick={() => handleSessionAction(session)}
-                                    disabled={actionLoading === session.id || isExpired}
-                                    style={{ borderColor: 'white', color: 'white' }}
-                                >
-                                    {/* Temporarily showing button for testing even if expired */}
-                                    {isFree ? 'Join Now' : 'Pay For Session'}
-                                </Button>
+                                <div className={styles.actions}>
+                                    <Button
+                                        size="lg"
+                                        variant={isFree ? 'outline' : 'primary'}
+                                        onClick={() => handleSessionAction(session)}
+                                        disabled={actionLoading === session.id || isExpired}
+                                        style={{ borderColor: 'white', color: 'white' }}
+                                    >
+                                        {/* Temporarily showing button for testing even if expired */}
+                                        {isFree ? 'Join Now' : 'Pay For Session'}
+                                    </Button>
 
-                                <Button
-                                    size="lg"
-                                    variant="secondary"
-                                    onClick={() => navigate(`/sessions/${session.id}`)}
-                                    style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none' }}
-                                >
-                                    View Details
-                                </Button>
+                                    <Button
+                                        size="lg"
+                                        variant="secondary"
+                                        onClick={() => navigate(`/sessions/${session.id}`, { state: { session } })}
+                                        style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none' }}
+                                    >
+                                        View Details
+                                    </Button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                );
-            })}
+                    );
+                })}
 
-            {/* Navigation Dots */}
-            <div className={styles.dots}>
-                {sessions.map((_, idx) => (
-                    <div
-                        key={idx}
-                        className={`${styles.dot} ${idx === activeIndex ? styles.active : ''}`}
-                        onClick={() => handleNavigation(idx)}
-                        aria-label={`Go to slide ${idx + 1}`}
-                    />
-                ))}
+                {/* Navigation Dots */}
+                <div className={styles.dots}>
+                    {sessions.map((_, idx) => (
+                        <div
+                            key={idx}
+                            className={`${styles.dot} ${idx === activeIndex ? styles.active : ''}`}
+                            onClick={() => handleNavigation(idx)}
+                            aria-label={`Go to slide ${idx + 1}`}
+                        />
+                    ))}
+                </div>
             </div>
-        </div >
+            <RetreatContentSection />
+        </div>
     );
 };
 

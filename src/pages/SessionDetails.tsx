@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
 import { sessionApi } from '../api/session.api';
@@ -12,8 +12,14 @@ import { razorpayService } from '../services/razorpay.service';
 
 const SessionDetails: React.FC = () => {
     const { sessionId } = useParams<{ sessionId: string }>();
-    const [session, setSession] = useState<Session | null>(null);
-    const [loading, setLoading] = useState(true);
+    const location = useLocation();
+    const initialSession = location.state?.session as Session | undefined;
+
+    // Initialize with passed session if available to avoid loading state if we have data
+    const [session, setSession] = useState<Session | null>(initialSession || null);
+
+    // If we have initial data, we aren't "loading" in the visual sense, but we still fetch fresh data
+    const [loading, setLoading] = useState(!initialSession);
     const [actionLoading, setActionLoading] = useState(false);
     const { isAuthenticated } = useAuth();
     const { showToast } = useToast();
@@ -29,6 +35,10 @@ const SessionDetails: React.FC = () => {
         try {
             setLoading(true);
             const data = await sessionApi.getSession(id);
+            // Fallback for guideName if missing in detail but present in list
+            if (!data.guideName && initialSession?.guideName) {
+                data.guideName = initialSession.guideName;
+            }
             setSession(data);
         } catch (error) {
             showToast('Failed to load session details', 'error');
@@ -126,44 +136,82 @@ const SessionDetails: React.FC = () => {
     const isExpired = new Date(session.startTime) < new Date();
 
     return (
-        <Section className={styles.container}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>{session.title}</h1>
-                <p className={styles.instructor}>with {session.guideName}</p>
-            </div>
+        <Section className={styles.pageWrapper}>
+            <div className={styles.container}>
+                {/* Hero Header */}
+                <div className={styles.heroHeader}>
+                    <h1 className={styles.title}>{session.title}</h1>
+                    <div className={styles.instructorRow}>
+                        <span className={styles.instructorLabel}>with</span>
+                        <span className={styles.instructorName}>{session.guideName}</span>
+                    </div>
+                </div>
 
-            <div className={styles.meta}>
-                <div className={styles.metaItem}>
-                    <span className={styles.label}>Date & Time</span>
-                    <span className={styles.value}>{formatDate(session.startTime)}</span>
-                </div>
-                <div className={styles.metaItem}>
-                    <span className={styles.label}>Duration</span>
-                    <span className={styles.value}>{getDuration(session.startTime, session.endTime)}</span>
-                </div>
-                <div className={styles.metaItem}>
-                    <span className={styles.label}>Type</span>
-                    <span className={styles.value}>{session.type}</span>
-                </div>
-            </div>
+                {/* Divider */}
+                <hr className={styles.divider} />
 
-            <div className={styles.description}>
-                {session.description}
-            </div>
-
-            <div className={styles.actionArea}>
-                <div className={styles.price}>
-                    {formatCurrency(session.price, session.currency)}
+                {/* Meta Info Row */}
+                <div className={styles.metaRow}>
+                    <div className={styles.metaPill}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span>{formatDate(session.startTime)}</span>
+                    </div>
+                    <div className={styles.metaPill}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>{getDuration(session.startTime, session.endTime)}</span>
+                    </div>
+                    <div className={styles.metaPill}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                        </svg>
+                        <span>{session.type} Session</span>
+                    </div>
                 </div>
-                <Button
-                    size="lg"
-                    variant="primary"
-                    onClick={handleAction}
-                    disabled={actionLoading || isExpired}
-                >
-                    {/* Temporarily showing button for testing even if expired */}
-                    {isFree ? 'Join Free' : 'Pay For Session'}
-                </Button>
+
+                {/* Main Content Layout */}
+                <div className={styles.mainLayout}>
+                    {/* Left: Description */}
+                    <div className={styles.descriptionCard}>
+                        <h3 className={styles.cardTitle}>About this Session</h3>
+                        <p className={styles.descriptionText}>{session.description}</p>
+                    </div>
+
+                    {/* Right: Action/Booking Card */}
+                    <div className={styles.actionColumn}>
+                        <div className={styles.actionCard}>
+                            <div className={styles.priceTag}>
+                                <span className={styles.priceLabel}>{isFree ? 'Entry' : 'Price'}</span>
+                                <span className={styles.priceValue}>
+                                    {isFree ? 'Free' : formatCurrency(session.price, session.currency)}
+                                </span>
+                            </div>
+
+                            <Button
+                                size="lg"
+                                variant="primary"
+                                onClick={handleAction}
+                                disabled={actionLoading || isExpired}
+                                className={styles.actionButton}
+                                style={{ width: '100%' }}
+                            >
+                                {actionLoading ? 'Processing...' : (isFree ? 'Join Now' : 'Book Session')}
+                            </Button>
+
+                            {isExpired && (
+                                <p className={styles.expiredNotice}>This session has ended</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
         </Section >
     );
