@@ -2,7 +2,7 @@
 .section {
     position: relative;
     padding: 8rem 2rem;
-    background: var(--color-bg-main);
+    background: transparent;
     /* Match global bg */
     overflow: hidden;
 }

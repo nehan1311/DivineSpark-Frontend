@@ -141,9 +141,19 @@ const Sessions: React.FC = () => {
     };
 
     const handleNavigation = (index: number) => {
-        const slides = containerRef.current?.children;
-        if (slides && slides[index]) {
-            slides[index].scrollIntoView({ behavior: 'smooth' });
+        const container = containerRef.current;
+        if (!container) return;
+
+        const slides = container.children;
+        const targetSlide = slides[index] as HTMLElement;
+
+        if (targetSlide) {
+            // Use container.scrollTo instead of scrollIntoView to prevent 
+            // the main window from scrolling when the slider is out of view.
+            container.scrollTo({
+                left: targetSlide.offsetLeft,
+                behavior: 'smooth'
+            });
         }
     };
 
@@ -178,6 +188,7 @@ const Sessions: React.FC = () => {
 
     return (
         <div className={styles.pageWrapper}>
+            <div className={styles.meshContainer}></div>
             <div
                 className={styles.horizontalSection}
                 ref={containerRef}

@@ -137,6 +137,7 @@ const SessionDetails: React.FC = () => {
 
     return (
         <Section className={styles.pageWrapper}>
+            <div className={styles.meshContainer}></div>
             <div className={styles.container}>
                 {/* Hero Header */}
                 <div className={styles.heroHeader}>

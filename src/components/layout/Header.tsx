@@ -6,6 +6,7 @@ import styles from './Header.module.css';
 import logoImg from '../../assets/divinespark logo.jpeg';
 import { ConfirmationModal } from '../../components/ui/Modal';
 
+import ProfileModal from '../../pages/Profile';
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
@@ -14,6 +15,7 @@ const Header: React.FC = () => {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
 
 
     const handleLogout = () => {
@@ -104,7 +106,7 @@ const Header: React.FC = () => {
                                 <div className={styles.dropdown}>
                                     <div className={styles.dropdownItem} onClick={() => {
                                         setMenuOpen(false);
-                                        navigate('/profile');
+                                        setShowProfile(true);
                                     }}>
                                         Profile
                                     </div>
@@ -144,7 +146,6 @@ const Header: React.FC = () => {
 
             <ConfirmationModal
                 isOpen={logoutModalOpen}
-
                 onClose={() => setLogoutModalOpen(false)}
                 onConfirm={() => {
                     handleLogout();
@@ -153,6 +154,11 @@ const Header: React.FC = () => {
                 title="Log Out"
                 message="Are you sure you want to log out?"
                 confirmText="Log Out"
+            />
+
+            <ProfileModal
+                isOpen={showProfile}
+                onClose={() => setShowProfile(false)}
             />
         </header>
     );

@@ -1,9 +1,26 @@
+/* Background mesh similar to Home page */
+.meshContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: url('../assets/home_bg.jpg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.3;
+}
+
 /* Page Wrapper allowing vertical scroll */
 .pageWrapper {
     width: 100%;
     overflow-x: hidden;
-    background-color: var(--color-bg-main);
+    background-color: transparent;
+    /* Changed from var(--color-bg-main) */
     padding-top: 100px;
+    position: relative;
+    z-index: 1;
 }
 
 /* Full-screen horizontal scroll container */
