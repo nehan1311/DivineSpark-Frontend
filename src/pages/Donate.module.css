@@ -1,0 +1,238 @@
+/* Background mesh similar to Home page */
+.meshContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: url('../assets/home_bg.jpg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.3;
+    /* Matches Home page subtle background */
+}
+
+/* Ensure full viewport fit, no window scroll */
+.splitLayout {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    padding-top: 90px;
+    /* Header Offset matching Header height */
+    box-sizing: border-box;
+}
+
+/* Left Panel - Matches Home Hero: Light/Mesh visible, Dark Text */
+.leftPanel {
+    flex: 0 0 45%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 4rem;
+    background: linear-gradient(to right, rgba(13, 31, 26, 0.05), rgba(13, 31, 26, 0));
+    /* Subtle overlay like Home */
+    color: var(--color-text-primary);
+    /* Dark text to match Home Hero */
+    position: relative;
+}
+
+.leftContent {
+    max-width: 500px;
+    position: relative;
+    z-index: 2;
+}
+
+.brandLabel {
+    font-family: var(--font-family-body);
+    font-size: 0.75rem;
+    /* Reduced */
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-text-body);
+    opacity: 0.8;
+    margin-bottom: 1.5rem;
+    /* Reduced */
+    display: block;
+    font-weight: 600;
+}
+
+.title {
+    font-family: var(--font-family-heading);
+    font-size: clamp(2.5rem, 3.5vw, 3.5rem);
+    /* Reduced from 4.5rem max */
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    /* Reduced */
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+}
+
+.missionText {
+    font-size: clamp(0.95rem, 1vw, 1.05rem);
+    line-height: 1.5;
+    color: #4a554a;
+    /* Matches Home subtitle color */
+    margin-bottom: 2rem;
+    /* Reduced */
+    font-weight: 500;
+    max-width: 450px;
+}
+
+.quote {
+    font-style: italic;
+    color: var(--color-text-body);
+    opacity: 0.8;
+    font-size: 0.95rem;
+    border-left: 2px solid var(--color-primary);
+    padding-left: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* Right Panel - Form Area */
+.rightPanel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Center Vertically */
+    align-items: center;
+    padding: 0 4rem;
+    /* Removed top padding */
+    background: rgba(255, 255, 255, 0.6);
+    /* blends with mesh */
+    backdrop-filter: blur(8px);
+    overflow-y: auto;
+    /* Allow form scroll if screen is too short vertically */
+}
+
+.formContainer {
+    width: 100%;
+    max-width: 480px;
+    background: transparent;
+}
+
+.formHeader {
+    margin-bottom: 1.5rem;
+    /* Reduced */
+}
+
+.formTitle {
+    font-family: var(--font-family-heading);
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin-bottom: 0.25rem;
+}
+
+.formSubtitle {
+    color: var(--color-text-body);
+    font-size: 0.95rem;
+    opacity: 0.8;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    /* Reduced gap */
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-body);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Input Styles - Refined & Compact */
+.input,
+.textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    /* Compact height ~48px total */
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family-body);
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.input:focus,
+.textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(26, 60, 52, 0.1);
+}
+
+.actions {
+    margin-top: 1rem;
+}
+
+/* Success State */
+.successWrapper {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-lg);
+}
+
+.successIcon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.successTitle {
+    font-family: var(--font-family-heading);
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+}
+
+.successDesc {
+    font-size: 1.1rem;
+    color: var(--color-text-body);
+    margin-bottom: 2rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
+    .splitLayout {
+        flex-direction: column;
+        height: auto;
+        overflow-y: auto;
+    }
+
+    .leftPanel {
+        flex: none;
+        width: 100%;
+        padding: 8rem 2rem 4rem;
+        min-height: auto;
+    }
+
+    .title {
+        font-size: 3rem;
+    }
+
+    .rightPanel {
+        flex: none;
+        width: 100%;
+        padding: 4rem 1.5rem;
+        background: #fff;
+    }
+}

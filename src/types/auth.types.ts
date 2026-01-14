@@ -20,6 +20,11 @@ export interface RegisterPayload {
     // Add other registration fields as needed
 }
 
+export interface UpdateProfilePayload {
+    contactNumber?: string;
+    username?: string;
+}
+
 export interface LoginPayload {
     email: string;
     password: string;
@@ -32,6 +37,7 @@ export interface User {
     role: string;
     createdAt: string;
     fullName?: string; // Keeping as optional in case it's used elsewhere
+    contactNumber?: string;
 }
 
 export interface AuthResponse {

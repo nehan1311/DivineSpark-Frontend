@@ -19,6 +19,8 @@ import {
     getSessionBookings,
     getAdminPayments
 } from '../../api/admin.api';
+import { API_BASE_URL } from '../../api/endpoints';
+import { getToken } from '../../utils/authStorage';
 import type {
     DashboardStats,
     AdminSession,
@@ -46,6 +48,7 @@ const SessionsTable: React.FC<{
     activeTab: 'Upcoming' | 'Past';
     onTabChange: (tab: 'Upcoming' | 'Past') => void;
 }> = ({ sessions, onAction, isLoading, activeTab, onTabChange }) => {
+    const { showToast } = useToast();
     const [typeFilter, setTypeFilter] = useState<'ALL' | 'FREE' | 'PAID'>('ALL');
 
     const filteredSessions = sessions.filter(s => {
@@ -132,6 +135,58 @@ const SessionsTable: React.FC<{
                                     </td>
                                     <td>
                                         <button className={styles.actionBtn} onClick={() => onAction('edit_session', session)}>Edit</button>
+                                        <button
+                                            type="button"
+                                            className={styles.actionBtn}
+                                            onClick={async () => {
+                                                const token = getToken();
+                                                if (!token) {
+                                                    showToast("Authentication error", "error");
+                                                    return;
+                                                }
+
+                                                try {
+                                                    showToast("Download started...", "info");
+
+                                                    const response = await fetch(
+                                                        `${API_BASE_URL}/admin/sessions/${session.id}/users/download`,
+                                                        {
+                                                            headers: {
+                                                                Authorization: `Bearer ${token}`,
+                                                            },
+                                                        }
+                                                    );
+
+                                                    if (!response.ok) {
+                                                        throw new Error("Download failed");
+                                                    }
+
+                                                    const blob = await response.blob();
+                                                    const url = window.URL.createObjectURL(blob);
+
+                                                    const link = document.createElement("a");
+                                                    link.href = url;
+                                                    link.download = `session_${session.id}_users.csv`;
+                                                    document.body.appendChild(link);
+                                                    link.click();
+                                                    link.remove();
+
+                                                    window.URL.revokeObjectURL(url);
+                                                } catch (err) {
+                                                    showToast("Failed to download CSV", "error");
+                                                }
+                                            }}
+                                            disabled={((session.maxSeats || 0) - (session.availableSeats || 0)) <= 0}
+                                            style={
+                                                ((session.maxSeats || 0) - (session.availableSeats || 0)) <= 0
+                                                    ? { opacity: 0.5, cursor: "not-allowed" }
+                                                    : {}
+                                            }
+                                            title="Download CSV"
+                                        >
+                                            Download CSV
+                                        </button>
+
                                         {!isCancelled && (
                                             <button
                                                 className={`${styles.actionBtn} ${styles.deleteBtn}`}

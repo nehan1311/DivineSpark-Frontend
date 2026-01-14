@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getUserProfile } from '../api/auth.api';
+import { getUserProfile, updateUserProfile } from '../api/auth.api';
 import type { User } from '../types/auth.types';
 import { useToast } from '../context/ToastContext';
 import styles from './Profile.module.css';
@@ -18,12 +18,24 @@ const Profile: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    // Edit Mode State
+    const [isEditing, setIsEditing] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [formData, setFormData] = useState({
+        contactNumber: '',
+        username: ''
+    });
+
     useEffect(() => {
         const fetchProfile = async () => {
             try {
                 setLoading(true);
                 const data = await getUserProfile();
                 setUser(data);
+                setFormData({
+                    contactNumber: data.contactNumber || '',
+                    username: data.username || ''
+                });
                 setError(null);
             } catch (err: any) {
                 const msg = err.response?.data?.message || 'Failed to load profile';
@@ -38,6 +50,24 @@ const Profile: React.FC = () => {
             fetchProfile();
         }
     }, [isAuthenticated, showToast]);
+
+    const handleSave = async () => {
+        setSaving(true);
+        try {
+            await updateUserProfile(formData);
+            showToast('Profile updated successfully', 'success');
+            setIsEditing(false);
+            // Update local user state to reflect changes immediately
+            if (user) {
+                setUser({ ...user, ...formData });
+            }
+        } catch (err: any) {
+            const msg = err.response?.data?.message || 'Failed to update profile';
+            showToast(msg, 'error');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -77,11 +107,23 @@ const Profile: React.FC = () => {
                 <div className={styles.divider}></div>
 
                 <div className={styles.formGrid}>
+
+
                     <div className={styles.fieldGroup}>
                         <label className={styles.label}>Username</label>
-                        <div className={styles.valueDisplay}>
-                            {user.username}
-                        </div>
+                        {isEditing ? (
+                            <input
+                                type="text"
+                                className={styles.input}
+                                style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                                value={formData.username}
+                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                            />
+                        ) : (
+                            <div className={styles.valueDisplay}>
+                                {user.username}
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.fieldGroup}>
@@ -91,7 +133,28 @@ const Profile: React.FC = () => {
                         </div>
                     </div>
 
-
+                    <div className={styles.fieldGroup}>
+                        <label className={styles.label}>Contact Number</label>
+                        {isEditing ? (
+                            <input
+                                type="tel"
+                                className={styles.input}
+                                style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                                value={formData.contactNumber}
+                                maxLength={10}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val === '' || /^\d+$/.test(val)) {
+                                        setFormData({ ...formData, contactNumber: val });
+                                    }
+                                }}
+                            />
+                        ) : (
+                            <div className={styles.valueDisplay}>
+                                {user.contactNumber || 'Not provided'}
+                            </div>
+                        )}
+                    </div>
 
                     <div className={styles.fieldGroup}>
                         <label className={styles.label}>Member Since</label>
@@ -105,8 +168,31 @@ const Profile: React.FC = () => {
                     </div>
                 </div>
 
-                <div style={{ marginTop: '2rem', textAlign: 'right' }}>
-                    {/* Placeholder for future "Edit Profile" button if needed */}
+                <div style={{ marginTop: '2rem', textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                    {isEditing ? (
+                        <>
+                            <Button
+                                variant="secondary"
+                                onClick={() => {
+                                    setIsEditing(false);
+                                    setFormData({
+                                        contactNumber: user.contactNumber || '',
+                                        username: user.username || ''
+                                    });
+                                }}
+                                disabled={saving}
+                            >
+                                Cancel
+                            </Button>
+                            <Button onClick={handleSave} disabled={saving}>
+                                {saving ? 'Saving...' : 'Save Changes'}
+                            </Button>
+                        </>
+                    ) : (
+                        <Button onClick={() => setIsEditing(true)}>
+                            Edit Profile
+                        </Button>
+                    )}
                 </div>
             </div>
         </div>
