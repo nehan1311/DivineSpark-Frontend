@@ -6,7 +6,8 @@ import type {
     RegisterPayload,
     LoginPayload,
     AuthResponse,
-    User
+    User,
+    UpdateProfilePayload
 } from '../types/auth.types';
 
 /**
@@ -69,4 +70,11 @@ export const googleLogin = async (code: string) => {
 export const getUserProfile = async (): Promise<User> => {
     const response = await axiosInstance.get<User>(AUTH_ENDPOINTS.GET_PROFILE);
     return response.data;
+};
+
+/**
+ * Update the logged-in user's profile.
+ */
+export const updateUserProfile = async (payload: UpdateProfilePayload): Promise<void> => {
+    await axiosInstance.put(AUTH_ENDPOINTS.UPDATE_PROFILE, payload);
 };

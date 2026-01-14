@@ -5,7 +5,7 @@ import Button from '../ui/Button';
 import styles from './Header.module.css';
 import logoImg from '../../assets/divinespark logo.jpeg';
 import { ConfirmationModal } from '../../components/ui/Modal';
-import DonateModal from '../payment/DonateModal';
+
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
@@ -14,7 +14,6 @@ const Header: React.FC = () => {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
-    const [donateModalOpen, setDonateModalOpen] = useState(false);
 
 
     const handleLogout = () => {
@@ -54,19 +53,12 @@ const Header: React.FC = () => {
                     >
                         Book a Session
                     </Link>
-                    <button
-                        className={styles.navLink}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}
-                        onClick={() => {
-                            if (!isAuthenticated) {
-                                navigate('/login');
-                            } else {
-                                setDonateModalOpen(true);
-                            }
-                        }}
+                    <Link
+                        to="/donate"
+                        className={`${styles.navLink} ${location.pathname === '/donate' ? styles.active : ''}`}
                     >
                         Donate
-                    </button>
+                    </Link>
                     <Link to="#" className={styles.navLink}>About Us</Link>
                 </nav>
 
@@ -148,11 +140,7 @@ const Header: React.FC = () => {
                 </div>
             </div>
 
-            {/* Donate Modal */}
-            <DonateModal
-                isOpen={donateModalOpen}
-                onClose={() => setDonateModalOpen(false)}
-            />
+
 
             <ConfirmationModal
                 isOpen={logoutModalOpen}
