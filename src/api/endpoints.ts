@@ -12,6 +12,7 @@ export const AUTH_ENDPOINTS = {
 
 export const SESSION_ENDPOINTS = {
     BASE: '/sessions',
+    MY_BOOKINGS: '/sessions/my-bookings',
 };
 
 export const ADMIN_ENDPOINTS = {

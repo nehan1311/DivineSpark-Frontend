@@ -28,6 +28,14 @@ export const sessionApi = {
         return response.data;
     },
 
+    // Get User Bookings
+    getUserBookings: async (): Promise<any[]> => {
+        sessionApi._ensureAuth();
+        const headers = sessionApi._authHeaders();
+        const response = await axiosInstance.get(SESSION_ENDPOINTS.MY_BOOKINGS, { headers });
+        return response.data;
+    },
+
     // Get Session Details
     getSession: async (sessionId: string): Promise<Session> => {
         const response = await axiosInstance.get<Session>(`${SESSION_ENDPOINTS.BASE}/${sessionId}`);

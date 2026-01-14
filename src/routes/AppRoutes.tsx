@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import Home from '../pages/Home';
 import Sessions from '../pages/Sessions';
@@ -16,6 +16,16 @@ import Donate from '../pages/Donate';
 import UserRoute from './UserRoute';
 import PublicRoute from './PublicRoute';
 import AdminRoute from './AdminRoute';
+
+const ProfilePage = () => {
+    const navigate = useNavigate();
+    return (
+        <Profile
+            isOpen={true}
+            onClose={() => navigate('/')}
+        />
+    );
+};
 
 const AppRoutes: React.FC = () => {
     return (
@@ -36,7 +46,7 @@ const AppRoutes: React.FC = () => {
                 <Route element={<UserRoute />}>
                     <Route path="sessions" element={<Sessions />} />
                     <Route path="sessions/:sessionId" element={<SessionDetails />} />
-                    <Route path="profile" element={<Profile />} />
+                    <Route path="profile" element={<ProfilePage />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path="donate" element={<Donate />} />
                 </Route>
