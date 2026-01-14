@@ -5,7 +5,8 @@ import type {
     VerifyOtpPayload,
     RegisterPayload,
     LoginPayload,
-    AuthResponse
+    AuthResponse,
+    User
 } from '../types/auth.types';
 
 /**
@@ -60,4 +61,12 @@ export const googleLogin = async (code: string) => {
         response.data;
 
     return { token };
+};
+
+/**
+ * Fetch the logged-in user's profile.
+ */
+export const getUserProfile = async (): Promise<User> => {
+    const response = await axiosInstance.get<User>(AUTH_ENDPOINTS.GET_PROFILE);
+    return response.data;
 };

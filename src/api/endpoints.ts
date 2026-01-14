@@ -6,7 +6,7 @@ export const AUTH_ENDPOINTS = {
     REGISTER: '/auth/register',
     LOGIN: '/auth/login',
     GOOGLE_LOGIN: '/auth/google',
-    GET_PROFILE: '/users/profile',
+    GET_PROFILE: '/sessions/profile',
 };
 
 export const SESSION_ENDPOINTS = {

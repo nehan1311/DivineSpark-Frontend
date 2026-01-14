@@ -1,0 +1,136 @@
+.profileContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    padding: 85px 1.5rem 1.5rem;
+    /* Adjusted for header */
+    box-sizing: border-box;
+    background-color: var(--color-background-warm);
+}
+
+.profileCard {
+    width: 100%;
+    max-width: 500px;
+    /* Reduced max-width for better focus */
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    /* Soft/subtle shadow */
+    animation: fadeIn 0.4s ease-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.title {
+    font-family: var(--font-family-heading);
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    margin-bottom: 0.25rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-family: var(--font-family-body);
+    color: var(--color-text-body);
+    font-size: 0.9rem;
+    opacity: 0.6;
+}
+
+.divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.08), transparent);
+    /* Soft divider */
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.formGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    /* Consistent spacing */
+}
+
+.fieldGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6c757d;
+    /* Muted label color */
+    margin-left: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.valueDisplay {
+    padding: 0.75rem 1rem;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: var(--radius-md);
+    font-family: var(--font-family-body);
+    font-size: 0.95rem;
+    color: var(--color-text-body);
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.valueDisplay:not(.readOnly):hover {
+    border-color: var(--color-primary-light);
+    background: #fafafa;
+}
+
+.valueDisplay.readOnly {
+    background: #f8f9fa;
+    /* Muted background */
+    color: #495057;
+    border-color: transparent;
+    /* Visual cue for read-only */
+    cursor: default;
+    user-select: text;
+}
+
+.ctaPlaceholder {
+    margin-top: 2rem;
+    text-align: right;
+    min-height: 1rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 640px) {
+    .profileContainer {
+        padding: 80px 1rem 1rem;
+    }
+
+    .profileCard {
+        padding: 1.5rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+}
