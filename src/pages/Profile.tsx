@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserProfile, updateUserProfile } from '../api/auth.api';
 import type { User } from '../types/auth.types';
@@ -6,13 +7,14 @@ import { useToast } from '../context/ToastContext';
 import styles from './Profile.module.css';
 import Button from '../components/ui/Button';
 
-const Profile: React.FC = () => {
+interface ProfileModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
     const { isAuthenticated } = useAuth();
     const { showToast } = useToast();
-
-    // Disable body scroll when on profile page to prevent double scrolling if needed, 
-    // but usually '100vh' + 'overflow hidden' on container works best. 
-    // We'll rely on the container styles.
 
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
@@ -26,177 +28,217 @@ const Profile: React.FC = () => {
         username: ''
     });
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                setLoading(true);
-                const data = await getUserProfile();
-                setUser(data);
-                setFormData({
-                    contactNumber: data.contactNumber || '',
-                    username: data.username || ''
-                });
-                setError(null);
-            } catch (err: any) {
-                const msg = err.response?.data?.message || 'Failed to load profile';
-                setError(msg);
-                showToast(msg, 'error');
-            } finally {
-                setLoading(false);
-            }
-        };
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-        if (isAuthenticated) {
-            fetchProfile();
+    // Handle scroll locking and ESC key
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+            const handleEsc = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') onClose();
+            };
+            window.addEventListener('keydown', handleEsc);
+            return () => {
+                document.body.style.overflow = 'unset';
+                window.removeEventListener('keydown', handleEsc);
+            };
+        } else {
+            document.body.style.overflow = 'unset';
         }
-    }, [isAuthenticated, showToast]);
+    }, [isOpen, onClose]);
+
+    // Fetch data when opened
+    useEffect(() => {
+        if (isOpen && isAuthenticated) {
+            fetchProfile();
+            setError(null);
+            setSuccessMsg(null);
+        }
+    }, [isOpen, isAuthenticated]);
+
+    const fetchProfile = async () => {
+        try {
+            setLoading(true);
+            const data = await getUserProfile();
+            setUser(data);
+            setFormData({
+                contactNumber: data.contactNumber || '',
+                username: data.username || ''
+            });
+            setError(null);
+        } catch (err: any) {
+            const msg = err.response?.data?.message || 'Failed to load profile';
+            setError(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSave = async () => {
+        // Reset messages
+        setError(null);
+        setSuccessMsg(null);
+
+        // Validation: 10 digit phone number
+        const phoneRegex = /^\d{10}$/;
+        if (formData.contactNumber && !phoneRegex.test(formData.contactNumber)) {
+            setError('Please enter a valid 10-digit phone number');
+            return;
+        }
+
         setSaving(true);
         try {
             await updateUserProfile(formData);
+            setSuccessMsg('Profile updated successfully!');
             showToast('Profile updated successfully', 'success');
             setIsEditing(false);
-            // Update local user state to reflect changes immediately
             if (user) {
                 setUser({ ...user, ...formData });
             }
         } catch (err: any) {
             const msg = err.response?.data?.message || 'Failed to update profile';
-            showToast(msg, 'error');
+            setError(msg);
+            // showToast(msg, 'error'); // Optional: duplicate
         } finally {
             setSaving(false);
         }
     };
 
-    if (loading) {
-        return (
-            <div className={styles.profileContainer}>
-                <div style={{ color: '#fff', fontSize: '1.2rem' }}>Loading profile...</div>
-            </div>
-        );
-    }
+    if (!isOpen) return null;
 
-    if (error) {
-        return (
-            <div className={styles.profileContainer}>
-                <div style={{ textAlign: 'center', color: '#ff6b6b' }}>
-                    <p style={{ marginBottom: '1rem' }}>{error}</p>
-                    <Button onClick={() => window.location.reload()}>Retry</Button>
-                </div>
-            </div>
-        );
-    }
+    const modalContent = (
+        <div className={styles.overlay} onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+        }}>
+            <div className={styles.modal}>
+                <button className={styles.closeButton} onClick={onClose} aria-label="Close modal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
 
-    if (!user) {
-        return (
-            <div className={styles.profileContainer}>
-                <div style={{ color: '#fff' }}>User not found</div>
-            </div>
-        );
-    }
-
-    return (
-        <div className={styles.profileContainer}>
-            <div className={styles.profileCard}>
                 <div className={styles.header}>
-                    <h2 className={styles.title}>My Profile</h2>
-                    <p className={styles.subtitle}>Manage your account information</p>
+                    <h2 className={styles.title}>Your Profile</h2>
+                    <p className={styles.subtitle}>Manage your personal information</p>
                 </div>
 
-                <div className={styles.divider}></div>
-
-                <div className={styles.formGrid}>
-
-
-                    <div className={styles.fieldGroup}>
-                        <label className={styles.label}>Username</label>
-                        {isEditing ? (
-                            <input
-                                type="text"
-                                className={styles.input}
-                                style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
-                                value={formData.username}
-                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                            />
-                        ) : (
-                            <div className={styles.valueDisplay}>
-                                {user.username}
-                            </div>
-                        )}
+                {/* Inline Messages */}
+                {error && (
+                    <div style={{
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        color: '#ef4444',
+                        padding: '0.75rem',
+                        borderRadius: '4px',
+                        marginBottom: '1rem',
+                        fontSize: '0.9rem',
+                        textAlign: 'center'
+                    }}>
+                        {error}
+                        {loading && <Button size="sm" onClick={fetchProfile} style={{ marginTop: '0.5rem' }}>Retry</Button>}
                     </div>
+                )}
 
-                    <div className={styles.fieldGroup}>
-                        <label className={styles.label}>Email Address</label>
-                        <div className={`${styles.valueDisplay} ${styles.readOnly}`}>
-                            {user.email}
+                {successMsg && (
+                    <div style={{
+                        background: 'rgba(34, 197, 94, 0.1)',
+                        color: '#15803d',
+                        padding: '0.75rem',
+                        borderRadius: '4px',
+                        marginBottom: '1rem',
+                        fontSize: '0.9rem',
+                        textAlign: 'center'
+                    }}>
+                        {successMsg}
+                    </div>
+                )}
+
+                {loading && !error ? (
+                    <div className={styles.loading}>Loading details...</div>
+                ) : user && (
+                    <div className={styles.formGrid}>
+                        {/* Username */}
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Username</label>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    className={styles.input}
+                                    value={formData.username}
+                                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                    placeholder="Enter username"
+                                />
+                            ) : (
+                                <div className={styles.valueDisplay}>{user.username}</div>
+                            )}
+                        </div>
+
+                        {/* Email */}
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Email Address</label>
+                            <div className={`${styles.valueDisplay} ${styles.readOnly}`}>
+                                {user.email}
+                            </div>
+                        </div>
+
+                        {/* Contact */}
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.label}>Contact Number</label>
+                            {isEditing ? (
+                                <input
+                                    type="tel"
+                                    className={styles.input}
+                                    value={formData.contactNumber}
+                                    maxLength={10}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (val === '' || /^\d+$/.test(val)) {
+                                            setFormData({ ...formData, contactNumber: val });
+                                        }
+                                    }}
+                                    placeholder="Enter phone number"
+                                />
+                            ) : (
+                                <div className={styles.valueDisplay}>
+                                    {user.contactNumber || 'Not provided'}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className={styles.footer}>
+                            {isEditing ? (
+                                <>
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => {
+                                            setIsEditing(false);
+                                            setFormData({
+                                                contactNumber: user.contactNumber || '',
+                                                username: user.username || ''
+                                            });
+                                        }}
+                                        disabled={saving}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button onClick={handleSave} disabled={saving} variant="primary">
+                                        {saving ? 'Saving...' : 'Save Changes'}
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button onClick={() => setIsEditing(true)} variant="outline">
+                                    Edit Profile
+                                </Button>
+                            )}
                         </div>
                     </div>
-
-                    <div className={styles.fieldGroup}>
-                        <label className={styles.label}>Contact Number</label>
-                        {isEditing ? (
-                            <input
-                                type="tel"
-                                className={styles.input}
-                                style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
-                                value={formData.contactNumber}
-                                maxLength={10}
-                                onChange={(e) => {
-                                    const val = e.target.value;
-                                    if (val === '' || /^\d+$/.test(val)) {
-                                        setFormData({ ...formData, contactNumber: val });
-                                    }
-                                }}
-                            />
-                        ) : (
-                            <div className={styles.valueDisplay}>
-                                {user.contactNumber || 'Not provided'}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className={styles.fieldGroup}>
-                        <label className={styles.label}>Member Since</label>
-                        <div className={styles.valueDisplay}>
-                            {new Date(user.createdAt).toLocaleDateString(undefined, {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            })}
-                        </div>
-                    </div>
-                </div>
-
-                <div style={{ marginTop: '2rem', textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                    {isEditing ? (
-                        <>
-                            <Button
-                                variant="secondary"
-                                onClick={() => {
-                                    setIsEditing(false);
-                                    setFormData({
-                                        contactNumber: user.contactNumber || '',
-                                        username: user.username || ''
-                                    });
-                                }}
-                                disabled={saving}
-                            >
-                                Cancel
-                            </Button>
-                            <Button onClick={handleSave} disabled={saving}>
-                                {saving ? 'Saving...' : 'Save Changes'}
-                            </Button>
-                        </>
-                    ) : (
-                        <Button onClick={() => setIsEditing(true)}>
-                            Edit Profile
-                        </Button>
-                    )}
-                </div>
+                )}
             </div>
         </div>
     );
+
+    return ReactDOM.createPortal(modalContent, document.body);
 };
 
-export default Profile;
+export default ProfileModal;
