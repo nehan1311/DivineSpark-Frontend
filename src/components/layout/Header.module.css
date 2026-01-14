@@ -30,8 +30,10 @@
 }
 
 /* Logo */
+/* Logo */
 .logo {
     /* Container if needed */
+    display: flex;
 }
 
 .brandLink {
@@ -106,34 +108,41 @@
 
 .loginBtn {
     border-radius: var(--radius-full);
-    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
-    /* Less padding right for avatar */
+    padding: 0.6rem 1.25rem;
     font-family: var(--font-family-body);
     font-weight: 600;
-    letter-spacing: -0.01em;
-    background-color: #fff;
-    /* White pill for contrast on sage bg */
-    color: var(--color-text-primary);
+    letter-spacing: 0.02em;
+    background-color: var(--color-primary);
+    color: #ffffff;
     display: flex;
     align-items: center;
-    gap: 12px;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .loginBtn:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
 }
 
 .userIcon {
-    width: 24px;
-    height: 24px;
-    background-image: url('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?fit=facearea&facepad=2&w=100&h=100&q=80');
-    background-size: cover;
-    background-position: center;
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 500;
+    font-family: var(--font-family-body);
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.2);
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 @media (min-width: 768px) {

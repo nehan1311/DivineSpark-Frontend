@@ -23,7 +23,10 @@ const Register: React.FC = () => {
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState('');
     const [fullName, setFullName] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [contactNumber, setContactNumber] = useState('');
+    const [contactNumberError, setContactNumberError] = useState<string | null>(null);
 
     const handleRequestOtp = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -63,12 +66,58 @@ const Register: React.FC = () => {
         }
     };
 
+    const validateContactNumber = (value: string): boolean => {
+        setContactNumberError(null);
+
+        if (!value) {
+            setContactNumberError('Contact number is required');
+            return false;
+        }
+
+        if (!/^\d+$/.test(value)) {
+            setContactNumberError('Contact number must contain only digits');
+            return false;
+        }
+
+        if (value.length !== 10) {
+            setContactNumberError('Contact number must be exactly 10 digits');
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleContactNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        // Only allow digits and limit to 10 characters
+        if (value === '' || /^\d{0,10}$/.test(value)) {
+            setContactNumber(value);
+            if (contactNumberError) {
+                validateContactNumber(value);
+            }
+        }
+    };
+
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+
+        if (!username.trim()) {
+            const msg = 'Username is required';
+            setError(msg);
+            showToast(msg, 'error');
+            return;
+        }
+
+        // Validate contact number before submission
+        if (!validateContactNumber(contactNumber)) {
+            showToast(contactNumberError || 'Invalid contact number', 'error');
+            return;
+        }
+
         setIsLoading(true);
         try {
-            const response = await register({ email, fullName, password });
+            const response = await register({ email, fullName, username, password, contactNumber });
             // Accept token as plain string or within an object
             let token: string | undefined;
             if (!response) token = undefined;
@@ -175,6 +224,38 @@ const Register: React.FC = () => {
                 onChange={(e) => setFullName(e.target.value)}
                 required
             />
+            <input
+                type="text"
+                placeholder="Username"
+                className={styles.input}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+            />
+            <div style={{ width: '100%' }}>
+                <input
+                    type="tel"
+                    placeholder="10-digit mobile number"
+                    className={styles.input}
+                    value={contactNumber}
+                    onChange={handleContactNumberChange}
+                    maxLength={10}
+                    required
+                    style={{
+                        borderColor: contactNumberError ? '#ff4444' : undefined,
+                    }}
+                />
+                {contactNumberError && (
+                    <div style={{
+                        color: '#ff4444',
+                        fontSize: '0.875rem',
+                        marginTop: '0.25rem',
+                        textAlign: 'left'
+                    }}>
+                        {contactNumberError}
+                    </div>
+                )}
+            </div>
             <input
                 type="password"
                 placeholder="Create Password"

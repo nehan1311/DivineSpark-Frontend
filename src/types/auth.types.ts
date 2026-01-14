@@ -14,7 +14,9 @@ export interface VerifyOtpPayload {
 export interface RegisterPayload {
     fullName: string;
     email: string;
+    username: string;
     password: string;
+    contactNumber: string;
     // Add other registration fields as needed
 }
 
@@ -24,10 +26,12 @@ export interface LoginPayload {
 }
 
 export interface User {
-    id: string;
+    id: number;
+    username: string;
     email: string;
-    fullName: string;
     role: string;
+    createdAt: string;
+    fullName?: string; // Keeping as optional in case it's used elsewhere
 }
 
 export interface AuthResponse {
