@@ -25,6 +25,7 @@ const MailIcon = () => (
 const Contact: React.FC = () => {
     return (
         <div className={styles.pageWrapper}>
+            <div className={styles.meshContainer}></div>
             <div className={styles.container}>
                 {/* Left Column: Contact Info */}
                 <div className={`${styles.card} ${styles.leftColumn}`}>
