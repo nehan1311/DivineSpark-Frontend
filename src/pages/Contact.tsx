@@ -41,13 +41,13 @@ const Contact: React.FC = () => {
                         </a>
 
                         {/* WhatsApp */}
-                        <a href="https://wa.me/912345678901" target="_blank" rel="noopener noreferrer" className={styles.infoItem}>
+                        <a href="https://wa.me/8692993228" target="_blank" rel="noopener noreferrer" className={styles.infoItem}>
                             <div className={styles.iconWrapper}>
                                 <WhatsAppIcon />
                             </div>
                             <div className={styles.infoContent}>
                                 <span className={styles.infoTitle}>WhatsApp</span>
-                                <span className={styles.infoValue}>+91 2345678901</span>
+                                <span className={styles.infoValue}>+91 8692993228</span>
                             </div>
                         </a>
 
