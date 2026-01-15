@@ -61,6 +61,12 @@ const Header: React.FC = () => {
                     >
                         Donate
                     </Link>
+                    <Link
+                        to="/contact"
+                        className={`${styles.navLink} ${location.pathname === '/contact' ? styles.active : ''}`}
+                    >
+                        Contact
+                    </Link>
                     <Link to="#" className={styles.navLink}>About Us</Link>
                 </nav>
 

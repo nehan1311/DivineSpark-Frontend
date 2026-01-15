@@ -54,7 +54,7 @@ const SessionDetails: React.FC = () => {
 
         if (!isAuthenticated) {
             showToast('Please login to continue', 'info');
-            navigate('/login');
+            navigate('/login', { state: { from: location } });
             return;
         }
 

@@ -1,23 +1,32 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { sessionApi } from '../api/session.api';
 import type { Session } from '../types/session.types';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Sessions.module.css';
-import Button from '../components/ui/Button'; // Assuming we can use UI button or style generic ones
+import Button from '../components/ui/Button';
 import { formatDate, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
 import RetreatContentSection from '../components/sessions/RetreatContentSection';
 
-// Fallback images if session image is missing
-const FALLBACK_BG = 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1920';
+const FALLBACK_BG =
+    'https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1920';
+
+type BookingLike = {
+    id?: any;
+    status?: any;
+    sessionId?: any;
+    session_id?: any;
+    session?: { id?: any };
+};
 
 const Sessions: React.FC = () => {
     const [sessions, setSessions] = useState<Session[]>([]);
+    const [userBookings, setUserBookings] = useState<BookingLike[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
-    const [activeIndex, setActiveIndex] = useState(0); // Track active slide for animations
+    const [activeIndex, setActiveIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -26,23 +35,60 @@ const Sessions: React.FC = () => {
     const { isAuthenticated } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         fetchSessions();
-        // Cleanup observer on unmount
         return () => {
             if (observerRef.current) observerRef.current.disconnect();
         };
     }, []);
 
+    // Fetch bookings whenever user becomes authenticated
+    useEffect(() => {
+        if (isAuthenticated) fetchUserBookings();
+        else setUserBookings([]);
+    }, [isAuthenticated]);
+
+    const fetchUserBookings = async () => {
+        try {
+            const bookings = await sessionApi.getUserBookings();
+
+            // Normalize to always have sessionId (number)
+            const normalized: BookingLike[] = (bookings || []).map((b: any) => ({
+                ...b,
+                sessionId: Number(b.sessionId ?? b.session_id ?? b.session?.id),
+                status: String(b.status ?? '').toUpperCase().trim(),
+            }));
+
+            setUserBookings(normalized);
+        } catch (error) {
+            console.error('Failed to fetch user bookings', error);
+            setUserBookings([]);
+        }
+    };
+
+    // A fast lookup map: sessionId -> booking
+    const bookingBySessionId = useMemo(() => {
+        const map = new Map<number, BookingLike>();
+        for (const b of userBookings) {
+            const sid = Number((b as any).sessionId ?? (b as any).session_id ?? (b as any).session?.id);
+            if (!Number.isNaN(sid)) map.set(sid, b);
+        }
+        return map;
+    }, [userBookings]);
+
+    const isConfirmedBooking = (booking?: BookingLike) => {
+        const status = String(booking?.status ?? '').toUpperCase().trim();
+        return status === 'CONFIRMED';
+    };
+
     // Set up IntersectionObserver after sessions load
     useEffect(() => {
         if (sessions.length === 0) return;
 
-        // Disconnect previous
         if (observerRef.current) observerRef.current.disconnect();
 
-        // Initialize new observer
         observerRef.current = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
@@ -52,33 +98,27 @@ const Sessions: React.FC = () => {
                     }
                 });
             },
-            { threshold: 0.6 } // Slide must be 60% visible to be 'active'
+            { threshold: 0.6 }
         );
 
         const slides = document.querySelectorAll(`.${styles.slide}`);
         slides.forEach((slide) => {
             if (observerRef.current) observerRef.current.observe(slide);
         });
-
     }, [sessions]);
-
 
     const fetchSessions = async () => {
         try {
             setLoading(true);
             const data: any = await sessionApi.getSessions({ page: 0, size: 20 });
 
-            if (Array.isArray(data)) {
-                setSessions(data);
-            } else if (data?.sessions) {
-                setSessions(data.sessions);
-            } else if (data?.content) {
-                setSessions(data.content);
-            } else {
-                setSessions([]);
-            }
+            if (Array.isArray(data)) setSessions(data);
+            else if (data?.sessions) setSessions(data.sessions);
+            else if (data?.content) setSessions(data.content);
+            else setSessions([]);
         } catch (error) {
             showToast('Failed to load upcoming sessions', 'error');
+            setSessions([]);
         } finally {
             setLoading(false);
         }
@@ -87,49 +127,52 @@ const Sessions: React.FC = () => {
     const handleSessionAction = async (session: Session) => {
         if (!isAuthenticated) {
             showToast('Please login to join this session', 'info');
-            navigate('/login');
+            navigate('/login', { state: { from: location } });
+            return;
+        }
+
+        // Re-check booking before action
+        const booking = bookingBySessionId.get(Number(session.id));
+        const alreadyBooked = isConfirmedBooking(booking);
+
+        if (alreadyBooked) {
+            showToast('You have already booked this session. Please check your email/WhatsApp.', 'info');
             return;
         }
 
         try {
             setActionLoading(session.id);
+
             if (session.type === 'FREE') {
                 await sessionApi.joinSession(session.id);
                 showToast(`Successfully joined "${session.title}"`, 'success');
+                await fetchUserBookings(); // refresh
                 navigate(`/sessions/${session.id}`, { state: { session } });
             } else {
-                // Load Razorpay script first
                 const isLoaded = await razorpayService.loadRazorpay();
                 if (!isLoaded) {
                     showToast('Razorpay SDK failed to load. Are you online?', 'error');
                     return;
                 }
 
-                // 1. Create Order
                 const orderData = await sessionApi.payForSession(session.id);
 
-                // 2. Open Payment Modal
                 razorpayService.initializePayment(
                     {
                         orderId: orderData.orderId,
                         amount: orderData.amount,
-                        currency: orderData.currency
+                        currency: orderData.currency,
                     },
                     session,
-                    () => {
-                        // ✅ UI-only success
-                        showToast(
-                            `Payment successful! You will receive session details shortly.`,
-                            'success'
-                        );
-
+                    async () => {
+                        showToast('Payment successful! You will receive session details shortly.', 'success');
+                        await fetchUserBookings(); // refresh after payment
                         navigate(`/sessions/${session.id}`, { state: { session } });
                     },
                     (errorMsg) => {
                         showToast(errorMsg || 'Payment failed', 'error');
                     }
                 );
-
             }
         } catch (error: any) {
             console.error('List Action Failed:', error);
@@ -148,16 +191,13 @@ const Sessions: React.FC = () => {
         const targetSlide = slides[index] as HTMLElement;
 
         if (targetSlide) {
-            // Use container.scrollTo instead of scrollIntoView to prevent 
-            // the main window from scrolling when the slider is out of view.
             container.scrollTo({
                 left: targetSlide.offsetLeft,
-                behavior: 'smooth'
+                behavior: 'smooth',
             });
         }
     };
 
-    // Auto-scroll logic
     useEffect(() => {
         if (loading || sessions.length <= 1 || isPaused) return;
 
@@ -189,6 +229,7 @@ const Sessions: React.FC = () => {
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.meshContainer}></div>
+
             <div
                 className={styles.horizontalSection}
                 ref={containerRef}
@@ -200,13 +241,18 @@ const Sessions: React.FC = () => {
                     const isFree = session.type === 'FREE';
                     const isExpired = new Date(session.startTime) < new Date();
 
+                    const booking = bookingBySessionId.get(Number(session.id));
+                    const isBooked = isConfirmedBooking(booking);
+
+                    // Disable if expired OR currently processing OR already booked
+                    const disabled = actionLoading === session.id || isExpired || isBooked;
+
                     return (
                         <div
                             key={session.id}
                             className={`${styles.slide} ${isActive ? styles.active : ''}`}
                             data-index={index}
                         >
-                            {/* Background */}
                             <div className={styles.background}>
                                 <img
                                     src={session.imageUrl || FALLBACK_BG}
@@ -216,9 +262,7 @@ const Sessions: React.FC = () => {
                                 <div className={styles.overlay} />
                             </div>
 
-                            {/* Content */}
                             <div className={styles.content}>
-
                                 <h1 className={styles.title}>{session.title}</h1>
                                 <p className={styles.description}>{session.description}</p>
 
@@ -227,35 +271,66 @@ const Sessions: React.FC = () => {
                                         <span className={styles.metaLabel}>Instructor</span>
                                         <span className={styles.metaValue}>{session.guideName}</span>
                                     </div>
+
                                     <div className={styles.metaItem}>
                                         <span className={styles.metaLabel}>Date</span>
                                         <span className={styles.metaValue}>{formatDate(session.startTime)}</span>
                                     </div>
+
                                     {!isFree && (
                                         <div className={styles.metaItem}>
                                             <span className={styles.metaLabel}>Price</span>
-                                            <span className={styles.metaValue}>{formatCurrency(session.price, session.currency)}</span>
+                                            <span className={styles.metaValue}>
+                                                {formatCurrency(session.price, session.currency)}
+                                            </span>
                                         </div>
                                     )}
                                 </div>
 
                                 <div className={styles.actions}>
-                                    <Button
-                                        size="lg"
-                                        variant={isFree ? 'outline' : 'primary'}
-                                        onClick={() => handleSessionAction(session)}
-                                        disabled={actionLoading === session.id || isExpired}
-                                        style={{ borderColor: 'white', color: 'white' }}
+                                    {/* Wrapper allows showing toast even when Button is disabled */}
+                                    <div
+                                        onClick={() => {
+                                            if (isBooked) {
+                                                showToast(
+                                                    'Already booked. Please check your email/WhatsApp for details.',
+                                                    'info'
+                                                );
+                                            }
+                                        }}
                                     >
-                                        {/* Temporarily showing button for testing even if expired */}
-                                        {isFree ? 'Join Now' : 'Pay For Session'}
-                                    </Button>
+                                        <Button
+                                            size="lg"
+                                            variant={isFree ? 'outline' : 'primary'}
+                                            onClick={() => {
+                                                if (!isBooked) handleSessionAction(session);
+                                            }}
+                                            disabled={disabled}
+                                            style={
+                                                isBooked
+                                                    ? {
+                                                        backgroundColor: '#666',
+                                                        borderColor: '#666',
+                                                        color: '#fff',
+                                                        opacity: 0.9,
+                                                        cursor: 'not-allowed',
+                                                    }
+                                                    : { borderColor: 'white', color: 'white' }
+                                            }
+                                        >
+                                            {isBooked ? 'Already Booked' : isFree ? 'Join Now' : 'Book Session'}
+                                        </Button>
+                                    </div>
 
                                     <Button
                                         size="lg"
                                         variant="secondary"
                                         onClick={() => navigate(`/sessions/${session.id}`, { state: { session } })}
-                                        style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none' }}
+                                        style={{
+                                            background: 'rgba(255,255,255,0.1)',
+                                            color: 'white',
+                                            border: 'none',
+                                        }}
                                     >
                                         View Details
                                     </Button>
@@ -265,7 +340,6 @@ const Sessions: React.FC = () => {
                     );
                 })}
 
-                {/* Navigation Dots */}
                 <div className={styles.dots}>
                     {sessions.map((_, idx) => (
                         <div
@@ -277,6 +351,7 @@ const Sessions: React.FC = () => {
                     ))}
                 </div>
             </div>
+
             <RetreatContentSection />
         </div>
     );
