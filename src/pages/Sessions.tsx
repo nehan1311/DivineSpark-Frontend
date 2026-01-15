@@ -131,18 +131,34 @@ const Sessions: React.FC = () => {
             return;
         }
 
-        // Re-check booking before action
-        const booking = bookingBySessionId.get(Number(session.id));
-        const alreadyBooked = isConfirmedBooking(booking);
+        setActionLoading(session.id); // Show loading immediately
 
-        if (alreadyBooked) {
-            showToast('You have already booked this session. Please check your email/WhatsApp.', 'info');
-            return;
+        // 1. Fresh check for bookings to avoid stale state (Best Effort)
+        try {
+            const bookings = await sessionApi.getUserBookings();
+            const normalizedBookings = (bookings || []).map((b: any) => ({
+                ...b,
+                sessionId: Number(b.sessionId ?? b.session_id ?? b.session?.id),
+                status: String(b.status ?? '').toUpperCase().trim(),
+            }));
+
+            // Update state too so UI reflects it
+            setUserBookings(normalizedBookings);
+
+            const booking = normalizedBookings.find(b => b.sessionId === Number(session.id));
+
+            if (booking && booking.status === 'CONFIRMED') {
+                showToast('Session already Booked! Please check your email.', 'info');
+                setActionLoading(null);
+                return;
+            }
+        } catch (ignored) {
+            console.warn('Pre-check for bookings failed, proceeding with backend check...', ignored);
         }
 
         try {
-            setActionLoading(session.id);
 
+            // Proceed if not booked
             if (session.type === 'FREE') {
                 await sessionApi.joinSession(session.id);
                 showToast(`Successfully joined "${session.title}"`, 'success');
@@ -176,8 +192,35 @@ const Sessions: React.FC = () => {
             }
         } catch (error: any) {
             console.error('List Action Failed:', error);
-            const msg = error.response?.data?.message || error.message || 'Action failed. Please try again.';
-            showToast(msg, 'error');
+            console.dir(error);
+
+            const data = error.response?.data;
+            const messageFromData = typeof data === 'string' ? data : (data?.message || data?.error);
+            const errorMsg = String(messageFromData || error.message || '').toLowerCase();
+
+            if (errorMsg.includes('already booked')) {
+                showToast('Session already Booked!', 'info');
+                fetchUserBookings();
+                return;
+            }
+
+            // Fallback: Check if we are actually booked now (handling 500s masked)
+            try {
+                const bookings = await sessionApi.getUserBookings();
+                const isBookedNow = bookings.some((b: any) => {
+                    const bSid = Number(b.sessionId ?? b.session_id ?? b.session?.id);
+                    return bSid === Number(session.id) && String(b.status).toUpperCase() === 'CONFIRMED';
+                });
+                if (isBookedNow) {
+                    showToast('Session already Booked!', 'info');
+                    // Update local state to reflect this
+                    setUserBookings(bookings);
+                    return;
+                }
+            } catch (ignore) { }
+
+            const displayMsg = typeof messageFromData === 'string' ? messageFromData : 'Unable to book session. Please try again.';
+            showToast(displayMsg, 'error');
         } finally {
             setActionLoading(null);
         }
@@ -309,10 +352,10 @@ const Sessions: React.FC = () => {
                                             style={
                                                 isBooked
                                                     ? {
-                                                        backgroundColor: '#666',
-                                                        borderColor: '#666',
-                                                        color: '#fff',
-                                                        opacity: 0.9,
+                                                        backgroundColor: '#4a5568', // Gray
+                                                        borderColor: '#4a5568',
+                                                        color: '#e2e8f0',
+                                                        opacity: 0.8,
                                                         cursor: 'not-allowed',
                                                     }
                                                     : { borderColor: 'white', color: 'white' }

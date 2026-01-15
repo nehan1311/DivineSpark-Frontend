@@ -45,3 +45,9 @@ export interface AuthResponse {
     refreshToken?: string;
     user: User;
 }
+
+export interface ResetPasswordPayload {
+    email: string;
+    otp: string;
+    newPassword: string;
+}

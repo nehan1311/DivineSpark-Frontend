@@ -8,6 +8,7 @@ export const AUTH_ENDPOINTS = {
     GOOGLE_LOGIN: '/auth/google',
     GET_PROFILE: '/profile',
     UPDATE_PROFILE: '/profile',
+    RESET_PASSWORD: '/auth/reset-password',
 };
 
 export const SESSION_ENDPOINTS = {

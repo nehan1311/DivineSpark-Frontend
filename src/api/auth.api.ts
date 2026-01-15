@@ -7,7 +7,8 @@ import type {
     LoginPayload,
     AuthResponse,
     User,
-    UpdateProfilePayload
+    UpdateProfilePayload,
+    ResetPasswordPayload
 } from '../types/auth.types';
 
 /**
@@ -77,4 +78,11 @@ export const getUserProfile = async (): Promise<User> => {
  */
 export const updateUserProfile = async (payload: UpdateProfilePayload): Promise<void> => {
     await axiosInstance.put(AUTH_ENDPOINTS.UPDATE_PROFILE, payload);
+};
+
+/**
+ * Reset password with OTP.
+ */
+export const resetPassword = async (payload: ResetPasswordPayload): Promise<void> => {
+    await axiosInstance.post(AUTH_ENDPOINTS.RESET_PASSWORD, payload);
 };
