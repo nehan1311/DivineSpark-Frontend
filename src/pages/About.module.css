@@ -1,0 +1,263 @@
+/* Page Wrapper */
+.pageWrapper {
+    width: 100%;
+    min-height: 100vh;
+    padding-top: var(--space-24);
+    /* Ensure content starts well below fixed header */
+}
+
+/* 1. HERO BANNER SECTION */
+.heroSection {
+    position: relative;
+    height: 350px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: var(--color-bg-dark);
+    overflow: hidden;
+    margin-bottom: var(--space-8);
+    border-radius: var(--radius-lg);
+    /* Optional: make it look like a distinct section card if separated */
+}
+
+/* Background Image with Overlay */
+.heroBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.heroImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.heroOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 60, 52, 0.65);
+    /* Forest green overlay */
+    z-index: 2;
+}
+
+.heroContent {
+    position: relative;
+    z-index: 3;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.heroTitle {
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-display);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.breadcrumbs {
+    display: flex;
+    gap: var(--space-2);
+    font-size: var(--font-size-md);
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+.breadcrumbLink {
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.breadcrumbLink:hover {
+    opacity: 0.8;
+}
+
+.breadcrumbSeparator {
+    opacity: 0.6;
+}
+
+/* 2. WELCOME / STORY SECTION (Split Layout) */
+.welcomeSection {
+    padding: var(--space-16) 0;
+}
+
+.welcomeGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    align-items: center;
+}
+
+.welcomeImageWrapper {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    aspect-ratio: 4/3;
+}
+
+.welcomeImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.welcomeImageWrapper:hover .welcomeImage {
+    transform: scale(1.05);
+}
+
+.welcomeContent {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    align-items: flex-start;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+}
+
+.headerLine {
+    width: 60px;
+    height: 2px;
+    background-color: var(--color-primary);
+}
+
+.overline {
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--color-primary);
+    /* DivineSpark Red/Pink or Primary Green? Keeping Primary */
+    font-weight: 700;
+}
+
+.heading {
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-3xl);
+    color: var(--color-text-primary);
+    line-height: 1.2;
+}
+
+.highlightText {
+    color: var(--color-primary);
+    /* Or a specific accent color if needed */
+}
+
+.bodyText {
+    font-size: var(--font-size-md);
+    color: var(--color-text-body);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+    text-align: justify;
+}
+
+/* ... Keep existing section styles for Offerings, Values etc if we want to retain them 
+   Or adapt them to be simpler as per typical 'About' pages 
+*/
+
+/* STATS */
+.statsRow {
+    display: flex;
+    gap: var(--space-8);
+    margin-top: var(--space-4);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+    width: 100%;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+}
+
+.statNumber {
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-2xl);
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.statLabel {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-body);
+}
+
+
+/* Common overrides */
+.iconBox {
+    width: 50px;
+    height: 50px;
+    background-color: var(--color-bg-surface);
+    color: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-4);
+}
+
+/* Values Grid (reusing simplistic style) */
+.valuesSection {
+    background-color: var(--color-bg-surface);
+}
+
+.valuesGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-8);
+    text-align: center;
+}
+
+.valueCard {
+    background: white;
+    padding: var(--space-8);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    transition: transform 0.3s;
+}
+
+.valueCard:hover {
+    transform: translateY(-5px);
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .heroSection {
+        height: 300px;
+    }
+
+    .heroTitle {
+        font-size: var(--font-size-2xl);
+    }
+
+    .welcomeGrid,
+    .valuesGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .statsRow {
+        justify-content: space-around;
+        gap: var(--space-4);
+    }
+}

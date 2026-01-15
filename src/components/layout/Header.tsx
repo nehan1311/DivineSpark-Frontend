@@ -67,7 +67,12 @@ const Header: React.FC = () => {
                     >
                         Contact
                     </Link>
-                    <Link to="#" className={styles.navLink}>About Us</Link>
+                    <Link
+                        to="/about"
+                        className={`${styles.navLink} ${location.pathname === '/about' ? styles.active : ''}`}
+                    >
+                        About Us
+                    </Link>
                 </nav>
 
                 <div className={styles.actions}>

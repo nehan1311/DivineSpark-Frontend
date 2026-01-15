@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import WhatsAppButton from '../ui/WhatsAppButton';
 
 const MainLayout: React.FC = () => {
     return (
@@ -10,6 +11,7 @@ const MainLayout: React.FC = () => {
             <main>
                 <Outlet />
             </main>
+            <WhatsAppButton />
             <Footer />
         </div>
     );

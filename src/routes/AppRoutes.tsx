@@ -14,6 +14,7 @@ import Profile from '../pages/Profile';
 
 import Donate from '../pages/Donate';
 import Contact from '../pages/Contact';
+import About from '../pages/About';
 
 import UserRoute from './UserRoute';
 import PublicRoute from './PublicRoute';
@@ -39,6 +40,7 @@ const AppRoutes: React.FC = () => {
 
                 <Route path="sessions/:sessionId" element={<SessionDetails />} />
                 <Route path="contact" element={<Contact />} />
+                <Route path="about" element={<About />} />
 
                 {/* Guest Routes (Redirects if authenticated) */}
                 <Route element={<PublicRoute />}>
