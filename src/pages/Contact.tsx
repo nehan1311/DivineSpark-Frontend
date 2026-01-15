@@ -52,7 +52,7 @@ const Contact: React.FC = () => {
                         </a>
 
                         {/* Email */}
-                        <a href="mailto:hello@divinespark.com" className={styles.infoItem}>
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@divinespark.com" target="_blank" rel="noopener noreferrer" className={styles.infoItem}>
                             <div className={styles.iconWrapper}>
                                 <MailIcon />
                             </div>
