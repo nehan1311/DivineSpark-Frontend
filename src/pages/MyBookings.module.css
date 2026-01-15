@@ -1,0 +1,209 @@
+.container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    color: #fff;
+    min-height: 80vh;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-family: 'Outfit', sans-serif;
+    /* Assuming Outfit is used or matches prompt */
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: #94a3b8;
+}
+
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+}
+
+.tab {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.tab:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.activeTab {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.activeTab::after {
+    content: '';
+    position: absolute;
+    bottom: -1.1rem;
+    /* Adjust to align with border-bottom of .tabs */
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #6366f1;
+    /* Indigo-500 */
+    border-radius: 3px 3px 0 0;
+}
+
+.bookingGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background: rgba(30, 41, 59, 0.7);
+    /* Slate-800 with opacity */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+.cardHeader {
+    margin-bottom: 1rem;
+}
+
+.sessionType {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.typeFree {
+    background: rgba(52, 211, 153, 0.2);
+    /* Emerald-400 */
+    color: #34d399;
+}
+
+.typePaid {
+    background: rgba(251, 191, 36, 0.2);
+    /* Amber-400 */
+    color: #fbbf24;
+}
+
+.sessionTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.4;
+}
+
+.cardDetails {
+    margin-bottom: 1.5rem;
+}
+
+.detailRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.detailIcon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.7;
+}
+
+.status {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.statusConfirmed {
+    color: #a7f3d0;
+}
+
+.statusCancelled {
+    color: #fca5a5;
+}
+
+.statusPending {
+    color: #fcd34d;
+}
+
+.cardActions {
+    margin-top: auto;
+}
+
+.joinButton {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+}
+
+.joinButton:hover {
+    filter: brightness(1.1);
+}
+
+.joinButtonDisabled {
+    background: #475569;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.emptyText {
+    font-size: 1.5rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+}

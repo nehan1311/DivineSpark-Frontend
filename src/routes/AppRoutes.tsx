@@ -4,6 +4,7 @@ import MainLayout from '../components/layout/MainLayout';
 import Home from '../pages/Home';
 import Sessions from '../pages/Sessions';
 import Login from '../pages/Login';
+import ForgotPassword from '../pages/ForgotPassword';
 import Register from '../pages/Register';
 import Settings from '../pages/Settings';
 import SessionDetails from '../pages/SessionDetails';
@@ -45,6 +46,7 @@ const AppRoutes: React.FC = () => {
                 {/* Guest Routes (Redirects if authenticated) */}
                 <Route element={<PublicRoute />}>
                     <Route path="login" element={<Login />} />
+                    <Route path="forgot-password" element={<ForgotPassword />} />
                     <Route path="register" element={<Register />} />
                     <Route path="oauth-success" element={<OAuthSuccess />} />
                     <Route path="admin/login" element={<AdminLogin />} />

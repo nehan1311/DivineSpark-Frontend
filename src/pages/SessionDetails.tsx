@@ -25,11 +25,40 @@ const SessionDetails: React.FC = () => {
     const { showToast } = useToast();
     const navigate = useNavigate();
 
+    const [isBooked, setIsBooked] = useState(false);
+
     useEffect(() => {
         if (sessionId) {
             fetchSession(sessionId);
         }
     }, [sessionId]);
+
+    useEffect(() => {
+        if (isAuthenticated && session) {
+            checkBookingStatus();
+        } else {
+            setIsBooked(false);
+        }
+    }, [isAuthenticated, session]);
+
+    const checkBookingStatus = async () => {
+        try {
+            const bookings = await sessionApi.getUserBookings();
+            const currentSessionId = Number(session?.id);
+
+            const hasBooking = bookings.some((b: any) => {
+                const bSid = Number(b.sessionId ?? b.session_id ?? b.session?.id);
+                // Check if session ID matches AND status is confirmed (or pending if you want to block duplicates too)
+                // Ususally confirmed is the strict check.
+                const status = String(b.status ?? '').toUpperCase().trim();
+                return bSid === currentSessionId && status === 'CONFIRMED';
+            });
+
+            setIsBooked(hasBooking);
+        } catch (error) {
+            console.error('Failed to check booking status', error);
+        }
+    };
 
     const fetchSession = async (id: string) => {
         try {
@@ -52,18 +81,45 @@ const SessionDetails: React.FC = () => {
     const handleAction = async () => {
         if (!session) return;
 
+        if (isBooked) {
+            showToast('You have already booked this session.', 'info');
+            return;
+        }
+
         if (!isAuthenticated) {
             showToast('Please login to continue', 'info');
             navigate('/login', { state: { from: location } });
             return;
         }
 
+        setActionLoading(true);
+
+        // 1. Pre-check: Verify booking status from backend fresh (Best Effort)
         try {
-            setActionLoading(true);
+            const bookings = await sessionApi.getUserBookings();
+            const currentSessionId = Number(session.id);
+            const freshIsBooked = bookings.some((b: any) => {
+                const bSid = Number(b.sessionId ?? b.session_id ?? b.session?.id);
+                const status = String(b.status ?? '').toUpperCase().trim();
+                return bSid === currentSessionId && status === 'CONFIRMED';
+            });
+
+            if (freshIsBooked) {
+                setIsBooked(true);
+                showToast('Session already Booked!', 'info');
+                setActionLoading(false);
+                return;
+            }
+        } catch (ignored) {
+            console.warn('Pre-booking check failed', ignored);
+        }
+
+        try {
 
             if (session.type === 'FREE') {
                 await sessionApi.joinSession(session.id);
                 showToast(`Successfully joined "${session.title}"`, 'success');
+                setIsBooked(true); // Optimistically update
                 return;
             }
 
@@ -88,14 +144,13 @@ const SessionDetails: React.FC = () => {
                 },
                 session,
                 () => {
-
                     showToast(
                         'Payment successful! You will receive session details shortly.',
                         'success'
                     );
-
+                    setIsBooked(true); // Optimistically update
                     // Webhook will confirm booking
-                    navigate('/sessions');
+                    // navigate('/sessions'); // Optional: stay on page to see "Booked" status
                 },
                 (errorMsg) => {
                     showToast(errorMsg || 'Payment failed', 'error');
@@ -104,11 +159,19 @@ const SessionDetails: React.FC = () => {
 
         } catch (error: any) {
             console.error('Payment Action Failed:', error);
-            const msg =
-                error.response?.data?.message ||
-                error.message ||
-                'Action failed. Please try again.';
-            showToast(msg, 'error');
+
+            // Extract error message from various possible locations
+            const data = error.response?.data;
+            const messageFromData = typeof data === 'string' ? data : (data?.message || data?.error);
+            const errorMsg = String(messageFromData || error.message || '').toLowerCase();
+
+            if (errorMsg.includes('already booked')) {
+                showToast('Session already Booked!', 'info');
+                setIsBooked(true); // Optimistically update
+            } else {
+                const displayMsg = typeof messageFromData === 'string' ? messageFromData : 'Unable to book session. Please try again.';
+                showToast(displayMsg, 'error');
+            }
         } finally {
             setActionLoading(false);
         }
@@ -200,11 +263,11 @@ const SessionDetails: React.FC = () => {
                                 size="lg"
                                 variant="primary"
                                 onClick={handleAction}
-                                disabled={actionLoading || isExpired}
+                                disabled={actionLoading || isExpired || isBooked}
                                 className={styles.actionButton}
-                                style={{ width: '100%' }}
+                                style={{ width: '100%', cursor: isBooked ? 'not-allowed' : 'pointer' }}
                             >
-                                {actionLoading ? 'Processing...' : (isFree ? 'Join Now' : 'Book Session')}
+                                {isBooked ? 'Already Booked' : actionLoading ? 'Processing...' : (isFree ? 'Join Now' : 'Book Session')}
                             </Button>
 
                             {isExpired && (
