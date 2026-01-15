@@ -37,15 +37,11 @@ const About: React.FC = () => {
 
     return (
         <div className={styles.pageWrapper}>
+            <div className={styles.meshContainer}></div>
 
             {/* 1. HERO BANNER - Reference Style */}
             <div className={styles.heroSection}>
                 <div className={styles.heroBackground}>
-                    <img
-                        src="https://images.unsplash.com/photo-1600334129128-685c5582fd35?q=80&w=2000&auto=format&fit=crop"
-                        alt="Meditation Atmosphere"
-                        className={styles.heroImg}
-                    />
                     <div className={styles.heroOverlay}></div>
                 </div>
 
