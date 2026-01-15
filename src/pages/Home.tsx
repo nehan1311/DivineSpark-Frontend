@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, useMotionValue, useSpring, type Variants } from 'framer-motion';
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
@@ -42,6 +43,7 @@ const MagneticWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) 
 };
 
 const Home: React.FC = () => {
+    const navigate = useNavigate();
     const { scrollY } = useScroll();
 
     // Parallax logic for hero image
@@ -125,9 +127,8 @@ const Home: React.FC = () => {
                                 transition={{ delay: 1.0, duration: 0.8 }}
                             >
                                 <MagneticWrapper>
-                                    <Button size="lg" variant="primary">Join Member</Button>
+                                    <Button size="lg" variant="primary" onClick={() => navigate('/sessions')}>Explore Workshops</Button>
                                 </MagneticWrapper>
-                                <Button size="lg" variant="outline">Start for free</Button>
                             </motion.div>
                         </div>
 

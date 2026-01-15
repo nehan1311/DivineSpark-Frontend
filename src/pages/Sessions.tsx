@@ -3,7 +3,7 @@ import { sessionApi } from '../api/session.api';
 import type { Session } from '../types/session.types';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Sessions.module.css';
 import Button from '../components/ui/Button';
 import { formatDate, formatCurrency } from '../utils/format';
@@ -35,6 +35,7 @@ const Sessions: React.FC = () => {
     const { isAuthenticated } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         fetchSessions();
@@ -126,7 +127,7 @@ const Sessions: React.FC = () => {
     const handleSessionAction = async (session: Session) => {
         if (!isAuthenticated) {
             showToast('Please login to join this session', 'info');
-            navigate('/login');
+            navigate('/login', { state: { from: location } });
             return;
         }
 
@@ -317,7 +318,7 @@ const Sessions: React.FC = () => {
                                                     : { borderColor: 'white', color: 'white' }
                                             }
                                         >
-                                            {isBooked ? 'Already Booked' : isFree ? 'Join Now' : 'Pay For Session'}
+                                            {isBooked ? 'Already Booked' : isFree ? 'Join Now' : 'Book Session'}
                                         </Button>
                                     </div>
 

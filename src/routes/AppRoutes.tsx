@@ -11,7 +11,9 @@ import AdminLogin from '../pages/admin/AdminLogin';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import OAuthSuccess from '../pages/OAuthSuccess';
 import Profile from '../pages/Profile';
+
 import Donate from '../pages/Donate';
+import Contact from '../pages/Contact';
 
 import UserRoute from './UserRoute';
 import PublicRoute from './PublicRoute';
@@ -33,6 +35,10 @@ const AppRoutes: React.FC = () => {
             {/* User & Public Interface */}
             <Route element={<MainLayout />}>
                 <Route index element={<Home />} />
+                <Route path="sessions" element={<Sessions />} />
+
+                <Route path="sessions/:sessionId" element={<SessionDetails />} />
+                <Route path="contact" element={<Contact />} />
 
                 {/* Guest Routes (Redirects if authenticated) */}
                 <Route element={<PublicRoute />}>
@@ -42,10 +48,7 @@ const AppRoutes: React.FC = () => {
                     <Route path="admin/login" element={<AdminLogin />} />
                 </Route>
 
-                {/* User Protected Routes */}
                 <Route element={<UserRoute />}>
-                    <Route path="sessions" element={<Sessions />} />
-                    <Route path="sessions/:sessionId" element={<SessionDetails />} />
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path="donate" element={<Donate />} />
