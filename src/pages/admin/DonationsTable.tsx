@@ -3,6 +3,7 @@ import { getAdminDonations, getDonationStats } from '../../api/admin.api';
 import type { AdminDonation, DonationStats } from '../../types/admin.types';
 import { useToast } from '../../context/ToastContext';
 import styles from './Admin.module.css';
+import { formatFullDateTime } from '../../utils/format';
 
 const DonationsTable: React.FC = () => {
     const { showToast } = useToast();
@@ -107,7 +108,7 @@ const DonationsTable: React.FC = () => {
                                     <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={donation.note}>
                                         {donation.note || '-'}
                                     </td>
-                                    <td>{new Date(donation.createdAt).toLocaleDateString()}</td>
+                                    <td>{formatFullDateTime(donation.createdAt)}</td>
                                     <td>
                                         <span className={`${styles.badge} ${donation.status === 'SUCCESS' ? styles.badgeSuccess : styles.badgeWarning}`}>
                                             {donation.status}

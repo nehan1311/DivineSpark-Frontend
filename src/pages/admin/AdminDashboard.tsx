@@ -21,6 +21,8 @@ import {
 } from '../../api/admin.api';
 import { API_BASE_URL } from '../../api/endpoints';
 import { getToken } from '../../utils/authStorage';
+import { formatFullDateTime, formatTime } from '../../utils/format';
+import dayjs from 'dayjs';
 import type {
     DashboardStats,
     AdminSession,
@@ -124,7 +126,7 @@ const SessionsTable: React.FC<{
                                             {session.type}
                                         </span>
                                     </td>
-                                    <td>{new Date(session.startTime).toLocaleString()}</td>
+                                    <td>{formatFullDateTime(session.startTime)}</td>
                                     <td>
                                         {isSeatsValid ? `${availableSeats} / ${maxSeats}` : '—'}
                                     </td>
@@ -205,8 +207,9 @@ const SessionsTable: React.FC<{
                 </table>
             ) : (
                 <div className={styles.emptyState}>No {activeTab.toLowerCase()} sessions found.</div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 
@@ -281,15 +284,7 @@ const SessionParticipants: React.FC = () => {
         }
     };
 
-    const formatDateTime = (dateString: string) => {
-        return new Date(dateString).toLocaleString(undefined, {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
+
 
     return (
         <div className={styles.section}>
@@ -314,7 +309,7 @@ const SessionParticipants: React.FC = () => {
                             </span>
                         </div>
                         <div className={styles.cardDateTime}>
-                            <span>📅</span> {formatDateTime(session.startTime)}
+                            <span>📅</span> {formatFullDateTime(session.startTime)}
                         </div>
                     </div>
                 ))}
@@ -374,7 +369,7 @@ const SessionParticipants: React.FC = () => {
                                             {user.bookingStatus}
                                         </span>
                                     </td>
-                                    <td>{formatDateTime(user.joinedDate)}</td>
+                                    <td>{formatFullDateTime(user.joinedDate)}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -463,13 +458,7 @@ const PaymentsTable: React.FC = () => {
 
     const formatDateTime = (dateString?: string) => {
         if (!dateString) return '—';
-        return new Date(dateString + 'Z').toLocaleString(undefined, {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        return formatFullDateTime(dateString);
     };
 
     const formatCurrency = (amount: number, currency: string = 'INR') => {
@@ -691,17 +680,17 @@ const DashboardWidgets: React.FC<{
     navigate: (path: string) => void;
     openCreateModal: () => void;
 }> = ({ sessions, navigate, openCreateModal }) => {
-    const now = new Date();
-    const next24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const now = dayjs();
+    const next24h = now.add(24, 'hour');
 
     // 1. Today / Next 24h
     const todaySessions = sessions
         .filter(s => {
             if (s.status !== 'UPCOMING') return false;
-            const start = new Date(s.startTime);
-            return start >= now && start <= next24h;
+            const start = dayjs(s.startTime);
+            return (start.isSame(now) || start.isAfter(now)) && (start.isSame(next24h) || start.isBefore(next24h));
         })
-        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+        .sort((a, b) => dayjs(a.startTime).valueOf() - dayjs(b.startTime).valueOf())
         .slice(0, 3);
 
     // 2. Alerts
@@ -718,12 +707,9 @@ const DashboardWidgets: React.FC<{
                 message: `Session "${s.title}" is CANCELLED.`
             });
         } else if (s.status === 'UPCOMING') {
-            const start = new Date(s.startTime);
+            const start = dayjs(s.startTime);
             // Starting soon: startTime <= now + 30 minutes
-            // We interpret this as "Starts within the next 30 mins" or "Overdue but still upcoming"
-            // Condition: start <= now + 30m. (And logically start could be > now, or filtered by API)
-            // If start is way in the past, it might be stale, but rule says <= now + 30m.
-            const timeDiffMins = (start.getTime() - now.getTime()) / (1000 * 60);
+            const timeDiffMins = start.diff(now, 'minute');
 
             if (timeDiffMins <= 30) {
                 // For display nicety: if diff is negative, it started X mins ago. If positive, starts in X mins.
@@ -789,7 +775,7 @@ const DashboardWidgets: React.FC<{
                                         <span style={{ fontSize: '0.8rem', color: '#666' }}>{s.guideName}</span>
                                     </div>
                                     <span className={styles.sessionTime}>
-                                        {new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        {formatTime(s.startTime)}
                                     </span>
                                 </div>
                             ))
