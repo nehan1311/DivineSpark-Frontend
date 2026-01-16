@@ -30,3 +30,15 @@ export interface SessionFilters {
     size?: number;
     type?: SessionType;
 }
+
+export interface UserBooking {
+    bookingId?: string;
+    sessionId: string;
+    sessionTitle: string;
+    sessionType: SessionType;
+    startTime: string;
+    endTime: string;
+    guideName?: string;
+    status: 'CONFIRMED' | 'CANCELLED' | 'PENDING' | 'COMPLETED' | string;
+    joinLink?: string;
+}

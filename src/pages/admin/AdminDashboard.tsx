@@ -117,6 +117,7 @@ const SessionsTable: React.FC<{
                             // If status is cancelled, maybe hide cancel button.
 
                             const isCancelled = session.status === 'CANCELLED';
+                            const bookedSeats = Math.max(0, (session.maxSeats ?? 0) - (session.availableSeats ?? 0));
 
                             return (
                                 <tr key={session.id}>
@@ -178,9 +179,9 @@ const SessionsTable: React.FC<{
                                                     showToast("Failed to download CSV", "error");
                                                 }
                                             }}
-                                            disabled={((session.maxSeats || 0) - (session.availableSeats || 0)) <= 0}
+                                            disabled={bookedSeats === 0}
                                             style={
-                                                ((session.maxSeats || 0) - (session.availableSeats || 0)) <= 0
+                                                bookedSeats === 0
                                                     ? { opacity: 0.5, cursor: "not-allowed" }
                                                     : {}
                                             }

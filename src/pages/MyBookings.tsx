@@ -27,9 +27,23 @@ const MyBookings: React.FC = () => {
         try {
             setLoading(true);
             const data = await sessionApi.getUserBookings();
+
+            const now = new Date();
+            const upcoming = data.filter(b => {
+                const isCancelled = b.status === 'CANCELLED';
+                const isPast = new Date(b.endTime) < now;
+                return !isCancelled && !isPast;
+            });
+
+            const past = data.filter(b => {
+                const isCancelled = b.status === 'CANCELLED';
+                const isPast = new Date(b.endTime) < now;
+                return isCancelled || isPast;
+            });
+
             setBookings({
-                upcoming: data.upcoming || [],
-                past: data.past || []
+                upcoming,
+                past
             });
             setError(null);
         } catch (err: any) {

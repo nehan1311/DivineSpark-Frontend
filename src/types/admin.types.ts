@@ -106,5 +106,10 @@ export interface AdminDonation {
 
 export interface DonationStats {
     totalAmount: number;
-    count: number;
+    totalDonors: number;
+    monthlyDonations: {
+        month: number;
+        year: number;
+        amount: number;
+    }[];
 }
