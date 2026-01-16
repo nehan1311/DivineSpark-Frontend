@@ -1,6 +1,6 @@
 import axiosInstance from './axios';
 import { SESSION_ENDPOINTS } from './endpoints';
-import type { Session, SessionsResponse, SessionFilters } from '../types/session.types';
+import type { Session, SessionsResponse, SessionFilters, UserBooking } from '../types/session.types';
 
 import { getToken } from '../utils/authStorage';
 
@@ -29,10 +29,10 @@ export const sessionApi = {
     },
 
     // Get User Bookings
-    getUserBookings: async (): Promise<any[]> => {
+    getUserBookings: async (): Promise<UserBooking[]> => {
         sessionApi._ensureAuth();
         const headers = sessionApi._authHeaders();
-        const response = await axiosInstance.get(SESSION_ENDPOINTS.MY_BOOKINGS, { headers });
+        const response = await axiosInstance.get<UserBooking[]>(SESSION_ENDPOINTS.MY_BOOKINGS, { headers });
         return response.data;
     },
 
