@@ -21,8 +21,7 @@ import {
 } from '../../api/admin.api';
 import { API_BASE_URL } from '../../api/endpoints';
 import { getToken } from '../../utils/authStorage';
-import { formatFullDateTime, formatTime } from '../../utils/format';
-import dayjs from 'dayjs';
+import { formatFullDateTime } from '../../utils/format';
 import type {
     DashboardStats,
     AdminSession,
@@ -676,142 +675,7 @@ const PaymentsTable: React.FC = () => {
     );
 };
 
-const DashboardWidgets: React.FC<{
-    sessions: AdminSession[];
-    navigate: (path: string) => void;
-    openCreateModal: () => void;
-}> = ({ sessions, navigate, openCreateModal }) => {
-    const now = dayjs();
-    const next24h = now.add(24, 'hour');
 
-    // 1. Today / Next 24h
-    const todaySessions = sessions
-        .filter(s => {
-            if (s.status !== 'UPCOMING') return false;
-            const start = dayjs(s.startTime);
-            return (start.isSame(now) || start.isAfter(now)) && (start.isSame(next24h) || start.isBefore(next24h));
-        })
-        .sort((a, b) => dayjs(a.startTime).valueOf() - dayjs(b.startTime).valueOf())
-        .slice(0, 3);
-
-    // 2. Alerts
-    // Buckets for prioritization: Cancelled > Starting Soon > Low Seats
-    const cancelledAlerts: { id: string; type: 'urgent' | 'warning' | 'info'; message: string }[] = [];
-    const soonAlerts: { id: string; type: 'urgent' | 'warning' | 'info'; message: string }[] = [];
-    const seatsAlerts: { id: string; type: 'urgent' | 'warning' | 'info'; message: string }[] = [];
-
-    sessions.forEach(s => {
-        if (s.status === 'CANCELLED') {
-            cancelledAlerts.push({
-                id: `${s.id}-cancelled`,
-                type: 'urgent',
-                message: `Session "${s.title}" is CANCELLED.`
-            });
-        } else if (s.status === 'UPCOMING') {
-            const start = dayjs(s.startTime);
-            // Starting soon: startTime <= now + 30 minutes
-            const timeDiffMins = start.diff(now, 'minute');
-
-            if (timeDiffMins <= 30) {
-                // For display nicety: if diff is negative, it started X mins ago. If positive, starts in X mins.
-                const timeMsg = timeDiffMins < 0
-                    ? `started ${Math.abs(Math.round(timeDiffMins))} mins ago`
-                    : `starts in ${Math.round(timeDiffMins)} mins`;
-
-                soonAlerts.push({
-                    id: `${s.id}-soon`,
-                    type: 'urgent',
-                    message: `Session "${s.title}" ${timeMsg}.`
-                });
-            }
-
-            // Low seats: availableSeats <= 5
-            if (typeof s.availableSeats === 'number' && s.availableSeats <= 5) {
-                seatsAlerts.push({
-                    id: `${s.id}-seats`,
-                    type: 'warning',
-                    message: `Low seats (${s.availableSeats}) for "${s.title}".`
-                });
-            }
-        }
-    });
-
-    const alerts = [...cancelledAlerts, ...soonAlerts, ...seatsAlerts];
-
-    return (
-        <>
-            {/* Quick Actions Bar */}
-            <div className={styles.quickActionsSection}>
-                <div className={styles.quickActionsTitle}>
-                    <span>🚀</span> Quick Actions
-                </div>
-                <div className={styles.quickActionsBar}>
-                    <button className={styles.actionCardBtn} onClick={openCreateModal}>
-                        <span>➕</span> Create Session
-                    </button>
-                    <button className={styles.actionCardBtn} onClick={() => navigate('/admin/sessions')}>
-                        <span>🧘</span> Manage Sessions
-                    </button>
-                    <button className={styles.actionCardBtn} onClick={() => navigate('/admin/users')}>
-                        <span>👥</span> View Users
-                    </button>
-                    <button className={styles.actionCardBtn} onClick={() => navigate('/admin/payments')}>
-                        <span>💳</span> View Payments
-                    </button>
-                </div>
-            </div>
-
-            <div className={styles.dashboardWidgetsGrid}>
-                {/* Today's Sessions */}
-                <div className={styles.widgetCard}>
-                    <div className={styles.widgetTitle}>
-                        <span>📅</span> Today / Next 24h
-                    </div>
-                    <div className={styles.widgetContent}>
-                        {todaySessions.length > 0 ? (
-                            todaySessions.map(s => (
-                                <div key={s.id} className={styles.sessionItem}>
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <span style={{ fontWeight: 500 }}>{s.title}</span>
-                                        <span style={{ fontSize: '0.8rem', color: '#666' }}>{s.guideName}</span>
-                                    </div>
-                                    <span className={styles.sessionTime}>
-                                        {formatTime(s.startTime)}
-                                    </span>
-                                </div>
-                            ))
-                        ) : (
-                            <div style={{ color: '#666', fontSize: '0.9rem', textAlign: 'center', marginTop: '1rem' }}>
-                                No sessions in the next 24 hours.
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Alerts */}
-                <div className={styles.widgetCard}>
-                    <div className={styles.widgetTitle}>
-                        <span>⚠️</span> Session Alerts
-                    </div>
-                    <div className={styles.widgetContent} style={{ overflowY: 'auto', maxHeight: '200px' }}>
-                        {alerts.length > 0 ? (
-                            alerts.map(alert => (
-                                <div key={alert.id} className={`${styles.alertItem} ${alert.type === 'urgent' ? styles.urgent : ''}`}>
-                                    <span className={styles.alertIcon}>{alert.type === 'urgent' ? '🔴' : '🟠'}</span>
-                                    <div>{alert.message}</div>
-                                </div>
-                            ))
-                        ) : (
-                            <div style={{ color: '#666', fontSize: '0.9rem', textAlign: 'center', marginTop: '1rem' }}>
-                                No active alerts.
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </>
-    );
-};
 
 // --- MAIN PAGE ---
 
@@ -859,12 +723,8 @@ const AdminDashboard: React.FC = () => {
         setIsLoading(true);
         try {
             if (activeView === 'dashboard') {
-                const [statsData, sessionsResponse] = await Promise.all([
-                    getDashboardStats(),
-                    getAdminSessions({ size: 100 })
-                ]);
+                const statsData = await getDashboardStats();
                 setStats(statsData);
-                setSessions(sessionsResponse.sessions || []);
             } else if (activeView === 'sessions') {
                 // Fetch All Sessions and filter client-side to strictly enforce tab rules
                 // This ensures Cancelled/Completed appear ONLY in Past, and Upcoming ONLY in Upcoming.
@@ -1063,11 +923,25 @@ const AdminDashboard: React.FC = () => {
                             )}
                         </div>
 
-                        <DashboardWidgets
-                            sessions={sessions}
-                            navigate={navigate}
-                            openCreateModal={openCreateModal}
-                        />
+                        <div className={styles.quickActionsSection}>
+                            <div className={styles.quickActionsTitle}>
+                                <span>🚀</span> Quick Actions
+                            </div>
+                            <div className={styles.quickActionsBar}>
+                                <button className={styles.actionCardBtn} onClick={openCreateModal}>
+                                    <span>➕</span> Create Session
+                                </button>
+                                <button className={styles.actionCardBtn} onClick={() => navigate('/admin/sessions')}>
+                                    <span>🧘</span> Manage Sessions
+                                </button>
+                                <button className={styles.actionCardBtn} onClick={() => navigate('/admin/users')}>
+                                    <span>👥</span> View Users
+                                </button>
+                                <button className={styles.actionCardBtn} onClick={() => navigate('/admin/payments')}>
+                                    <span>💳</span> View Payments
+                                </button>
+                            </div>
+                        </div>
                     </>
                 )}
 

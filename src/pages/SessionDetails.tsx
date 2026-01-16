@@ -161,13 +161,16 @@ const SessionDetails: React.FC = () => {
             console.error('Payment Action Failed:', error);
 
             // Extract error message from various possible locations
+            const status = error.response?.status;
             const data = error.response?.data;
             const messageFromData = typeof data === 'string' ? data : (data?.message || data?.error);
             const errorMsg = String(messageFromData || error.message || '').toLowerCase();
 
-            if (errorMsg.includes('already booked')) {
-                showToast('Session already Booked!', 'info');
-                setIsBooked(true); // Optimistically update
+            // Handle duplicate booking specific case
+            if ((status === 400 || status === 409) && (errorMsg.includes('already booked') || errorMsg.includes('duplicate'))) {
+                const displayMsg = messageFromData || 'You have already booked this session.';
+                showToast(displayMsg, 'info');
+                setIsBooked(true); // Sync state
             } else {
                 const displayMsg = typeof messageFromData === 'string' ? messageFromData : 'Unable to book session. Please try again.';
                 showToast(displayMsg, 'error');
