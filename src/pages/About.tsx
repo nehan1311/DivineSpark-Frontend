@@ -1,28 +1,92 @@
-import React from 'react';
-import { motion, type Variants } from 'framer-motion';
+import React, { useCallback } from 'react';
+// Lucide icons replaced with inline SVGs to avoid restart issues
+const ChevronLeft = ({ size = 24, color = "currentColor" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m15 18-6-6 6-6" />
+    </svg>
+);
+
+const ChevronRight = ({ size = 24, color = "currentColor" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m9 18 6-6-6-6" />
+    </svg>
+);
+import { motion, type Variants, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Section from '../components/ui/Section';
 import styles from './About.module.css';
+import founderImg from '../assets/download (4).jpg';
+import slide1Img from '../assets/slide-1.png';
+import slide2Img from '../assets/slide-2.png';
+import slide3Img from '../assets/slide-3.png';
+import slide4Img from '../assets/slide-4.png';
+import slide5Img from '../assets/slide-5.png';
+import slide6Img from '../assets/slide-6.png';
+import slide7Img from '../assets/slide-7.png';
 
-// SVGs
-const LotusIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21c-2.8 0-5.1-2.3-5.1-5.1 0-2.8 5.1-9.9 5.1-9.9s5.1 7.1 5.1 9.9c0 2.8-2.3 5.1-5.1 5.1z" /><path d="M12 21c4.2 0 7.6-3.4 7.6-7.6 0-4.2-7.6-11.4-7.6-11.4S4.4 9.2 4.4 13.4c0 4.2 3.4 7.6 7.6 7.6z" /><path d="M12 8c2.1 0 3.8-1.7 3.8-3.8 0-2.1-1.7-3.8-3.8-3.8S8.2 2.1 8.2 4.2 9.9 8 12 8z" /></svg>
-);
-const SunIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><path d="M12 1v2" /><path d="M12 21v2" /><path d="M4.22 4.22l1.42 1.42" /><path d="M18.36 18.36l1.42 1.42" /><path d="M1 12h2" /><path d="M21 12h2" /><path d="M4.22 19.78l1.42-1.42" /><path d="M18.36 5.64l1.42-1.42" /></svg>
-);
-const HeartIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>
-);
-const LeafIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.77 10-10 10Z" /><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" /></svg>
-);
+// SVGs removed as they are no longer used in the layout
+
+// Carousel Data
+const carouselSlides = [
+    {
+        id: 1,
+        image: slide1Img,
+    },
+    {
+        id: 2,
+        image: slide2Img,
+    },
+    {
+        id: 3,
+        image: slide3Img,
+    },
+    {
+        id: 4,
+        image: slide4Img,
+    },
+    {
+        id: 5,
+        image: slide5Img,
+    },
+    {
+        id: 6,
+        image: slide6Img,
+    },
+    {
+        id: 7,
+        image: slide7Img,
+    }
+];
 
 const About: React.FC = () => {
+    const [currentSlide, setCurrentSlide] = useState(0);
+
+    const nextSlide = useCallback(() => {
+        setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+    }, []);
+
+    const prevSlide = useCallback(() => {
+        setCurrentSlide((prev) => (prev === 0 ? carouselSlides.length - 1 : prev - 1));
+    }, []);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            nextSlide();
+        }, 5000);
+        return () => clearInterval(timer);
+    }, [nextSlide]);
+
     // Animation Variants
     const fadeUp: Variants = {
         hidden: { opacity: 0, y: 30 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+    };
+
+    const slideVariants: Variants = {
+        enter: { opacity: 0, x: 50 },
+        center: { opacity: 1, x: 0 },
+        exit: { opacity: 0, x: -50 }
     };
 
     const staggerContainer: Variants = {
@@ -68,7 +132,7 @@ const About: React.FC = () => {
                     <motion.div className={styles.welcomeImageWrapper} variants={fadeUp}>
                         <img
                             src="https://images.unsplash.com/photo-1599447291135-26038df8df43?q=80&w=1000&auto=format&fit=crop"
-                            alt="Welcome to DivineSpark"
+                            alt="DivineSpark Center"
                             className={styles.welcomeImage}
                         />
                     </motion.div>
@@ -78,41 +142,100 @@ const About: React.FC = () => {
                         {/* Header with Line */}
                         <div className={styles.sectionHeader}>
                             <div className={styles.headerLine}></div>
-                            <span className={styles.overline}>ABOUT US</span>
+                            <span className={styles.overline}>PUNE, INDIA</span>
                             <div className={styles.headerLine}></div>
                         </div>
 
-                        <h2 className={styles.heading}>Welcome to <span className={styles.highlightText}>DivineSpark</span></h2>
+                        <h2 className={styles.heading}><span className={styles.highlightText}>DivineSpark</span></h2>
 
                         <p className={styles.bodyText}>
-                            At DivineSpark — Holistic Healing, we believe that true healing begins from within.
-                            In today's fast-paced world, finding a moment of peace can feel impossible.
-                            We created this sanctuary to be that pause—a space where you can reconnect with your breath, your body, and your spirit.
+                            Feed The Soul’s is an energy-based healing center focused on holistic wellbeing through ancient healing practices that work with life force energy.
                         </p>
                         <p className={styles.bodyText}>
-                            Founded in 2020 by XYZ, our community has grown from a small meditation circle into a comprehensive holistic center offering yoga, energy work, and spiritual guidance.
+                            The approach is completely non-invasive, involving no touch and no medication, and aims to improve immunity, health, happiness, and inner balance.
                         </p>
-
-                        <div className={styles.statsRow}>
-                            <div className={styles.statItem}>
-                                <span className={styles.statNumber}>10+</span>
-                                <span className={styles.statLabel}>Years Exp.</span>
-                            </div>
-                            <div className={styles.statItem}>
-                                <span className={styles.statNumber}>3K+</span>
-                                <span className={styles.statLabel}>Happy Clients</span>
-                            </div>
-                            <div className={styles.statItem}>
-                                <span className={styles.statNumber}>25+</span>
-                                <span className={styles.statLabel}>Expert Guides</span>
-                            </div>
-                        </div>
                     </motion.div>
                 </motion.div>
             </Section>
 
-            {/* 3. CORE VALUES - 4 Cards Grid */}
-            <Section bg="surface" className={styles.valuesSection}>
+            {/* 2. FOUNDER / HEALER INTRODUCTION */}
+            <Section>
+                <motion.div
+                    className={styles.welcomeGrid}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={staggerContainer}
+                >
+                    {/* Content Left */}
+                    <motion.div className={styles.welcomeContent} variants={fadeUp}>
+                        {/* Header with Line */}
+                        <div className={styles.sectionHeader}>
+                            <div className={styles.headerLine}></div>
+                            <span className={styles.overline}>FOUNDER & HEALER</span>
+                            <div className={styles.headerLine}></div>
+                        </div>
+
+                        <h2 className={styles.heading}>Meet <span className={styles.highlightText}>Suvir Sabnis</span></h2>
+                        <h4 style={{ fontSize: '1.2rem', color: 'var(--color-primary)', fontWeight: 600 }}>Healer & Trainer</h4>
+
+                        <p className={styles.bodyText}>
+                            Practicing energy healing since the age of 24, Suvir has helped thousands of people through healing. Nearly 90% of cases handled were critical (ICU-level), demonstrating the power of these ancient practices.
+                        </p>
+                        <p className={styles.bodyText}>
+                            Committed to the well-being of society, the majority of his healing sessions are offered free of cost.
+                        </p>
+
+                        <div className={styles.statsRow}>
+                            <div className={styles.statItem}>
+                                <span className={styles.statNumber}>24+</span>
+                                <span className={styles.statLabel}>Years Practice</span>
+                            </div>
+                            <div className={styles.statItem}>
+                                <span className={styles.statNumber}>3000+</span>
+                                <span className={styles.statLabel}>Lives Healed</span>
+                            </div>
+                            <div className={styles.statItem}>
+                                <span className={styles.statNumber}>90%</span>
+                                <span className={styles.statLabel}>Critical Cases</span>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* Image Right */}
+                    <motion.div className={styles.welcomeImageWrapper} variants={fadeUp}>
+                        <img
+                            src={founderImg}
+                            alt="Suvir Sabnis"
+                            className={styles.welcomeImage}
+                        />
+                    </motion.div>
+                </motion.div>
+            </Section>
+
+            {/* 3. HEALING PHILOSOPHY */}
+            <Section bg="surface">
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={fadeUp}
+                    style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}
+                >
+                    <div className={styles.sectionHeader} style={{ justifyContent: 'center' }}>
+                        <div className={styles.headerLine}></div>
+                        <span className={styles.overline}>PHILOSOPHY</span>
+                        <div className={styles.headerLine}></div>
+                    </div>
+                    <h2 className={styles.heading} style={{ marginBottom: '1.5rem' }}>Our Vision</h2>
+                    <p className={styles.bodyText} style={{ fontSize: '1.1rem', textAlign: 'center' }}>
+                        “Feed The Soul energy healing is an ancient art and science of healing that works with life force energy. It is a no-touch, no-drug therapy designed to help individuals build immunity, maintain good health, and live a happy, peaceful life.”
+                    </p>
+                </motion.div>
+            </Section>
+
+            {/* 4. WORKSHOPS & OUTREACH (Gallery) */}
+            <Section className={styles.valuesSection}>
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
@@ -120,40 +243,159 @@ const About: React.FC = () => {
                     variants={staggerContainer}
                     style={{ textAlign: 'center', marginBottom: '3rem' }}
                 >
-                    <span className={styles.overline}>OUR PHILOSOPHY</span>
-                    <h2 className={styles.heading} style={{ marginTop: '0.5rem' }}>Why Choose Us?</h2>
+                    <span className={styles.overline}>GALLERY</span>
+                    <h2 className={styles.heading} style={{ marginTop: '0.5rem' }}>Workshops & Outreach</h2>
                 </motion.div>
 
                 <motion.div
-                    className={styles.valuesGrid}
+                    className={styles.carouselContainer}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={fadeUp}
+                >
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={currentSlide}
+                            className={styles.carouselSlide}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{ duration: 0.8, ease: "easeInOut" }}
+                        >
+                            <img
+                                src={carouselSlides[currentSlide].image}
+                                className={styles.slideImage}
+                            />
+                            <div className={styles.slideOverlay}>
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
+
+                    {/* Navigation Arrows */}
+                    <button
+                        onClick={prevSlide}
+                        style={{
+                            position: 'absolute',
+                            left: '20px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            backdropFilter: 'blur(4px)',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '40px',
+                            height: '40px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            cursor: 'pointer',
+                            zIndex: 10,
+                            transition: 'background-color 0.3s'
+                        }}
+                        className="hover:bg-white/40"
+                    >
+                        <ChevronLeft size={24} />
+                    </button>
+
+                    <button
+                        onClick={nextSlide}
+                        style={{
+                            position: 'absolute',
+                            right: '20px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            backdropFilter: 'blur(4px)',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '40px',
+                            height: '40px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            cursor: 'pointer',
+                            zIndex: 10,
+                            transition: 'background-color 0.3s'
+                        }}
+                        className="hover:bg-white/40"
+                    >
+                        <ChevronRight size={24} />
+                    </button>
+
+                    {/* Indicators */}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: '20px',
+                        right: '30px',
+                        display: 'flex',
+                        gap: '8px',
+                        zIndex: 10
+                    }}>
+                        {carouselSlides.map((_slide, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    width: '10px',
+                                    height: '10px',
+                                    borderRadius: '50%',
+                                    backgroundColor: index === currentSlide ? 'white' : 'rgba(255,255,255,0.4)',
+                                    cursor: 'pointer',
+                                    transition: 'background-color 0.3s'
+                                }}
+                                onClick={() => setCurrentSlide(index)}
+                            />
+                        ))}
+                    </div>
+                </motion.div>
+            </Section>
+
+            {/* 5. REGULAR MEDITATION ACTIVITY */}
+            <Section bg="surface">
+                <motion.div
+                    className={styles.welcomeGrid}
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={staggerContainer}
                 >
-                    <motion.div className={styles.valueCard} variants={fadeUp}>
-                        <div className={styles.iconBox}><LotusIcon /></div>
-                        <h4>Holistic Approach</h4>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-body)' }}>Integrating mind, body, and spirit for complete wellness.</p>
+                    <motion.div className={styles.welcomeContent} variants={fadeUp}>
+                        <h2 className={styles.heading}>Meditation on Peace & Illumination</h2>
+                        <p className={styles.bodyText}>
+                            Every Sunday, we conduct a guided meditation session focused on peace and illumination. This session is open for all and encourages collective healing and inner harmony.
+                        </p>
                     </motion.div>
+                    <motion.div className={styles.welcomeImageWrapper} variants={fadeUp}>
+                        <img
+                            src="https://images.unsplash.com/photo-1512438248247-f0f2a5a8b7f0?q=80&w=1000&auto=format&fit=crop"
+                            alt="Meditation"
+                            className={styles.welcomeImage}
+                        />
+                    </motion.div>
+                </motion.div>
+            </Section>
 
-                    <motion.div className={styles.valueCard} variants={fadeUp}>
-                        <div className={styles.iconBox}><HeartIcon /></div>
-                        <h4>Compassionate Care</h4>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-body)' }}>Every session is held with deep empathy and non-judgment.</p>
-                    </motion.div>
-
-                    <motion.div className={styles.valueCard} variants={fadeUp}>
-                        <div className={styles.iconBox}><SunIcon /></div>
-                        <h4>Experienced Guides</h4>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-body)' }}>Certified practitioners with decades of combined experience.</p>
-                    </motion.div>
-
-                    <motion.div className={styles.valueCard} variants={fadeUp}>
-                        <div className={styles.iconBox}><LeafIcon /></div>
-                        <h4>Natural Healing</h4>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-body)' }}>Using the power of nature and energy to restore balance.</p>
-                    </motion.div>
+            {/* 6. MISSION / PURPOSE STATEMENT */}
+            <Section>
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={fadeUp}
+                    style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto', padding: '2rem 0' }}
+                >
+                    <div className={styles.sectionHeader} style={{ justifyContent: 'center' }}>
+                        <div className={styles.headerLine}></div>
+                        <span className={styles.overline}>OUR MISSION</span>
+                        <div className={styles.headerLine}></div>
+                    </div>
+                    <h2 className={styles.heading} style={{ marginBottom: '1.5rem' }}>Spreading Happiness</h2>
+                    <p className={styles.bodyText} style={{ fontSize: '1.2rem', textAlign: 'center', fontStyle: 'italic' }}>
+                        “The main purpose of our life is to spread happiness. Our mission is to teach energy healing to as many people as possible and contribute to a peaceful, healthy, and joyful society.”
+                    </p>
                 </motion.div>
             </Section>
 
