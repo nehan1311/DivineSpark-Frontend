@@ -6,7 +6,7 @@ import { useToast } from '../context/ToastContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Sessions.module.css';
 import Button from '../components/ui/Button';
-import { formatDate, formatCurrency } from '../utils/format';
+import { formatFullDateTime, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
 import RetreatContentSection from '../components/sessions/RetreatContentSection';
 
@@ -316,8 +316,8 @@ const Sessions: React.FC = () => {
                                     </div>
 
                                     <div className={styles.metaItem}>
-                                        <span className={styles.metaLabel}>Date</span>
-                                        <span className={styles.metaValue}>{formatDate(session.startTime)}</span>
+                                        <span className={styles.metaLabel}>Date & Time</span>
+                                        <span className={styles.metaValue}>{formatFullDateTime(session.startTime)}</span>
                                     </div>
 
                                     {!isFree && (

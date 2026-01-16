@@ -5,6 +5,7 @@ import type { UserBooking } from '../types/session.types';
 import styles from './MyBookings.module.css';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button'; // Assuming generic Button exists
+import { formatDate, formatTime } from '../utils/format';
 
 const MyBookings: React.FC = () => {
     const navigate = useNavigate();
@@ -70,15 +71,7 @@ const MyBookings: React.FC = () => {
         }
     };
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleString('en-US', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
+
 
     const displayedBookings = activeTab === 'upcoming' ? bookings.upcoming : bookings.past;
 
@@ -152,7 +145,7 @@ const MyBookings: React.FC = () => {
                                 </div>
                                 <div className={styles.detailRow}>
                                     <span>⏳</span>
-                                    <span>{new Date(booking.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} End</span>
+                                    <span>{formatTime(booking.endTime)} End</span>
                                 </div>
                                 {booking.guideName && (
                                     <div className={styles.detailRow}>

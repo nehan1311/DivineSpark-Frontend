@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import type { AdminSession } from '../../types/admin.types';
 import Button from '../../components/ui/Button';
 import styles from './SessionModal.module.css';
+import { formatForInput, parseFromInput, getNowInIST } from '../../utils/format';
+import dayjs from 'dayjs';
 
 interface SessionModalProps {
     isOpen: boolean;
@@ -36,8 +38,8 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
             // Edit Mode
             setFormData({
                 ...session,
-                startTime: session.startTime ? new Date(session.startTime).toISOString().slice(0, 16) : '',
-                endTime: session.endTime ? new Date(session.endTime).toISOString().slice(0, 16) : '',
+                startTime: session.startTime ? formatForInput(session.startTime) : '',
+                endTime: session.endTime ? formatForInput(session.endTime) : '',
             });
         } else {
             // Reset for Create Mode
@@ -57,51 +59,36 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
     }, [session, isOpen]);
 
     // Helpers
-    const getLocalNow = () => {
-        const now = new Date();
-        // Adjust for local timezone offset to get a "local" ISO string
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        return now.toISOString().slice(0, 16);
-    };
-
     const getMinEndTime = (startStr: string) => {
         if (!startStr) return '';
-        const date = new Date(startStr); // This will parse startStr as local time
-        if (isNaN(date.getTime())) return '';
+        const start = dayjs.tz(startStr, 'Asia/Kolkata');
+        if (!start.isValid()) return '';
 
         // Add 30 minutes
-        date.setMinutes(date.getMinutes() + 30);
-
-        // The `datetime-local` input expects a string in the format "YYYY-MM-DDTHH:mm"
-        // which represents local time. `toISOString()` converts to UTC.
-        // To get the local time string from the adjusted date object, we need to
-        // manually adjust for the timezone offset before slicing.
-        const offset = date.getTimezoneOffset() * 60000; // offset in milliseconds
-        const localDate = new Date(date.getTime() - offset);
-        return localDate.toISOString().slice(0, 16);
+        return start.add(30, 'minute').format('YYYY-MM-DDTHH:mm');
     };
 
-    const minStartTime = getLocalNow();
+    const minStartTime = getNowInIST().format('YYYY-MM-DDTHH:mm');
     const minEndTime = getMinEndTime(formData.startTime || '');
 
     const validateField = (name: string, value: any, currentFormData: Partial<AdminSession>) => {
         let err = '';
-        const now = new Date();
+        const now = getNowInIST();
 
         if (name === 'startTime') {
-            const start = new Date(value);
-            if (value && start < now) {
+            const start = dayjs.tz(value, 'Asia/Kolkata');
+            if (value && start.isBefore(now)) {
                 err = "Start time cannot be in the past.";
             } else if (value && currentFormData.endTime) {
                 // If start time changes, re-validate end time against new start time
-                const end = new Date(currentFormData.endTime);
-                if (end <= start) {
+                const end = dayjs.tz(currentFormData.endTime, 'Asia/Kolkata');
+                if (end.isBefore(start) || end.isSame(start)) {
                     setFieldErrors(prev => ({ ...prev, endTime: "End time must be after start time." }));
-                } else if ((end.getTime() - start.getTime()) / (1000 * 60) < 30) {
+                } else if (end.diff(start, 'minute') < 30) {
                     setFieldErrors(prev => ({ ...prev, endTime: "Duration must be at least 30 min." }));
                 } else {
                     // Check if start and end are on the same local date
-                    if (start.getDate() !== end.getDate() || start.getMonth() !== end.getMonth() || start.getFullYear() !== end.getFullYear()) {
+                    if (!start.isSame(end, 'day')) {
                         setFieldErrors(prev => ({ ...prev, endTime: "Must be same date as start." }));
                     } else {
                         // If all good, clear end time error
@@ -115,19 +102,19 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
         }
 
         if (name === 'endTime') {
-            const end = new Date(value);
+            const end = dayjs.tz(value, 'Asia/Kolkata');
             const startStr = currentFormData.startTime;
             if (value && startStr) {
-                const start = new Date(startStr);
-                if (end <= start) {
+                const start = dayjs.tz(startStr, 'Asia/Kolkata');
+                if (end.isBefore(start) || end.isSame(start)) {
                     err = "End time must be after start time.";
                 } else {
-                    const duration = (end.getTime() - start.getTime()) / (1000 * 60);
+                    const duration = end.diff(start, 'minute');
                     if (duration < 30) {
                         err = "Duration must be at least 30 min.";
                     } else {
                         // Same date check for local dates
-                        if (start.getDate() !== end.getDate() || start.getMonth() !== end.getMonth() || start.getFullYear() !== end.getFullYear()) {
+                        if (!start.isSame(end, 'day')) {
                             err = "Must be same date as start.";
                         }
                     }
@@ -202,8 +189,8 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
             // Ensure ISO strings for dates
             const payload = {
                 ...formData,
-                startTime: new Date(formData.startTime!).toISOString(),
-                endTime: new Date(formData.endTime!).toISOString(),
+                startTime: parseFromInput(formData.startTime!),
+                endTime: parseFromInput(formData.endTime!),
             };
 
             // If creating, ensure availableSeats matches maxSeats (since input is hidden)

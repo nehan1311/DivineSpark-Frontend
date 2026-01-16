@@ -4,6 +4,8 @@ import Button from './ui/Button';
 import styles from './SessionCard.module.css';
 import { formatDate, formatCurrency } from '../utils/format';
 
+import dayjs from 'dayjs';
+
 interface SessionCardProps {
     session: Session;
     onAction: (session: Session) => void;
@@ -13,7 +15,7 @@ interface SessionCardProps {
 const SessionCard: React.FC<SessionCardProps> = ({ session, onAction, loading = false }) => {
     const isFree = session.type === 'FREE';
     // Check if session is in the past
-    const isExpired = new Date(session.startTime) < new Date();
+    const isExpired = dayjs(session.startTime).isBefore(dayjs());
 
     // Status text logic could be improved, but relying on isExpired for now
     const ctaLabel = isExpired ? 'Expired' : (isFree ? 'Join Free' : 'Pay For Session');
