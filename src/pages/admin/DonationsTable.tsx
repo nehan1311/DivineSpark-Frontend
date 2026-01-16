@@ -1,3 +1,4 @@
+// Re-trigger build
 import React, { useState, useEffect } from 'react';
 import {
     BarChart,
@@ -88,13 +89,11 @@ const DonationsTable: React.FC = () => {
     const [donations, setDonations] = useState<AdminDonation[]>([]);
     const [stats, setStats] = useState<DonationStats | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     const fetchData = async () => {
         setIsRefreshing(true);
         if (!stats) setIsLoading(true);
-        setError(null);
 
         try {
             const [donationsData, statsData] = await Promise.all([
@@ -105,7 +104,6 @@ const DonationsTable: React.FC = () => {
             setStats(statsData);
         } catch (err: any) {
             const msg = err.response?.data?.message || 'Failed to load donations';
-            setError(msg);
             showToast(msg, 'error');
         } finally {
             setIsLoading(false);
