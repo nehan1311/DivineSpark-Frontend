@@ -9,8 +9,9 @@ import Button from '../components/ui/Button';
 import { formatFullDateTime, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
 import RetreatContentSection from '../components/sessions/RetreatContentSection';
+import defaultThumbnail from '../assets/defaultthumbnail.jpg';
 
-import { API_BASE_URL, ADMIN_ENDPOINTS } from '../api/endpoints';
+import { API_BASE_URL, PUBLIC_ENDPOINTS } from '../api/endpoints';
 
 
 
@@ -312,12 +313,13 @@ const Sessions: React.FC = () => {
                         >
                             <div className={styles.background}>
                                 <img
-                                    src={`${API_BASE_URL}${ADMIN_ENDPOINTS.THUMBNAIL(session.id)}`}
+                                    src={`${API_BASE_URL}${PUBLIC_ENDPOINTS.THUMBNAIL(session.id)}`}
                                     onError={(e) => {
                                         const target = e.currentTarget;
-                                        // If primary fails, try session.imageUrl (if different/valid)
-                                        if (session.imageUrl && target.src !== session.imageUrl && target.src !== new URL(session.imageUrl, window.location.href).href) {
+                                        if (session.imageUrl && target.src !== session.imageUrl) {
                                             target.src = session.imageUrl;
+                                        } else {
+                                            target.src = defaultThumbnail;
                                         }
                                     }}
                                     alt={session.title}
