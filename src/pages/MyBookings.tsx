@@ -78,6 +78,7 @@ const MyBookings: React.FC = () => {
     const [cancellingId, setCancellingId] = useState<number | null>(null);
     const [ratingId, setRatingId] = useState<number | null>(null); // bookingId for review
     const [submittingReview, setSubmittingReview] = useState(false);
+    const [waLoadingId, setWaLoadingId] = useState<number | null>(null);
 
     useEffect(() => {
         fetchBookings();
@@ -110,6 +111,22 @@ const MyBookings: React.FC = () => {
 
     const handleJoinSession = (link?: string) => {
         if (link) window.open(link, '_blank');
+    };
+
+    const handleWhatsAppJoin = async (sessionId: number, bookingId: number) => {
+        setWaLoadingId(bookingId);
+        try {
+            const link = await sessionApi.getWhatsAppLink(sessionId);
+            if (link) {
+                window.open(link, '_blank');
+            } else {
+                showToast('WhatsApp link not available yet.', 'info');
+            }
+        } catch (error) {
+            showToast('Failed to fetch WhatsApp link', 'error');
+        } finally {
+            setWaLoadingId(null);
+        }
     };
 
     const handleCancelBooking = async (bookingId: number) => {
@@ -260,6 +277,15 @@ const MyBookings: React.FC = () => {
                                                 ) : (
                                                     <span className={styles.disabledLinkText}>Link not available yet</span>
                                                 )}
+
+                                                <button
+                                                    className={styles.joinButton}
+                                                    style={{ backgroundColor: '#25D366', borderColor: '#25D366', marginTop: '0.5rem', marginBottom: '0.5rem' }}
+                                                    onClick={() => handleWhatsAppJoin(booking.sessionId, booking.bookingId)}
+                                                    disabled={waLoadingId === booking.bookingId}
+                                                >
+                                                    {waLoadingId === booking.bookingId ? 'Fetching...' : 'Join WhatsApp Group'}
+                                                </button>
 
                                                 <button
                                                     className={styles.cancelButton}

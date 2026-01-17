@@ -4,6 +4,7 @@ import Button from '../../components/ui/Button';
 import styles from './SessionModal.module.css';
 import { formatForInput, parseFromInput, getNowInIST } from '../../utils/format';
 import dayjs from 'dayjs';
+import { API_BASE_URL, ADMIN_ENDPOINTS } from '../../api/endpoints';
 
 
 interface SessionModalProps {
@@ -48,7 +49,8 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                 endTime: session.endTime ? formatForInput(session.endTime) : '',
                 imageUrl: session.imageUrl || '',
             });
-            setPreviewUrl(session.imageUrl || null);
+            // Use the dedicated thumbnail endpoint for preview
+            setPreviewUrl(`${API_BASE_URL}${ADMIN_ENDPOINTS.THUMBNAIL(session.id)}`);
         } else {
             // Reset for Create Mode
             setFormData({
