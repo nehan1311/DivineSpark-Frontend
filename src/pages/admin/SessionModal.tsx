@@ -4,6 +4,7 @@ import Button from '../../components/ui/Button';
 import styles from './SessionModal.module.css';
 import { formatForInput, parseFromInput, getNowInIST } from '../../utils/format';
 import dayjs from 'dayjs';
+import { uploadThumbnail } from '../../api/admin.api';
 
 interface SessionModalProps {
     isOpen: boolean;
@@ -17,6 +18,10 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
     const [error, setError] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
 
+    // Thumbnail State
+    const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
     // Form State
     const [formData, setFormData] = useState<Partial<AdminSession>>({
         title: '',
@@ -28,7 +33,8 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
         endTime: '',
         maxSeats: 50,
         availableSeats: 50,
-        zoomLink: '',
+        whatsappGroupLink: '',
+        imageUrl: '',
     });
 
     useEffect(() => {
@@ -40,7 +46,9 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                 ...session,
                 startTime: session.startTime ? formatForInput(session.startTime) : '',
                 endTime: session.endTime ? formatForInput(session.endTime) : '',
+                imageUrl: session.imageUrl || '',
             });
+            setPreviewUrl(session.imageUrl || null);
         } else {
             // Reset for Create Mode
             setFormData({
@@ -53,9 +61,12 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                 endTime: '',
                 maxSeats: 50,
                 availableSeats: 50,
-                zoomLink: '',
+                whatsappGroupLink: '',
+                imageUrl: '',
             });
+            setPreviewUrl(null);
         }
+        setThumbnailFile(null);
     }, [session, isOpen]);
 
     // Helpers
@@ -156,6 +167,23 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
         if (error) setError(null); // Clear general error on user interaction
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+
+            // Basic validation (optional)
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit example
+                setError("Image size should be less than 5MB");
+                return;
+            }
+
+            setThumbnailFile(file);
+            // Create object URL for preview
+            setPreviewUrl(URL.createObjectURL(file));
+            setError(null);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -186,9 +214,21 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
         setIsLoading(true);
         setError(null); // Clear any previous general errors before submission
         try {
+            // Upload Image if selected
+            let finalImageUrl = formData.imageUrl;
+            if (thumbnailFile) {
+                try {
+                    finalImageUrl = await uploadThumbnail(thumbnailFile);
+                } catch (uploadErr) {
+                    console.error("Thumbnail upload failed", uploadErr);
+                    throw new Error("Failed to upload thumbnail image.");
+                }
+            }
+
             // Ensure ISO strings for dates
             const payload = {
                 ...formData,
+                imageUrl: finalImageUrl,
                 startTime: parseFromInput(formData.startTime!),
                 endTime: parseFromInput(formData.endTime!),
             };
@@ -252,6 +292,31 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                             required
                             placeholder="Session Title"
                         />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Thumbnail Image</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className={styles.input} // Reusing input class might look okay, or customize
+                        />
+                        {previewUrl && (
+                            <div style={{ marginTop: '0.5rem' }}>
+                                <img
+                                    src={previewUrl}
+                                    alt="Thumbnail Preview"
+                                    style={{
+                                        width: '100%',
+                                        maxHeight: '200px',
+                                        objectFit: 'cover',
+                                        borderRadius: '8px',
+                                        border: '1px solid #ccc'
+                                    }}
+                                />
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.formGroup}>
@@ -357,14 +422,14 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label className={styles.label}>Zoom Link (Optional)</label>
+                        <label className={styles.label}>WhatsApp Group Link (Optional)</label>
                         <input
                             type="url"
-                            name="zoomLink"
-                            value={formData.zoomLink || ''}
+                            name="whatsappGroupLink"
+                            value={formData.whatsappGroupLink || ''}
                             onChange={handleChange}
                             className={styles.input}
-                            placeholder="https://zoom.us/j/..."
+                            placeholder="https://chat.whatsapp.com/..."
                         />
                     </div>
 

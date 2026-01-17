@@ -190,7 +190,7 @@ const DonationsTable: React.FC = () => {
 
             <h4 style={{ marginBottom: '1rem' }}>Monthly Trends</h4>
             <div style={{ marginBottom: '3rem', height: 300 }}>
-                {stats && stats.monthlyDonations.length > 0 ? (
+                {stats && stats.monthlyDonations && stats.monthlyDonations.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={prepareChartData(stats.monthlyDonations)}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />

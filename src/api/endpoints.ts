@@ -37,6 +37,7 @@ export const ADMIN_ENDPOINTS = {
 
     // Payment Management
     PAYMENTS: '/admin/payments', // GET (list with pagination)
+    THUMBNAIL: '/admin/thumbnail', // POST, PUT, DELETE, GET
 };
 export const PAYMENT_ENDPOINTS = {
     INITIATE: (sessionId: number) =>

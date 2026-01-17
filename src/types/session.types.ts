@@ -14,7 +14,7 @@ export interface Session {
     currentParticipants: number;
     status?: 'UPCOMING' | 'ONGOING' | 'COMPLETED' | 'CANCELLED';
     imageUrl?: string;
-    zoomLink?: string;
+    whatsappGroupLink?: string;
 }
 
 export interface SessionsResponse {
