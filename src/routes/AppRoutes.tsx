@@ -21,6 +21,16 @@ import UserRoute from './UserRoute';
 import PublicRoute from './PublicRoute';
 import AdminRoute from './AdminRoute';
 
+import { useAuth } from '../context/AuthContext';
+
+const RootRedirect = () => {
+    const { isAuthenticated, role } = useAuth();
+    if (isAuthenticated && role === 'ADMIN') {
+        return <Navigate to="/admin/dashboard" replace />;
+    }
+    return <Home />;
+};
+
 const ProfilePage = () => {
     const navigate = useNavigate();
     return (
@@ -36,7 +46,7 @@ const AppRoutes: React.FC = () => {
         <Routes>
             {/* User & Public Interface */}
             <Route element={<MainLayout />}>
-                <Route index element={<Home />} />
+                <Route index element={<RootRedirect />} />
                 <Route path="sessions" element={<Sessions />} />
 
                 <Route path="sessions/:sessionId" element={<SessionDetails />} />
