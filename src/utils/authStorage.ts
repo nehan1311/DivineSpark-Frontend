@@ -1,24 +1,24 @@
-let token: string | null = null;
+const TOKEN_KEY = 'divine_spark_token';
 
 /**
- * Retrieves the JWT token from memory.
+ * Retrieves the JWT token from local storage.
  */
 export const getToken = (): string | null => {
-    return token;
+    return localStorage.getItem(TOKEN_KEY);
 };
 
 /**
- * Stores the JWT token in memory.
- * @param newToken The JWT token to store
+ * Stores the JWT token in local storage.
+ * @param token The JWT token to store
  */
-export const setToken = (newToken: string): void => {
-    token = newToken;
+export const setToken = (token: string): void => {
+    localStorage.setItem(TOKEN_KEY, token);
 };
 
 /**
- * Removes the JWT token from memory.
+ * Removes the JWT token from local storage.
  */
 export const removeToken = (): void => {
-    token = null;
+    localStorage.removeItem(TOKEN_KEY);
 };
 
