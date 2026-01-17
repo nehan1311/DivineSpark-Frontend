@@ -118,7 +118,7 @@ const Home: React.FC = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.8, duration: 0.8 }}
                             >
-                                Join us in transforming your body and mind through our comprehensive yoga and fitness programs.
+                                Discover holistic healing and mindful practices designed to restore balance, build inner strength, and support a healthier, more peaceful life.
                             </motion.p>
 
                             <motion.div
@@ -156,20 +156,20 @@ const Home: React.FC = () => {
                     variants={staggerContainerVariant}
                 >
                     <motion.div className={styles.statItem} variants={fadeInUpVariant}>
-                        <span className={styles.statNumber}>3.2K</span>
-                        <span className={styles.statLabel}>World champions</span>
+                        <span className={styles.statNumber}>3000+</span>
+                        <span className={styles.statLabel}>Lives Touched</span>
                     </motion.div>
                     <motion.div className={styles.statItem} variants={fadeInUpVariant}>
-                        <span className={styles.statNumber}>1.8%</span>
-                        <span className={styles.statLabel}>Runner up champions</span>
+                        <span className={styles.statNumber}>90%</span>
+                        <span className={styles.statLabel}>Critical Care Support</span>
                     </motion.div>
                     <motion.div className={styles.statItem} variants={fadeInUpVariant}>
-                        <span className={styles.statNumber}>4.5M</span>
-                        <span className={styles.statLabel}>Sea games participation</span>
+                        <span className={styles.statNumber}>Across India & Abroad</span>
+                        <span className={styles.statLabel}>Workshops & Outreach</span>
                     </motion.div>
                     <motion.div className={styles.statsCta} variants={fadeInUpVariant}>
-                        <p>Once we receive your consult request we match you up with a trainer. This is to ensure that your unique goals align.</p>
-                        <a href="#" className={styles.linkCta}>Join Member</a>
+                        <p>Over the years, our work has reached individuals and communities through healing sessions, meditation practices, and workshops, both locally and internationally.</p>
+                        <a href="/about" className={styles.linkCta} onClick={(e) => { e.preventDefault(); navigate('/about'); }}>Learn More</a>
                     </motion.div>
                 </motion.div>
             </Section>
@@ -214,7 +214,7 @@ const Home: React.FC = () => {
                             <Flower size={48} strokeWidth={1.5} color="var(--color-primary)" />
                         </motion.div>
                         <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em', marginTop: '1rem' }}>Healing & Yoga Sessions</h3>
-                        <p>Experience guided healing and yoga sessions suitable for all levels. Our sessions blend Arhat Yoga Healing techniques with mindful movement and breathwork to help release energy blockages, improve flexibility, and restore inner balance.</p>
+                        <p>Guided sessions that focus on restoring balance, improving well-being, and supporting inner harmony through mindful healing practices.</p>
                         <motion.a
                             href="/about"
                             onClick={(e) => { e.preventDefault(); navigate('/about'); }}
@@ -238,8 +238,8 @@ const Home: React.FC = () => {
                         >
                             <Activity size={48} strokeWidth={1.5} color="var(--color-primary)" />
                         </motion.div>
-                        <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em', marginTop: '1rem' }}>Personal Wellness & Energy Training</h3>
-                        <p>Receive personalized wellness guidance focused on physical strength, emotional balance, and energetic alignment. Our expert practitioners support you with customized routines, lifestyle guidance, and continuous motivation for overall well-being.</p>
+                        <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em', marginTop: '1rem' }}>Workshops & Group Programs</h3>
+                        <p>Interactive workshops for individuals, children, and communities that introduce healing awareness, mindfulness, and spiritual growth.</p>
                         <motion.a
                             href="/about"
                             onClick={(e) => { e.preventDefault(); navigate('/about'); }}
@@ -263,8 +263,8 @@ const Home: React.FC = () => {
                         >
                             <Sparkles size={48} strokeWidth={1.5} color="var(--color-primary)" />
                         </motion.div>
-                        <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em', marginTop: '1rem' }}>Mindfulness & Holistic Workshops</h3>
-                        <p>Join interactive workshops centered on meditation, mindfulness, stress management, and holistic health. Gain practical tools, deeper self-awareness, and techniques you can apply in everyday life for long-term peace and clarity.</p>
+                        <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em', marginTop: '1rem' }}>Meditation Practices</h3>
+                        <p>Regular meditation sessions designed to cultivate peace, clarity, emotional stability, and collective well-being.</p>
                         <motion.a
                             href="/about"
                             onClick={(e) => { e.preventDefault(); navigate('/about'); }}
@@ -278,38 +278,7 @@ const Home: React.FC = () => {
                 </motion.div>
             </Section>
 
-            {/* Team Section */}
-            <Section bg="surface">
-                <motion.div
-                    className={styles.sectionHeader}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeInUpVariant}
-                >
-                    <span className={styles.overline}>OUR TEAM</span>
-                    <h2>Meet Our Team</h2>
-                </motion.div>
 
-                <motion.div
-                    className={styles.teamGrid}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }}
-                    variants={staggerContainerVariant}
-                >
-                    <motion.div className={`${styles.teamCard} ${styles.teamCardLarge}`} variants={fadeInUpVariant}>
-                        <div className={styles.teamContent}>
-                            <span className={styles.overline}>JOIN THE TEAM</span>
-                            <h3>Personalized Coaching</h3>
-                            <p>One-on-one sessions with our fitness and yoga experts, get personalized guidance.</p>
-                        </div>
-                    </motion.div>
-                    <motion.img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=500" alt="Team member" className={styles.teamImg} variants={fadeInUpVariant} />
-                    <motion.img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=500" alt="Team member" className={styles.teamImg} variants={fadeInUpVariant} />
-                    <motion.img src="https://images.unsplash.com/photo-1544367563-12123d8965cd?auto=format&fit=crop&w=500" alt="Team member" className={styles.teamImg} variants={fadeInUpVariant} />
-                </motion.div>
-            </Section>
         </>
     );
 };

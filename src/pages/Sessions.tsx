@@ -367,7 +367,7 @@ const Sessions: React.FC = () => {
                                     >
                                         <Button
                                             size="lg"
-                                            variant={isFree ? 'outline' : 'primary'}
+                                            variant="primary"
                                             onClick={() => {
                                                 if (!isBooked) handleSessionAction(session);
                                             }}
