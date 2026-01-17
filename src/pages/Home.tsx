@@ -4,8 +4,7 @@ import { motion, useScroll, useTransform, useMotionValue, useSpring, type Varian
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
 import styles from './Home.module.css';
-
-import peacefulMomentImg from '../assets/PeacefullMoment.jpg';
+import homePageImage from '../assets/home_page_image.jpg';
 import { Flower, Activity, Sparkles, ArrowRight } from 'lucide-react';
 
 // Helper for Magnetic Button
@@ -137,8 +136,8 @@ const Home: React.FC = () => {
                         <div className={styles.heroImageWrapper}>
                             <motion.div style={{ y: parallaxY, scale: parallaxScale, width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
                                 <img
-                                    src={peacefulMomentImg}
-                                    alt="Peaceful Moment"
+                                    src={homePageImage}
+                                    alt="DivineSpark Yoga"
                                     className={styles.heroImage}
                                 />
                             </motion.div>
@@ -190,7 +189,7 @@ const Home: React.FC = () => {
                             Whether you’re just beginning your healing journey or looking to deepen your practice, our offerings are thoughtfully designed to guide, support, and inspire you at every step.
                         </p>
                     </div>
-                    <Button variant="primary">Explore the services</Button>
+
                 </motion.div>
 
 
