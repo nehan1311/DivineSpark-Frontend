@@ -7,6 +7,7 @@ import logoImg from '../../assets/divinespark logo.jpeg';
 import { ConfirmationModal } from '../../components/ui/Modal';
 
 import ProfileModal from '../../pages/Profile';
+import ContactModal from '../../pages/Contact';
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ const Header: React.FC = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
+    const [contactModalOpen, setContactModalOpen] = useState(false);
 
 
     const handleLogout = () => {
@@ -61,12 +63,13 @@ const Header: React.FC = () => {
                     >
                         Donate
                     </Link>
-                    <Link
-                        to="/contact"
-                        className={`${styles.navLink} ${location.pathname === '/contact' ? styles.active : ''}`}
+                    <button
+                        onClick={() => setContactModalOpen(true)}
+                        className={`${styles.navLink} ${contactModalOpen ? styles.active : ''}`}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}
                     >
                         Contact
-                    </Link>
+                    </button>
                     <Link
                         to="/about"
                         className={`${styles.navLink} ${location.pathname === '/about' ? styles.active : ''}`}
@@ -123,8 +126,15 @@ const Header: React.FC = () => {
                                     </div>
                                     <div className={styles.dropdownItem} onClick={() => {
                                         setMenuOpen(false);
+                                        navigate('/my-bookings');
+                                    }}>
+                                        My Bookings
+                                    </div>
+                                    <div className={styles.dropdownItem} onClick={() => {
+                                        setMenuOpen(false);
                                         navigate('/settings');
                                     }}>
+
                                         Settings
                                     </div>
                                     <div className={styles.dropdownDivider} />
@@ -171,8 +181,14 @@ const Header: React.FC = () => {
                 isOpen={showProfile}
                 onClose={() => setShowProfile(false)}
             />
+
+            <ContactModal
+                isOpen={contactModalOpen}
+                onClose={() => setContactModalOpen(false)}
+            />
         </header>
     );
 };
 
 export default Header;
+

@@ -14,10 +14,17 @@ export const sessionApi = {
     _ensureAuth: () => {
         const token = getToken();
         if (!token) {
-            throw { response: { data: { message: 'Authentication required. Please login.' } } };
+            throw {
+                response: {
+                    status: 401,
+                    data: { message: 'Authentication required. Please login.' }
+                },
+                isAxiosError: false // It's a manual auth check failure
+            };
         }
         return token;
     },
+
     // Get Upcoming Sessions
     getSessions: async (filters: SessionFilters = {}): Promise<SessionsResponse> => {
         const { page = 0, size = 10, type } = filters;
@@ -73,5 +80,20 @@ export const sessionApi = {
         sessionApi._ensureAuth();
         const headers = sessionApi._authHeaders();
         await axiosInstance.post(`${SESSION_ENDPOINTS.BASE}/${paymentData.sessionId}/verify`, paymentData, { headers });
+    },
+
+    // Cancel Booking
+    cancelBooking: async (bookingId: number): Promise<void> => {
+        sessionApi._ensureAuth();
+        const headers = sessionApi._authHeaders();
+        await axiosInstance.patch(`${SESSION_ENDPOINTS.MY_BOOKINGS}/${bookingId}/cancel`, {}, { headers });
+    },
+
+    // Submit Review
+    submitReview: async (bookingId: number, reviewData: { rating: number; comment: string }): Promise<void> => {
+        sessionApi._ensureAuth();
+        const headers = sessionApi._authHeaders();
+        await axiosInstance.post(`${SESSION_ENDPOINTS.MY_BOOKINGS}/${bookingId}/review`, reviewData, { headers });
     }
 };
+

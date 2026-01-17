@@ -13,7 +13,7 @@ export const AUTH_ENDPOINTS = {
 
 export const SESSION_ENDPOINTS = {
     BASE: '/sessions',
-    MY_BOOKINGS: '/sessions/my-bookings',
+    MY_BOOKINGS: '/user/bookings',
 };
 
 export const ADMIN_ENDPOINTS = {
@@ -47,12 +47,18 @@ export const PAYMENT_ENDPOINTS = {
     CALLBACK: '/api/v1/payments/verify'
 };
 
+
 export const DONATION_ENDPOINTS = {
     INITIATE: '/donations', // POST { amount, note }
+};
+
+export const CONTACT_ENDPOINTS = {
+    SEND: '/contact',
 };
 
 export const ADMIN_DONATION_ENDPOINTS = {
     LIST: '/admin/donations', // GET
     STATS: '/admin/donations/stats', // GET
 };
+
 
