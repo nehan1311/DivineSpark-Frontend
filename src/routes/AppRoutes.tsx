@@ -8,7 +8,7 @@ import ForgotPassword from '../pages/ForgotPassword';
 import Register from '../pages/Register';
 import Settings from '../pages/Settings';
 import SessionDetails from '../pages/SessionDetails';
-import AdminLogin from '../pages/admin/AdminLogin';
+
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import OAuthSuccess from '../pages/OAuthSuccess';
 import Profile from '../pages/Profile';
@@ -49,7 +49,7 @@ const AppRoutes: React.FC = () => {
                     <Route path="forgot-password" element={<ForgotPassword />} />
                     <Route path="register" element={<Register />} />
                     <Route path="oauth-success" element={<OAuthSuccess />} />
-                    <Route path="admin/login" element={<AdminLogin />} />
+
                 </Route>
 
                 <Route element={<UserRoute />}>
