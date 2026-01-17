@@ -116,6 +116,23 @@ export const uploadSessionResources = async (sessionId: string, formData: FormDa
     });
 };
 
+/**
+ * Upload session thumbnail
+ */
+export const uploadThumbnail = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axiosInstance.post(ADMIN_ENDPOINTS.THUMBNAIL, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+    // Adjust based on actual backend response, assuming it returns the URL string or { url: "..." }
+    // If it returns an object { imageUrl: "..." }, change accordingly.
+    // For now assuming it returns the plain URL string or similar.
+    return typeof response.data === 'string' ? response.data : response.data.url || response.data.imageUrl;
+};
+
 // --- REPLACED / DEPRECATED HELPERS ---
 
 /**
