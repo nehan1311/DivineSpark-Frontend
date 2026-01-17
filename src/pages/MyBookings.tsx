@@ -47,11 +47,9 @@ const MyBookings: React.FC = () => {
             });
             setError(null);
         } catch (err: any) {
-            console.error('Failed to fetch bookings:', err);
+
             if (err.isAxiosError) {
-                console.error('Axios config:', err.config);
-                console.error('Axios response:', err.response);
-                console.error('Axios request:', err.request);
+                // Silently handle axios errors
             }
             // Handle 401 specifically if needed, though usually handled by interceptors or _ensureAuth throwing
             if (err.response?.status === 401) {

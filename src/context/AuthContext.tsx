@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const response = await axiosInstance.get<User>(AUTH_ENDPOINTS.GET_PROFILE);
             setUser(response.data);
         } catch (error) {
-            console.error("Failed to fetch user profile", error);
+
             // Optional: don't logout immediately on profile fetch fail, just log it
         }
     }, []);
@@ -80,11 +80,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const login = (token: string) => {
         setToken(token);
-        console.log("TOKEN SAVED IN MEMORY");
+
 
         setIsAuthenticated(true);
         const userRole = getRoleFromToken(token);
-        console.log("ROLE FROM TOKEN:", userRole);
+
         setRole(userRole);
 
         // Fetch profile immediately
@@ -110,7 +110,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     }, [isAuthenticated, user, fetchUserProfile]);
 
-    console.log("AUTH STATE →", { isAuthenticated, role, user });
+
 
 
     return (

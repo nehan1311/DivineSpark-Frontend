@@ -56,7 +56,7 @@ const SessionDetails: React.FC = () => {
 
             setIsBooked(hasBooking);
         } catch (error) {
-            console.error('Failed to check booking status', error);
+
         }
     };
 
@@ -71,7 +71,7 @@ const SessionDetails: React.FC = () => {
             setSession(data);
         } catch (error) {
             showToast('Failed to load session details', 'error');
-            console.error(error);
+
             navigate('/sessions');
         } finally {
             setLoading(false);
@@ -111,7 +111,7 @@ const SessionDetails: React.FC = () => {
                 return;
             }
         } catch (ignored) {
-            console.warn('Pre-booking check failed', ignored);
+
         }
 
         try {
@@ -158,7 +158,7 @@ const SessionDetails: React.FC = () => {
             );
 
         } catch (error: any) {
-            console.error('Payment Action Failed:', error);
+
 
             // Extract error message from various possible locations
             const status = error.response?.status;
