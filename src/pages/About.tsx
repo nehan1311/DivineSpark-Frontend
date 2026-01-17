@@ -16,7 +16,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Section from '../components/ui/Section';
 import styles from './About.module.css';
-import founderImg from '../assets/download (4).jpg';
+
 import slide1Img from '../assets/slide-1.png';
 import slide2Img from '../assets/slide-2.png';
 import slide3Img from '../assets/slide-3.png';
@@ -24,6 +24,9 @@ import slide4Img from '../assets/slide-4.png';
 import slide5Img from '../assets/slide-5.png';
 import slide6Img from '../assets/slide-6.png';
 import slide7Img from '../assets/slide-7.png';
+import divineSparkLogo from '../assets/divinespark logo.jpeg';
+import suvirImg from '../assets/SuvirSabnis.jpeg';
+import healingImg from '../assets/healing.jpg';
 
 // SVGs removed as they are no longer used in the layout
 
@@ -106,16 +109,15 @@ const About: React.FC = () => {
             {/* 1. HERO BANNER - Reference Style */}
             <div className={styles.heroSection}>
                 <div className={styles.heroBackground}>
+                    <img src={healingImg} alt="Healing" className={styles.heroImg} />
                     <div className={styles.heroOverlay}></div>
                 </div>
 
                 <div className={styles.heroContent}>
                     <h1 className={styles.heroTitle}>About Us</h1>
-                    <div className={styles.breadcrumbs}>
-                        <Link to="/" className={styles.breadcrumbLink}>Home</Link>
-                        <span className={styles.breadcrumbSeparator}>/</span>
-                        <Link to="/contact" className={styles.breadcrumbLink}>Contact</Link>
-                    </div>
+                    <Link to="/" className={styles.homeButton}>
+                        Home
+                    </Link>
                 </div>
             </div>
 
@@ -131,9 +133,10 @@ const About: React.FC = () => {
                     {/* Image Left */}
                     <motion.div className={styles.welcomeImageWrapper} variants={fadeUp}>
                         <img
-                            src="https://images.unsplash.com/photo-1599447291135-26038df8df43?q=80&w=1000&auto=format&fit=crop"
+                            src={divineSparkLogo}
                             alt="DivineSpark Center"
                             className={styles.welcomeImage}
+                            style={{ objectFit: 'contain', padding: '20px', backgroundColor: '#fff' }}
                         />
                     </motion.div>
 
@@ -188,7 +191,7 @@ const About: React.FC = () => {
 
                         <div className={styles.statsRow}>
                             <div className={styles.statItem}>
-                                <span className={styles.statNumber}>24+</span>
+                                <span className={styles.statNumber}>15+</span>
                                 <span className={styles.statLabel}>Years Practice</span>
                             </div>
                             <div className={styles.statItem}>
@@ -205,9 +208,10 @@ const About: React.FC = () => {
                     {/* Image Right */}
                     <motion.div className={styles.welcomeImageWrapper} variants={fadeUp}>
                         <img
-                            src={founderImg}
+                            src={suvirImg}
                             alt="Suvir Sabnis"
                             className={styles.welcomeImage}
+                            style={{ objectPosition: 'top' }}
                         />
                     </motion.div>
                 </motion.div>
