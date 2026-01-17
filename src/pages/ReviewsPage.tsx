@@ -35,6 +35,11 @@ const ReviewsPage: React.FC = () => {
                 <div className={styles.splitLayout}>
                     {/* LEFT COLUMN: Action/Message */}
                     <div className={styles.leftColumn}>
+                        <ReviewForm onReviewSubmitted={() => setRefreshTrigger(prev => prev + 1)} />
+                    </div>
+
+                    {/* RIGHT COLUMN: Rating + Reviews List */}
+                    <div className={styles.rightColumn}>
                         <div style={{ marginBottom: '2rem' }}>
                             <h1 style={{
                                 fontSize: '2.5rem',
@@ -49,11 +54,7 @@ const ReviewsPage: React.FC = () => {
                                 See what others are saying about their journey with DivineSpark. Your feedback helps us grow.
                             </p>
                         </div>
-                        <ReviewForm onReviewSubmitted={() => setRefreshTrigger(prev => prev + 1)} />
-                    </div>
 
-                    {/* RIGHT COLUMN: Rating + Reviews List */}
-                    <div className={styles.rightColumn}>
                         {/* Compact Rating Block */}
                         <div className={styles.ratingBlock}>
                             <div className={styles.avgRating}>
