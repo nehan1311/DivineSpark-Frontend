@@ -5,6 +5,7 @@ import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
 import styles from './Home.module.css';
 import homePageImage from '../assets/home_page_image.jpg';
+import { Flower, Activity, Sparkles, ArrowRight } from 'lucide-react';
 
 // Helper for Magnetic Button
 const MagneticWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -185,11 +186,13 @@ const Home: React.FC = () => {
                     <div style={{ maxWidth: '500px' }}>
                         <h2>Our Services</h2>
                         <p className={styles.sectionDesc}>
-                            Whether you're a beginner or an advanced practitioner, our offerings are designed to inspire and support you.
+                            Whether you’re just beginning your healing journey or looking to deepen your practice, our offerings are thoughtfully designed to guide, support, and inspire you at every step.
                         </p>
                     </div>
-                    <Button variant="primary">Explore the services</Button>
+
                 </motion.div>
+
+
 
                 <motion.div
                     className={`grid-cols-2 ${styles.servicesGrid}`}
@@ -198,23 +201,79 @@ const Home: React.FC = () => {
                     viewport={{ once: true, margin: "-100px" }}
                     variants={staggerContainerVariant}
                 >
-                    <motion.div className={styles.serviceCard} variants={fadeInUpVariant}>
-                        <div className={styles.iconBox}>🧘</div>
-                        <h3>Yoga Classes</h3>
-                        <p>Classes for all levels, from beginners to advanced. Enjoy various styles like Hatha, Vinyasa, and Yin Yoga.</p>
-                        <a href="#" className={styles.textLink}>View more →</a>
+                    <motion.div
+                        className={styles.serviceCard}
+                        variants={fadeInUpVariant}
+                        whileHover={{ y: -10, transition: { duration: 0.3 } }}
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        <motion.div
+                            className={styles.iconBox}
+                            style={{ background: 'transparent', boxShadow: 'none' }} // Override default if needed or just let it be clean
+                        >
+                            <Flower size={48} strokeWidth={1.5} color="var(--color-primary)" />
+                        </motion.div>
+                        <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em', marginTop: '1rem' }}>Healing & Yoga Sessions</h3>
+                        <p>Experience guided healing and yoga sessions suitable for all levels. Our sessions blend Arhat Yoga Healing techniques with mindful movement and breathwork to help release energy blockages, improve flexibility, and restore inner balance.</p>
+                        <motion.a
+                            href="/about"
+                            onClick={(e) => { e.preventDefault(); navigate('/about'); }}
+                            className={styles.textLink}
+                            whileHover={{ x: 5 }}
+                        >
+                            <span style={{ marginRight: '0.5rem' }}>View more</span>
+                            <ArrowRight size={16} />
+                        </motion.a>
                     </motion.div>
-                    <motion.div className={styles.serviceCard} variants={fadeInUpVariant}>
-                        <div className={styles.iconBox}>💪</div>
-                        <h3>Fitness Training</h3>
-                        <p>Our expert trainers offer customized workouts and ongoing support for weight loss, muscle building, and health.</p>
-                        <a href="#" className={styles.textLink}>View more →</a>
+
+                    <motion.div
+                        className={styles.serviceCard}
+                        variants={fadeInUpVariant}
+                        whileHover={{ y: -10, transition: { duration: 0.3 } }}
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        <motion.div
+                            className={styles.iconBox}
+                            style={{ background: 'transparent', boxShadow: 'none' }}
+                        >
+                            <Activity size={48} strokeWidth={1.5} color="var(--color-primary)" />
+                        </motion.div>
+                        <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em', marginTop: '1rem' }}>Personal Wellness & Energy Training</h3>
+                        <p>Receive personalized wellness guidance focused on physical strength, emotional balance, and energetic alignment. Our expert practitioners support you with customized routines, lifestyle guidance, and continuous motivation for overall well-being.</p>
+                        <motion.a
+                            href="/about"
+                            onClick={(e) => { e.preventDefault(); navigate('/about'); }}
+                            className={styles.textLink}
+                            whileHover={{ x: 5 }}
+                        >
+                            <span style={{ marginRight: '0.5rem' }}>View more</span>
+                            <ArrowRight size={16} />
+                        </motion.a>
                     </motion.div>
-                    <motion.div className={styles.serviceCard} variants={fadeInUpVariant}>
-                        <div className={styles.iconBox}>♡</div>
-                        <h3>Wellness Workshops</h3>
-                        <p>Workshops on mindfulness, stress management, and holistic health. Gain valuable insights and practical tools.</p>
-                        <a href="#" className={styles.textLink}>View more →</a>
+
+                    <motion.div
+                        className={styles.serviceCard}
+                        variants={fadeInUpVariant}
+                        whileHover={{ y: -10, transition: { duration: 0.3 } }}
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        <motion.div
+                            className={styles.iconBox}
+                            style={{ background: 'transparent', boxShadow: 'none' }}
+                        >
+                            <Sparkles size={48} strokeWidth={1.5} color="var(--color-primary)" />
+                        </motion.div>
+                        <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em', marginTop: '1rem' }}>Mindfulness & Holistic Workshops</h3>
+                        <p>Join interactive workshops centered on meditation, mindfulness, stress management, and holistic health. Gain practical tools, deeper self-awareness, and techniques you can apply in everyday life for long-term peace and clarity.</p>
+                        <motion.a
+                            href="/about"
+                            onClick={(e) => { e.preventDefault(); navigate('/about'); }}
+                            className={styles.textLink}
+                            whileHover={{ x: 5 }}
+                        >
+                            <span style={{ marginRight: '0.5rem' }}>View more</span>
+                            <ArrowRight size={16} />
+                        </motion.a>
                     </motion.div>
                 </motion.div>
             </Section>
