@@ -17,7 +17,13 @@ export const SESSION_ENDPOINTS = {
     WHATSAPP_LINK: (id: string | number) => `/sessions/${id}/whatsapp-link`,
 };
 
+export const REVIEW_ENDPOINTS = {
+    GET_ALL: '/user/review/all',
+    SUBMIT: '/user/review',
+};
+
 export const ADMIN_ENDPOINTS = {
+
     STATS: '/admin/stats',
     REVENUE: '/admin/revenue',
 

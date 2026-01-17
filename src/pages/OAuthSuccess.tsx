@@ -27,7 +27,7 @@ const OAuthSuccess: React.FC = () => {
             showToast('Successfully logged in!', 'success');
             // The PublicRoute component will detect the auth state change and redirect automatically.
             // But we can also add an explicit redirect here if used outside PublicRoute.
-            navigate('/sessions');
+            navigate('/');
         } else if (error) {
             showToast('Login failed: ' + error, 'error');
             navigate('/login');

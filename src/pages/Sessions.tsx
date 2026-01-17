@@ -255,20 +255,33 @@ const Sessions: React.FC = () => {
 
     if (loading) {
         return (
-            <div className={styles.emptyState}>
-                <h2>Loading Experiences...</h2>
+            <div className={styles.pageWrapper}>
+                <div className={styles.meshContainer}></div>
+                <div className={styles.emptyState}>
+                    <div className={styles.emptyIcon}>⌛</div>
+                    <h2 className={styles.emptyTitle}>Loading Experiences...</h2>
+                </div>
             </div>
         );
     }
 
     if (sessions.length === 0) {
         return (
-            <div className={styles.emptyState}>
-                <h3>No Upcoming Sessions</h3>
-                <p>Check back soon for new spiritual journeys.</p>
+            <div className={styles.pageWrapper}>
+                <div className={styles.meshContainer}></div>
+                <div className={styles.emptyState}>
+                    <div className={styles.emptyIcon}>✨</div>
+                    <h3 className={styles.emptyTitle}>No Upcoming Sessions</h3>
+                    <p className={styles.emptyText}>
+                        Our guides are preparing new spiritual journeys for you.
+                        Please check back soon to book your next session.
+                    </p>
+                    <Button onClick={fetchSessions} variant="secondary">Refresh</Button>
+                </div>
             </div>
         );
     }
+
 
     return (
         <div className={styles.pageWrapper}>
@@ -369,7 +382,8 @@ const Sessions: React.FC = () => {
                                                     : { borderColor: 'white', color: 'white' }
                                             }
                                         >
-                                            {isBooked ? 'Already Booked' : isFree ? 'Join Now' : 'Book Session'}
+                                            {isBooked ? 'Session Booked' : isFree ? 'Join Now' : 'Book Session'}
+
                                         </Button>
                                     </div>
 

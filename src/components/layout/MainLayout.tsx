@@ -4,6 +4,8 @@ import Header from './Header';
 import Footer from './Footer';
 import WhatsAppButton from '../ui/WhatsAppButton';
 
+import { ReviewReminder } from '../reviews/ReviewReminder';
+
 const MainLayout: React.FC = () => {
     return (
         <div className="app-shell">
@@ -11,6 +13,7 @@ const MainLayout: React.FC = () => {
             <main>
                 <Outlet />
             </main>
+            <ReviewReminder />
             <WhatsAppButton />
             <Footer />
         </div>

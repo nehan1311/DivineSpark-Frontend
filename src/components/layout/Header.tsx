@@ -63,6 +63,12 @@ const Header: React.FC = () => {
                     >
                         Donate
                     </Link>
+                    <Link
+                        to="/reviews"
+                        className={`${styles.navLink} ${location.pathname === '/reviews' ? styles.active : ''}`}
+                    >
+                        Reviews
+                    </Link>
                     <button
                         onClick={() => setContactModalOpen(true)}
                         className={`${styles.navLink} ${contactModalOpen ? styles.active : ''}`}
