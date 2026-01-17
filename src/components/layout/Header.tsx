@@ -8,6 +8,7 @@ import { ConfirmationModal } from '../../components/ui/Modal';
 
 import ProfileModal from '../../pages/Profile';
 import ContactModal from '../../pages/Contact';
+import SettingsModal from '../../pages/Settings';
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Header: React.FC = () => {
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
     const [contactModalOpen, setContactModalOpen] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
 
 
     const handleLogout = () => {
@@ -138,7 +140,7 @@ const Header: React.FC = () => {
                                     </div>
                                     <div className={styles.dropdownItem} onClick={() => {
                                         setMenuOpen(false);
-                                        navigate('/settings');
+                                        setShowSettings(true);
                                     }}>
 
                                         Settings
@@ -186,6 +188,11 @@ const Header: React.FC = () => {
             <ProfileModal
                 isOpen={showProfile}
                 onClose={() => setShowProfile(false)}
+            />
+
+            <SettingsModal
+                isOpen={showSettings}
+                onClose={() => setShowSettings(false)}
             />
 
             <ContactModal

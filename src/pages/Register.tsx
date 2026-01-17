@@ -29,6 +29,9 @@ const Register: React.FC = () => {
     const [contactNumberError, setContactNumberError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
 
+    // Strict Password Regex
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+
     const handleRequestOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
@@ -113,6 +116,11 @@ const Register: React.FC = () => {
         // Validate contact number before submission
         if (!validateContactNumber(contactNumber)) {
             showToast(contactNumberError || 'Invalid contact number', 'error');
+            return;
+        }
+
+        if (!passwordRegex.test(password)) {
+            setError('Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.');
             return;
         }
 
@@ -296,6 +304,9 @@ const Register: React.FC = () => {
                         </svg>
                     )}
                 </button>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: '#666', marginTop: '-0.5rem', marginBottom: '0.5rem' }}>
+                Must be 8+ chars with uppercase, lowercase, number & special char.
             </div>
             <Button fullWidth size="lg" type="submit" disabled={isLoading}>
                 {isLoading ? 'Creating Account...' : 'Sign Up'}

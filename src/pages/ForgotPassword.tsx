@@ -73,6 +73,14 @@ const ForgotPassword: React.FC = () => {
             return;
         }
 
+        // Strict Password Regex
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+
+        if (!passwordRegex.test(newPassword)) {
+            setError('Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.');
+            return;
+        }
+
         setIsLoading(true);
 
         try {
@@ -222,6 +230,9 @@ const ForgotPassword: React.FC = () => {
                                     </svg>
                                 )}
                             </button>
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: '#666', marginTop: '-0.5rem', marginBottom: '0.5rem' }}>
+                            Must be 8+ chars with uppercase, lowercase, number & special char.
                         </div>
                         <Button fullWidth size="lg" type="submit" disabled={isLoading}>
                             {isLoading ? 'Resetting...' : 'Reset Password'}

@@ -6,7 +6,7 @@ import Sessions from '../pages/Sessions';
 import Login from '../pages/Login';
 import ForgotPassword from '../pages/ForgotPassword';
 import Register from '../pages/Register';
-import Settings from '../pages/Settings';
+
 import SessionDetails from '../pages/SessionDetails';
 
 import AdminDashboard from '../pages/admin/AdminDashboard';
@@ -69,7 +69,7 @@ const AppRoutes: React.FC = () => {
                 <Route element={<UserRoute />}>
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="my-bookings" element={<MyBookings />} />
-                    <Route path="settings" element={<Settings />} />
+
                     <Route path="donate" element={<Donate />} />
 
                 </Route>

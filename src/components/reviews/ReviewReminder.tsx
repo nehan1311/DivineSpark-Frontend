@@ -14,8 +14,7 @@ export const ReviewReminder: React.FC = () => {
         let timer: ReturnType<typeof setTimeout>;
 
         const checkVisibility = () => {
-            const hasClosed = localStorage.getItem('has_closed_reminder');
-            const hasReviewed = sessionStorage.getItem('has_reviewed');
+
             // Don't show on the reviews page itself
             const isReviewPage = location.pathname === '/reviews';
 
