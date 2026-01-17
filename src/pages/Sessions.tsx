@@ -10,8 +10,9 @@ import { formatFullDateTime, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
 import RetreatContentSection from '../components/sessions/RetreatContentSection';
 
-const FALLBACK_BG =
-    'https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1920';
+import { API_BASE_URL, ADMIN_ENDPOINTS } from '../api/endpoints';
+
+
 
 type BookingLike = {
     id?: any;
@@ -298,7 +299,14 @@ const Sessions: React.FC = () => {
                         >
                             <div className={styles.background}>
                                 <img
-                                    src={session.imageUrl || FALLBACK_BG}
+                                    src={`${API_BASE_URL}${ADMIN_ENDPOINTS.THUMBNAIL(session.id)}`}
+                                    onError={(e) => {
+                                        const target = e.currentTarget;
+                                        // If primary fails, try session.imageUrl (if different/valid)
+                                        if (session.imageUrl && target.src !== session.imageUrl && target.src !== new URL(session.imageUrl, window.location.href).href) {
+                                            target.src = session.imageUrl;
+                                        }
+                                    }}
                                     alt={session.title}
                                     className={styles.bgImage}
                                 />

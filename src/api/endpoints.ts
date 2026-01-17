@@ -14,6 +14,7 @@ export const AUTH_ENDPOINTS = {
 export const SESSION_ENDPOINTS = {
     BASE: '/sessions',
     MY_BOOKINGS: '/user/bookings',
+    WHATSAPP_LINK: (id: string | number) => `/sessions/${id}/whatsapp-link`,
 };
 
 export const ADMIN_ENDPOINTS = {

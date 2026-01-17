@@ -94,6 +94,14 @@ export const sessionApi = {
         sessionApi._ensureAuth();
         const headers = sessionApi._authHeaders();
         await axiosInstance.post(`${SESSION_ENDPOINTS.MY_BOOKINGS}/${bookingId}/review`, reviewData, { headers });
+    },
+
+    // Get WhatsApp Group Link (For Confirmed Bookings)
+    getWhatsAppLink: async (sessionId: string | number): Promise<string> => {
+        sessionApi._ensureAuth();
+        const headers = sessionApi._authHeaders();
+        const response = await axiosInstance.get<{ whatsappLink: string }>(SESSION_ENDPOINTS.WHATSAPP_LINK(sessionId), { headers });
+        return response.data.whatsappLink;
     }
 };
 
