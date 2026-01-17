@@ -47,6 +47,7 @@ export interface SessionUser {
     id: string;
     name: string;
     email: string;
+    phoneNumber?: string;
     bookingType: 'FREE' | 'PAID';
     bookingStatus: 'CONFIRMED' | 'CANCELLED' | 'PENDING';
     joinedDate: string;
@@ -57,6 +58,7 @@ export interface AdminSessionBookingResponse {
     userId: string;
     username: string;
     email: string;
+    phoneNumber?: string;
     bookingType: 'FREE' | 'PAID';
     bookingStatus: 'CONFIRMED' | 'CANCELLED' | 'PENDING';
     bookedAt: string;

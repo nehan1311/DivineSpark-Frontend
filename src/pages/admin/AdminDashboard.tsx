@@ -223,6 +223,16 @@ const SessionParticipants: React.FC = () => {
     const [isLoadingUsers, setIsLoadingUsers] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const searchRef = React.useRef<HTMLInputElement>(null);
+
+    // Filter users based on search query (by phone number)
+    const filteredUsers = sessionUsers.filter(user => {
+        if (!searchQuery) return true;
+        const phone = user.phoneNumber || '';
+        return phone.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+
     // Fetch sessions on mount
     useEffect(() => {
         fetchSessions();
@@ -232,11 +242,23 @@ const SessionParticipants: React.FC = () => {
     useEffect(() => {
         if (selectedSessionId) {
             fetchSessionUsers(selectedSessionId);
+            setSearchQuery(''); // Reset search when session changes
         } else {
             setSessionUsers([]);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedSessionId]);
+
+    const handleSearchClick = (e: React.MouseEvent, sessionId: string) => {
+        e.stopPropagation(); // Prevent double trigger if card has onClick
+        setSelectedSessionId(sessionId);
+        // Timeout to allow render and ref to become active if it wasn't
+        setTimeout(() => {
+            if (searchRef.current) {
+                searchRef.current.focus();
+            }
+        }, 100);
+    };
 
     const fetchSessions = async () => {
         setIsLoadingSessions(true);
@@ -267,6 +289,7 @@ const SessionParticipants: React.FC = () => {
                     id: booking.id,
                     name: booking.username,
                     email: booking.email,
+                    phoneNumber: booking.phoneNumber,
                     bookingType: booking.bookingType || (selectedSession?.type === 'FREE' ? 'FREE' : 'PAID'),
                     bookingStatus: booking.bookingStatus,
                     joinedDate: booking.bookedAt
@@ -311,6 +334,17 @@ const SessionParticipants: React.FC = () => {
                         <div className={styles.cardDateTime}>
                             <span>📅</span> {formatFullDateTime(session.startTime)}
                         </div>
+
+                        {/* Search Button on Card */}
+                        <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'flex-end' }}>
+                            <button
+                                className={styles.actionBtn}
+                                style={{ fontSize: '0.8rem', padding: '0.3rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                                onClick={(e) => handleSearchClick(e, session.id)}
+                            >
+                                <span>🔍</span> Search Users
+                            </button>
+                        </div>
                     </div>
                 ))}
 
@@ -340,40 +374,68 @@ const SessionParticipants: React.FC = () => {
 
             {/* Users Table */}
             {!isLoadingUsers && !error && selectedSessionId && (
-                sessionUsers.length > 0 ? (
-                    <table className={styles.table}>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Booking Type</th>
-                                <th>Booking Status</th>
-                                <th>Joined Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sessionUsers.map(user => (
-                                <tr key={user.id}>
-                                    <td>{user.name}</td>
-                                    <td>{user.email}</td>
-                                    <td>
-                                        <span className={`${styles.badge} ${user.bookingType === 'FREE' ? styles.badgeSuccess : styles.badgeWarning}`}>
-                                            {user.bookingType}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span className={`${styles.badge} ${user.bookingStatus === 'CONFIRMED' ? styles.badgeSuccess :
-                                            user.bookingStatus === 'CANCELLED' ? styles.badgeError :
-                                                styles.badgeWarning
-                                            }`}>
-                                            {user.bookingStatus}
-                                        </span>
-                                    </td>
-                                    <td>{formatFullDateTime(user.joinedDate)}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                filteredUsers.length > 0 || searchQuery ? (
+                    <>
+                        {/* Search Filter */}
+                        <div style={{ marginBottom: '1rem', maxWidth: '300px' }}>
+                            <input
+                                ref={searchRef}
+                                type="text"
+                                placeholder="Search by Contact Number..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className={styles.formInput}
+                                style={{
+                                    padding: '0.5rem',
+                                    borderRadius: '4px',
+                                    border: '1px solid var(--color-border)',
+                                    width: '100%'
+                                }}
+                            />
+                        </div>
+
+                        {filteredUsers.length > 0 ? (
+                            <table className={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Contact Number</th>
+                                        <th>Booking Type</th>
+                                        <th>Booking Status</th>
+                                        <th>Joined Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredUsers.map(user => (
+                                        <tr key={user.id}>
+                                            <td>{user.name}</td>
+                                            <td>{user.email}</td>
+                                            <td>{user.phoneNumber || '-'}</td>
+                                            <td>
+                                                <span className={`${styles.badge} ${user.bookingType === 'FREE' ? styles.badgeSuccess : styles.badgeWarning}`}>
+                                                    {user.bookingType}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span className={`${styles.badge} ${user.bookingStatus === 'CONFIRMED' ? styles.badgeSuccess :
+                                                    user.bookingStatus === 'CANCELLED' ? styles.badgeError :
+                                                        styles.badgeWarning
+                                                    }`}>
+                                                    {user.bookingStatus}
+                                                </span>
+                                            </td>
+                                            <td>{formatFullDateTime(user.joinedDate)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        ) : (
+                            <div className={styles.emptyState}>
+                                No users found matching "{searchQuery}".
+                            </div>
+                        )}
+                    </>
                 ) : (
                     <div className={styles.emptyState}>
                         No users enrolled for this session.
