@@ -27,12 +27,12 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
         title: '',
         description: '',
         type: 'FREE',
-        price: 0,
+        price: undefined,
         guideName: '',
         startTime: '',
         endTime: '',
-        maxSeats: 50,
-        availableSeats: 50,
+        maxSeats: undefined,
+        availableSeats: undefined,
         whatsappGroupLink: '',
         imageUrl: '',
     });
@@ -55,12 +55,12 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                 title: '',
                 description: '',
                 type: 'FREE',
-                price: 0,
+                price: undefined,
                 guideName: '',
                 startTime: '',
                 endTime: '',
-                maxSeats: 50,
-                availableSeats: 50,
+                maxSeats: undefined,
+                availableSeats: undefined,
                 whatsappGroupLink: '',
                 imageUrl: '',
             });
@@ -143,7 +143,9 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
 
         const newFormData = {
             ...formData,
-            [name]: name === 'price' || name === 'maxSeats' || name === 'availableSeats' ? Number(value) : value
+            [name]: name === 'price' || name === 'maxSeats' || name === 'availableSeats'
+                ? (value === '' ? undefined : Number(value))
+                : value
         };
         setFormData(newFormData);
 
@@ -220,7 +222,7 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                 try {
                     finalImageUrl = await uploadThumbnail(thumbnailFile);
                 } catch (uploadErr) {
-                    console.error("Thumbnail upload failed", uploadErr);
+
                     throw new Error("Failed to upload thumbnail image.");
                 }
             }
@@ -241,7 +243,7 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
             await onSave(payload);
             onClose();
         } catch (error) {
-            console.error(error);
+
             // Parent handles error toast usually, but we can set local error too
             setError("Failed to save session. Please try again.");
         } finally {
@@ -258,6 +260,7 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
         formData.guideName &&
         formData.startTime &&
         formData.endTime &&
+        formData.whatsappGroupLink &&
         Object.keys(fieldErrors).length === 0;
 
     return (
@@ -352,7 +355,7 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                                     <input
                                         type="number"
                                         name="price"
-                                        value={formData.price}
+                                        value={formData.price ?? ''}
                                         onChange={handleChange}
                                         className={`${styles.input} ${styles.inputWithIcon}`}
                                         min="0"
@@ -412,7 +415,7 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                             <input
                                 type="number"
                                 name="maxSeats"
-                                value={formData.maxSeats}
+                                value={formData.maxSeats ?? ''}
                                 onChange={handleChange}
                                 className={styles.input}
                                 min="1"
@@ -422,14 +425,15 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label className={styles.label}>WhatsApp Group Link (Optional)</label>
+                        <label className={styles.label}>WhatsApp Group Link</label>
                         <input
                             type="url"
                             name="whatsappGroupLink"
-                            value={formData.whatsappGroupLink || ''}
+                            value={formData.whatsappGroupLink}
                             onChange={handleChange}
                             className={styles.input}
                             placeholder="https://chat.whatsapp.com/..."
+                            required
                         />
                     </div>
 

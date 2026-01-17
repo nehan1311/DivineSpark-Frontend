@@ -57,14 +57,14 @@ const DonateModal: React.FC<DonateModalProps> = ({ isOpen, onClose }) => {
                 },
                 (errorMsg) => {
                     // Error Callback
-                    console.error(errorMsg);
+
                     showToast(errorMsg || 'Payment cancelled or failed', 'error');
                     setLoading(false);
                 }
             );
 
         } catch (error: any) {
-            console.error('Donation failed:', error);
+
             const msg = error.response?.data?.message || 'Failed to initiate donation';
             showToast(msg, 'error');
             setLoading(false);

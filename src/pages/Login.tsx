@@ -57,7 +57,7 @@ const Login: React.FC = () => {
                     role = 'ADMIN';
                 }
             } catch (e) {
-                console.warn("Failed to decode token", e);
+
             }
 
             login(token); // Update context state

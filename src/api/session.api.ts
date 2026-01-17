@@ -54,7 +54,7 @@ export const sessionApi = {
         sessionApi._ensureAuth();
         const headers = sessionApi._authHeaders();
         const response = await axiosInstance.post(`${SESSION_ENDPOINTS.BASE}/${sessionId}/pay`, {}, { headers });
-        console.log('Backend Pay Response:', response.data);
+
 
         return {
             orderId: response.data.orderId,

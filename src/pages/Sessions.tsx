@@ -63,7 +63,7 @@ const Sessions: React.FC = () => {
 
             setUserBookings(normalized);
         } catch (error) {
-            console.error('Failed to fetch user bookings', error);
+
             setUserBookings([]);
         }
     };
@@ -153,7 +153,7 @@ const Sessions: React.FC = () => {
                 return;
             }
         } catch (ignored) {
-            console.warn('Pre-check for bookings failed, proceeding with backend check...', ignored);
+
         }
 
         try {
@@ -191,7 +191,7 @@ const Sessions: React.FC = () => {
                 );
             }
         } catch (error: any) {
-            console.error('List Action Failed:', error);
+
             console.dir(error);
 
             const data = error.response?.data;

@@ -437,7 +437,7 @@ const PaymentsTable: React.FC = () => {
                 }));
             }
         } catch (err: any) {
-            console.error('Error fetching payments:', err);
+
             const msg = err.response?.data?.message || err.message || 'Failed to load payments';
             setError(msg);
             showToast(msg, 'error');
@@ -749,7 +749,7 @@ const AdminDashboard: React.FC = () => {
             }
         } catch (error) {
 
-            console.error(error);
+
             showToast('Failed to fetch admin data', 'error');
             if (activeView === 'dashboard') {
                 setStats({ totalSessions: 0, upcomingSessions: 0, totalUsers: 0, totalBookings: 0 });

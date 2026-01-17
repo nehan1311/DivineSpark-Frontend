@@ -32,7 +32,7 @@ const OAuth2Callback: React.FC = () => {
                     showToast('Welcome back!', 'success');
                     navigate('/');
                 } catch (err) {
-                    console.error("Google Login Error:", err);
+
                     showToast('Failed to sign in with Google', 'error');
                     navigate('/login');
                 }
