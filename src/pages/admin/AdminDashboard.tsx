@@ -13,6 +13,8 @@ import {
     getAdminSessions,
     createSession,
     updateSession,
+    uploadSessionThumbnail,
+    updateSessionThumbnail,
     cancelSession as cancelSessionApi, // Using alias to avoid conflict
     blockUser,
     unblockUser,
@@ -831,13 +833,27 @@ const AdminDashboard: React.FC = () => {
         setLogoutModalOpen(false);
     };
 
-    const handleSaveSession = async (sessionData: Partial<AdminSession>) => {
+    const handleSaveSession = async (sessionData: Partial<AdminSession>, thumbnailFile?: File | null) => {
         try {
             if (editingSession) {
+                // Update Session
                 await updateSession(editingSession.id, sessionData);
+
+                // Update Thumbnail if provided
+                if (thumbnailFile) {
+                    await updateSessionThumbnail(editingSession.id, thumbnailFile);
+                }
+
                 showToast('Session updated successfully', 'success');
             } else {
-                await createSession(sessionData);
+                // Create Session
+                const newSession = await createSession(sessionData);
+
+                // Upload Thumbnail if provided (using new session ID)
+                if (thumbnailFile && newSession.id) {
+                    await uploadSessionThumbnail(newSession.id, thumbnailFile);
+                }
+
                 showToast('Session created successfully', 'success');
             }
             fetchData();

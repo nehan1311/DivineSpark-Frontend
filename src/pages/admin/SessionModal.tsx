@@ -4,12 +4,12 @@ import Button from '../../components/ui/Button';
 import styles from './SessionModal.module.css';
 import { formatForInput, parseFromInput, getNowInIST } from '../../utils/format';
 import dayjs from 'dayjs';
-import { uploadThumbnail } from '../../api/admin.api';
+
 
 interface SessionModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (session: Partial<AdminSession>) => Promise<void>;
+    onSave: (session: Partial<AdminSession>, thumbnailFile?: File | null) => Promise<void>;
     session: AdminSession | null; // If null, create mode
 }
 
@@ -216,21 +216,10 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
         setIsLoading(true);
         setError(null); // Clear any previous general errors before submission
         try {
-            // Upload Image if selected
-            let finalImageUrl = formData.imageUrl;
-            if (thumbnailFile) {
-                try {
-                    finalImageUrl = await uploadThumbnail(thumbnailFile);
-                } catch (uploadErr) {
-
-                    throw new Error("Failed to upload thumbnail image.");
-                }
-            }
-
-            // Ensure ISO strings for dates
             const payload = {
                 ...formData,
-                imageUrl: finalImageUrl,
+                // We keep existing imageUrl if available, or it might be updated by parent after upload
+                // If creating, this might be empty initially
                 startTime: parseFromInput(formData.startTime!),
                 endTime: parseFromInput(formData.endTime!),
             };
@@ -240,8 +229,10 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                 payload.availableSeats = payload.maxSeats;
             }
 
-            await onSave(payload);
+            await onSave(payload, thumbnailFile);
             onClose();
+
+
         } catch (error) {
 
             // Parent handles error toast usually, but we can set local error too

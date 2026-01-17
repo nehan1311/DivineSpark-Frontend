@@ -7,7 +7,6 @@ import type {
     AdminSession,
     PaginatedSessionsResponse,
     AdminSessionBookingResponse,
-    AdminPayment,
     PaginatedPaymentsResponse,
     AdminDonation,
     DonationStats
@@ -119,18 +118,37 @@ export const uploadSessionResources = async (sessionId: string, formData: FormDa
 /**
  * Upload session thumbnail
  */
-export const uploadThumbnail = async (file: File): Promise<string> => {
+/**
+ * Upload session thumbnail (Create)
+ */
+export const uploadSessionThumbnail = async (sessionId: string, file: File): Promise<void> => {
     const formData = new FormData();
-    formData.append('file', file);
-    const response = await axiosInstance.post(ADMIN_ENDPOINTS.THUMBNAIL, formData, {
+    formData.append('thumbnail', file); // Field name 'thumbnail' as per requirement
+    await axiosInstance.post(ADMIN_ENDPOINTS.THUMBNAIL(sessionId), formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     });
-    // Adjust based on actual backend response, assuming it returns the URL string or { url: "..." }
-    // If it returns an object { imageUrl: "..." }, change accordingly.
-    // For now assuming it returns the plain URL string or similar.
-    return typeof response.data === 'string' ? response.data : response.data.url || response.data.imageUrl;
+};
+
+/**
+ * Update session thumbnail
+ */
+export const updateSessionThumbnail = async (sessionId: string, file: File): Promise<void> => {
+    const formData = new FormData();
+    formData.append('thumbnail', file);
+    await axiosInstance.put(ADMIN_ENDPOINTS.THUMBNAIL(sessionId), formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
+/**
+ * Delete session thumbnail
+ */
+export const deleteSessionThumbnail = async (sessionId: string): Promise<void> => {
+    await axiosInstance.delete(ADMIN_ENDPOINTS.THUMBNAIL(sessionId));
 };
 
 // --- REPLACED / DEPRECATED HELPERS ---
