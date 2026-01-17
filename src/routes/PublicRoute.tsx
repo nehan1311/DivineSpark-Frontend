@@ -10,7 +10,7 @@ const PublicRoute: React.FC = () => {
             return <Navigate to="/admin/dashboard" replace />;
         }
         // Default to sessions for normal users
-        return <Navigate to="/sessions" replace />;
+        return <Navigate to="/" replace />;
     }
 
     return <Outlet />;

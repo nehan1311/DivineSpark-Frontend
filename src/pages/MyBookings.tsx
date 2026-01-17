@@ -89,9 +89,21 @@ const MyBookings: React.FC = () => {
             setLoading(true);
             const data = await sessionApi.getUserBookings();
 
-            // Strict filtering based on bookingStatus ONLY
-            const upcoming = data.filter(b => b.bookingStatus === 'CONFIRMED');
-            const past = data.filter(b => b.bookingStatus === 'COMPLETED' || b.bookingStatus === 'CANCELLED');
+            const now = new Date();
+
+            const upcoming = data.filter(b => {
+                const isCompleted = b.bookingStatus === 'COMPLETED';
+                const isCancelled = b.bookingStatus === 'CANCELLED';
+                const endTime = new Date(b.endTime);
+                return !isCompleted && !isCancelled && endTime > now;
+            });
+
+            const past = data.filter(b => {
+                const isCompleted = b.bookingStatus === 'COMPLETED';
+                const isCancelled = b.bookingStatus === 'CANCELLED';
+                const endTime = new Date(b.endTime);
+                return isCompleted || isCancelled || endTime <= now;
+            });
 
             setBookings({ upcoming, past });
             setError(null);
@@ -264,18 +276,24 @@ const MyBookings: React.FC = () => {
                                     </div>
 
                                     <div className={styles.cardActions}>
+                                        <button
+                                            className={styles.detailsButton}
+                                            onClick={() => navigate(`/sessions/${booking.sessionId}`)}
+                                        >
+                                            View Details
+                                        </button>
+
                                         {/* Actions for Upcoming (CONFIRMED) */}
                                         {booking.bookingStatus === 'CONFIRMED' && (
+
                                             <>
-                                                {booking.joinLink ? (
+                                                {booking.joinLink && (
                                                     <button
                                                         className={styles.joinButton}
                                                         onClick={() => handleJoinSession(booking.joinLink)}
                                                     >
                                                         Join Session
                                                     </button>
-                                                ) : (
-                                                    <span className={styles.disabledLinkText}>Link not available yet</span>
                                                 )}
 
                                                 <button

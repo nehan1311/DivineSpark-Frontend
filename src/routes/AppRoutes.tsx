@@ -16,6 +16,8 @@ import Profile from '../pages/Profile';
 import Donate from '../pages/Donate';
 import About from '../pages/About';
 import MyBookings from '../pages/MyBookings';
+import ReviewsPage from '../pages/ReviewsPage';
+
 
 
 import UserRoute from './UserRoute';
@@ -52,6 +54,7 @@ const AppRoutes: React.FC = () => {
 
                 <Route path="sessions/:sessionId" element={<SessionDetails />} />
                 <Route path="about" element={<About />} />
+                <Route path="reviews" element={<ReviewsPage />} />
 
 
                 {/* Guest Routes (Redirects if authenticated) */}

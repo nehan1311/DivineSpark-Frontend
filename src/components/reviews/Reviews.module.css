@@ -1,0 +1,280 @@
+/* Background */
+.meshContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: url('../../assets/home_bg.jpg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.3;
+}
+
+.pageWrapper {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+}
+
+/* Form Section */
+
+.formCard {
+    background: rgba(255, 255, 255, 0.95);
+    /* High opacity glass effect */
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    margin-bottom: 2rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.starRating {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.starBtn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.starBtn:hover {
+    transform: scale(1.1);
+}
+
+.activeStar {
+    color: #fbbf24;
+}
+
+.textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #cbd5e1;
+    background-color: rgba(255, 255, 255, 0.8);
+    /* Semi-opaque input */
+    border-radius: 8px;
+    min-height: 120px;
+    margin-bottom: 1.5rem;
+    font-family: inherit;
+    resize: vertical;
+    font-size: 1rem;
+    color: #1e293b;
+    transition: all 0.2s;
+}
+
+.textarea:focus {
+    outline: 2px solid #5fa06f;
+    border-color: transparent;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Page Layout */
+.splitLayout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+    max-width: 1200px;
+    margin: 3rem auto 0;
+}
+
+.stickyForm {
+    position: sticky;
+    top: 100px;
+    /* Adjust based on navbar height */
+}
+
+@media (max-width: 1024px) {
+    .splitLayout {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .stickyForm {
+        position: static;
+        width: 100%;
+        max-width: 600px;
+    }
+}
+
+
+/* List Section */
+.listContainer {
+    width: 100%;
+}
+
+.statsHeader {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-top: 1rem;
+}
+
+.avgRating {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.totalReviews {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.reviewCard {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.reviewCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.cardStars {
+    color: #fbbf24;
+    font-size: 1.1rem;
+}
+
+.cardDate {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.cardComment {
+    color: #334155;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.cardUser {
+    font-weight: 600;
+    color: #0f766e;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.userAvatar {
+    width: 24px;
+    height: 24px;
+    background: #ccfbf1;
+    color: #0f766e;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+
+/* Reminder */
+.reminder {
+    position: fixed;
+    bottom: 7rem;
+    right: 2rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+    padding: 1.5rem;
+    z-index: 9999;
+    width: 300px;
+    border: 1px solid #e2e8f0;
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.closeBtn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: #cbd5e1;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0.25rem;
+    transition: color 0.2s;
+}
+
+.closeBtn:hover {
+    color: #64748b;
+}
+
+.reminderContent {
+    text-align: left;
+}
+
+.reminderTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #0f766e;
+}
+
+.reminderText {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+}
+
+.loginPrompt {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    margin-bottom: 3rem;
+}
