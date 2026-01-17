@@ -22,6 +22,10 @@ export const REVIEW_ENDPOINTS = {
     SUBMIT: '/user/review',
 };
 
+export const PUBLIC_ENDPOINTS = {
+    THUMBNAIL: (id: string | number) => `/public/thumbnail/${id}`,
+};
+
 export const ADMIN_ENDPOINTS = {
 
     STATS: '/admin/stats',

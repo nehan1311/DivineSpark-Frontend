@@ -10,6 +10,7 @@ import styles from './SessionDetails.module.css';
 import { formatDate, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
 
+
 const SessionDetails: React.FC = () => {
     const { sessionId } = useParams<{ sessionId: string }>();
     const location = useLocation();
