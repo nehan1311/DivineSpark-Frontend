@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import Button from '../components/ui/Button';
 import styles from './Auth.module.css';
-import bgVideo from '../assets/Website_Video_for_Healing_and_Spirituality.mp4';
+import bgVideo from '../assets/grok-video-05d66eef-eed8-46c2-80bd-0577b1b2d8f4.mp4';
 import { useAuth } from '../context/AuthContext';
 import { login as loginApi } from '../api/auth.api';
 

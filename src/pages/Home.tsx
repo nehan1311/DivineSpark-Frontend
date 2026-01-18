@@ -175,7 +175,7 @@ const Home: React.FC = () => {
             </Section>
 
             {/* Services Section */}
-            <Section className="section-padding">
+            <Section className={`${styles.servicesSection} section-padding`}>
                 <motion.div
                     className={`flex-between ${styles.sectionHeader}`}
                     initial="hidden"
@@ -183,7 +183,7 @@ const Home: React.FC = () => {
                     viewport={{ once: true }}
                     variants={fadeInUpVariant}
                 >
-                    <div style={{ maxWidth: '500px' }}>
+                    <div style={{ maxWidth: '600px' }}>
                         <h2>Our Services</h2>
                         <p className={styles.sectionDesc}>
                             Whether you’re just beginning your healing journey or looking to deepen your practice, our offerings are thoughtfully designed to guide, support, and inspire you at every step.
@@ -192,10 +192,8 @@ const Home: React.FC = () => {
 
                 </motion.div>
 
-
-
                 <motion.div
-                    className={`grid-cols-2 ${styles.servicesGrid}`}
+                    className={styles.servicesGrid}
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
@@ -204,76 +202,85 @@ const Home: React.FC = () => {
                     <motion.div
                         className={styles.serviceCard}
                         variants={fadeInUpVariant}
-                        whileHover={{ y: -10, transition: { duration: 0.3 } }}
                         whileTap={{ scale: 0.98 }}
                     >
-                        <motion.div
-                            className={styles.iconBox}
-                            style={{ background: 'transparent', boxShadow: 'none' }} // Override default if needed or just let it be clean
-                        >
-                            <Flower size={48} strokeWidth={1.5} color="var(--color-primary)" />
-                        </motion.div>
-                        <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em', marginTop: '1rem' }}>Healing & Yoga Sessions</h3>
-                        <p>Guided sessions that focus on restoring balance, improving well-being, and supporting inner harmony through mindful healing practices.</p>
-                        <motion.a
-                            href="/about"
-                            onClick={(e) => { e.preventDefault(); navigate('/about'); }}
-                            className={styles.textLink}
-                            whileHover={{ x: 5 }}
-                        >
-                            <span style={{ marginRight: '0.5rem' }}>View more</span>
-                            <ArrowRight size={16} />
-                        </motion.a>
+                        <div className={styles.cardInner}>
+                            <motion.div
+                                className={styles.iconBox}
+                            >
+                                <Flower size={32} strokeWidth={1.5} color="currentColor" />
+                            </motion.div>
+                            <h3 className={styles.serviceTitle}>Healing & Yoga Sessions</h3>
+                            <p className={styles.serviceDesc}>Guided sessions that focus on restoring balance, improving well-being, and supporting inner harmony through mindful healing practices.</p>
+
+                            <div className={styles.cardFooter}>
+                                <motion.a
+                                    href="/about"
+                                    onClick={(e) => { e.preventDefault(); navigate('/about'); }}
+                                    className={styles.textLink}
+                                >
+                                    <span>View more</span>
+                                    <ArrowRight size={16} className={styles.linkArrow} />
+                                </motion.a>
+                            </div>
+                        </div>
+                        <div className={styles.cardAccent} />
                     </motion.div>
 
                     <motion.div
                         className={styles.serviceCard}
                         variants={fadeInUpVariant}
-                        whileHover={{ y: -10, transition: { duration: 0.3 } }}
                         whileTap={{ scale: 0.98 }}
                     >
-                        <motion.div
-                            className={styles.iconBox}
-                            style={{ background: 'transparent', boxShadow: 'none' }}
-                        >
-                            <Activity size={48} strokeWidth={1.5} color="var(--color-primary)" />
-                        </motion.div>
-                        <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em', marginTop: '1rem' }}>Workshops & Group Programs</h3>
-                        <p>Interactive workshops for individuals, children, and communities that introduce healing awareness, mindfulness, and spiritual growth.</p>
-                        <motion.a
-                            href="/about"
-                            onClick={(e) => { e.preventDefault(); navigate('/about'); }}
-                            className={styles.textLink}
-                            whileHover={{ x: 5 }}
-                        >
-                            <span style={{ marginRight: '0.5rem' }}>View more</span>
-                            <ArrowRight size={16} />
-                        </motion.a>
+                        <div className={styles.cardInner}>
+                            <motion.div
+                                className={styles.iconBox}
+                            >
+                                <Activity size={32} strokeWidth={1.5} color="currentColor" />
+                            </motion.div>
+                            <h3 className={styles.serviceTitle}>Workshops & Group Programs</h3>
+                            <p className={styles.serviceDesc}>Interactive workshops for individuals, children, and communities that introduce healing awareness, mindfulness, and spiritual growth.</p>
+
+                            <div className={styles.cardFooter}>
+                                <motion.a
+                                    href="/about"
+                                    onClick={(e) => { e.preventDefault(); navigate('/about'); }}
+                                    className={styles.textLink}
+                                >
+                                    <span>View more</span>
+                                    <ArrowRight size={16} className={styles.linkArrow} />
+                                </motion.a>
+                            </div>
+                        </div>
+                        <div className={styles.cardAccent} />
                     </motion.div>
 
                     <motion.div
                         className={styles.serviceCard}
                         variants={fadeInUpVariant}
-                        whileHover={{ y: -10, transition: { duration: 0.3 } }}
                         whileTap={{ scale: 0.98 }}
                     >
-                        <motion.div
-                            className={styles.iconBox}
-                            style={{ background: 'transparent', boxShadow: 'none' }}
-                        >
-                            <Sparkles size={48} strokeWidth={1.5} color="var(--color-primary)" />
-                        </motion.div>
-                        <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em', marginTop: '1rem' }}>Meditation Practices</h3>
-                        <p>Regular meditation sessions designed to cultivate peace, clarity, emotional stability, and collective well-being.</p>
-                        <motion.a
-                            href="/about"
-                            onClick={(e) => { e.preventDefault(); navigate('/about'); }}
-                            className={styles.textLink}
-                            whileHover={{ x: 5 }}
-                        >
-                            <span style={{ marginRight: '0.5rem' }}>View more</span>
-                            <ArrowRight size={16} />
-                        </motion.a>
+                        <div className={styles.cardInner}>
+                            <motion.div
+                                className={styles.iconBox}
+                            >
+                                <Sparkles size={32} strokeWidth={1.5} color="currentColor" />
+                            </motion.div>
+                            <h3 className={styles.serviceTitle}>Meditation Practices</h3>
+                            <p className={styles.serviceDesc}>Regular meditation sessions designed to cultivate peace, clarity, emotional stability, and collective well-being.</p>
+
+                            <div className={styles.cardFooter}>
+                                <motion.a
+                                    href="/about"
+                                    onClick={(e) => { e.preventDefault(); navigate('/about'); }}
+                                    className={styles.textLink}
+                                >
+                                    <span>View more</span>
+                                    <ArrowRight size={16} className={styles.linkArrow} />
+                                </motion.a>
+                            </div>
+                        </div>
+                        <div className={styles.cardAccent} />
                     </motion.div>
                 </motion.div>
             </Section>

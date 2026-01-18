@@ -177,7 +177,7 @@ const DonationsTable: React.FC = () => {
                             helperText="No successful donations yet"
                         />
                         <MetricCard
-                            label="Unique Donors"
+                            label="Total Donors"
                             value={stats.totalDonors}
                             icon={Users}
                             gradientClass={styles.statCardGradient2}
@@ -214,7 +214,7 @@ const DonationsTable: React.FC = () => {
                     <table className={`${styles.table} ${styles.zebraTable}`}>
                         <thead>
                             <tr>
-                                <th>Order ID</th>
+
                                 <th>Donor</th>
                                 <th>Amount</th>
                                 <th>Note</th>
@@ -225,10 +225,10 @@ const DonationsTable: React.FC = () => {
                         <tbody>
                             {donations.map(donation => (
                                 <tr key={donation.id}>
-                                    <td>{donation.orderId}</td>
+
                                     <td>
                                         <div>{donation.userName}</div>
-                                        <div>{donation.userEmail}</div>
+                                        <div>{donation.userPhone || donation.phoneNumber || donation.contactNumber || '-'}</div>
                                     </td>
                                     <td>{formatCurrency(donation.amount, donation.currency)}</td>
                                     <td>{donation.note || '-'}</td>
