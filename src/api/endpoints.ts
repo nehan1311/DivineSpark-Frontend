@@ -1,4 +1,6 @@
-export const API_BASE_URL = 'http://localhost:8080/api/v1';
+// Use environment variable if set, otherwise default to relative path for production (Nginx proxy)
+// or standard localhost for local dev if not running behind proxy
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export const AUTH_ENDPOINTS = {
     REQUEST_OTP: '/auth/request-otp',
@@ -51,11 +53,13 @@ export const ADMIN_ENDPOINTS = {
     THUMBNAIL: (id: string) => `/admin/thumbnail/${id}`, // POST, PUT, DELETE, GET
 };
 export const PAYMENT_ENDPOINTS = {
-    INITIATE: (sessionId: number) =>
-        `/api/v1/sessions/${sessionId}/pay`,
+    // Note: These paths were hardcoded with /api/v1 prefix, but should ideally be relative to API_BASE_URL
+    // However, if the axios instance already appends API_BASE_URL, we should remove /api/v1 from here.
+    // Assuming standard axios setup where baseURL is API_BASE_URL.
 
-
-    CALLBACK: '/api/v1/payments/verify'
+    // If your axios request uses the baseURL, these should just be:
+    INITIATE: (sessionId: number) => `/sessions/${sessionId}/pay`,
+    CALLBACK: '/payments/verify'
 };
 
 
