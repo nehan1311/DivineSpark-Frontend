@@ -16,14 +16,20 @@ export interface CreateReviewRequest {
 }
 
 export const reviewApi = {
+
+    /**
+     * Fetch all platform reviews
+     */
     getAllReviews: async (): Promise<PlatformReview[]> => {
-        const response = await axiosInstance.get(REVIEW_ENDPOINTS.GET_ALL);
+        const response = await axiosInstance.get<PlatformReview[]>(REVIEW_ENDPOINTS.GET_ALL);
         return response.data;
     },
 
+    /**
+     * Submit a new review (requires authentication)
+     */
     submitPlatformReview: async (data: CreateReviewRequest): Promise<void> => {
-        const token = localStorage.getItem('token'); // Manual auth header just in case
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        await axiosInstance.post(REVIEW_ENDPOINTS.SUBMIT, data, { headers });
+        // Token is attached automatically by axiosInstance interceptor
+        await axiosInstance.post(REVIEW_ENDPOINTS.SUBMIT, data);
     }
 };
