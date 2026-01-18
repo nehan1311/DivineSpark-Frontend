@@ -199,47 +199,165 @@
 }
 
 /* Services */
+.servicesSection {
+    position: relative;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(31, 77, 56, 0.03) 100%);
+    /* Optional subtle noise/texture could go here if assets available */
+}
+
 .sectionHeader {
-    margin-bottom: var(--space-12);
+    margin-bottom: var(--space-16);
     align-items: flex-end;
 }
 
 .sectionDesc {
     color: var(--color-text-body);
     margin-top: var(--space-4);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 90%;
 }
 
 .servicesGrid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-8);
 }
 
 .serviceCard {
-    /* No background, clean look */
+    position: relative;
+    border-radius: 20px;
+    background: var(--color-bg-main);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    /* Subtle border in primary theme color (low opacity) */
+    border: 1px solid rgba(26, 60, 52, 0.08);
+    box-shadow: 0 4px 24px rgba(26, 60, 52, 0.06);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+    height: 100%;
+}
+
+/* Center the last card if odd number of items */
+.serviceCard:last-child:nth-child(odd) {
+    grid-column: span 2;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.serviceCard:hover {
+    transform: translateY(-4px);
+    background: #ffffff;
+    border-color: rgba(26, 60, 52, 0.2);
+    box-shadow: 0 20px 40px rgba(26, 60, 52, 0.12), 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.cardInner {
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .iconBox {
-    font-size: 2rem;
-    margin-bottom: var(--space-4);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    /* Soft sage background derived from theme */
+    background: rgba(227, 233, 223, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-6);
+    color: var(--color-primary);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Subtle dot accent on icon */
+.iconBox::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-primary);
+    border-radius: 50%;
+    opacity: 0.6;
+}
+
+.serviceTitle {
+    font-family: var(--font-family-heading);
+    font-size: 1.5rem;
+    font-weight: 500;
     color: var(--color-text-primary);
-}
-
-.serviceCard h3 {
-    font-size: var(--font-size-lg);
-    margin-bottom: var(--space-2);
-}
-
-.serviceCard p {
-    color: var(--color-text-body);
     margin-bottom: var(--space-4);
-    font-size: var(--font-size-sm);
+    letter-spacing: -0.02em;
+}
+
+.serviceDesc {
+    color: var(--color-text-body);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: var(--space-8);
+    flex-grow: 1;
+    /* Push footer down */
+    opacity: 0.9;
+}
+
+.cardFooter {
+    margin-top: auto;
 }
 
 .textLink {
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 500;
     color: var(--color-text-primary);
-    font-size: var(--font-size-sm);
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+    position: relative;
+}
+
+.linkArrow {
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.serviceCard:hover .linkArrow {
+    transform: translateX(4px);
+}
+
+.textLink::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 1px;
+    background-color: var(--color-primary);
+    transition: width 0.3s ease;
+    opacity: 0.5;
+}
+
+.serviceCard:hover .textLink::after {
+    width: 100%;
+}
+
+/* Accent element (bottom right or subtle bg shape) */
+.cardAccent {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(31, 77, 56, 0.03) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
 }
 
 /* Team */
