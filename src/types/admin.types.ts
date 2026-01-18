@@ -99,6 +99,7 @@ export interface AdminDonation {
     userId: string;
     userName: string;
     userEmail: string;
+    contactNumber?: string;
     amount: number;
     currency: string;
     status: 'SUCCESS' | 'PENDING' | 'FAILED';

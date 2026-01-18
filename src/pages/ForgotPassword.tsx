@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import styles from './Auth.module.css';
-import bgVideo from '../assets/Website_Video_for_Healing_and_Spirituality.mp4';
+import bgVideo from '../assets/grok-video-05d66eef-eed8-46c2-80bd-0577b1b2d8f4.mp4';
 import { requestOtp, verifyOtp, resetPassword } from '../api/auth.api';
 import { useToast } from '../context/ToastContext';
 import type { AxiosError } from 'axios';
