@@ -20,6 +20,7 @@ const Header: React.FC = () => {
     const [showProfile, setShowProfile] = useState(false);
     const [contactModalOpen, setContactModalOpen] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
 
     const handleLogout = () => {
@@ -35,9 +36,15 @@ const Header: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Close mobile nav on route change
+    useEffect(() => {
+        setMobileNavOpen(false);
+        setMenuOpen(false);
+    }, [location]);
+
     return (
         <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
-            <div className={`container ${styles.headerContainer}`}>
+            <div className={`${styles.headerContainer}`}>
                 <div className={styles.logo}>
                     <Link to="/" className={styles.brandLink}>
                         <img src={logoImg} alt="DivineSpark Logo" className={styles.logoImage} />
@@ -45,6 +52,7 @@ const Header: React.FC = () => {
                     </Link>
                 </div>
 
+                {/* Desktop Nav */}
                 <nav className={styles.nav}>
                     <Link
                         to="/"
@@ -74,7 +82,6 @@ const Header: React.FC = () => {
                     <button
                         onClick={() => setContactModalOpen(true)}
                         className={`${styles.navLink} ${contactModalOpen ? styles.active : ''}`}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}
                     >
                         Contact
                     </button>
@@ -168,7 +175,71 @@ const Header: React.FC = () => {
                             </svg>
                         </Button>
                     )}
+
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        className={styles.mobileToggle}
+                        onClick={() => setMobileNavOpen(!mobileNavOpen)}
+                        aria-label="Toggle navigation"
+                    >
+                        {mobileNavOpen ? (
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        ) : (
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        )}
+                    </button>
                 </div>
+            </div>
+
+            {/* Mobile Navigation Overlay */}
+            <div className={`${styles.mobileMenu} ${mobileNavOpen ? styles.open : ''}`}>
+                <Link
+                    to="/"
+                    className={`${styles.mobileNavLink} ${location.pathname === '/' ? styles.active : ''}`}
+                >
+                    Home
+                </Link>
+
+                <Link
+                    to="/sessions"
+                    className={`${styles.mobileNavLink} ${location.pathname === '/sessions' ? styles.active : ''}`}
+                >
+                    Book a Session
+                </Link>
+                <Link
+                    to="/donate"
+                    className={`${styles.mobileNavLink} ${location.pathname === '/donate' ? styles.active : ''}`}
+                >
+                    Donate
+                </Link>
+                <Link
+                    to="/reviews"
+                    className={`${styles.mobileNavLink} ${location.pathname === '/reviews' ? styles.active : ''}`}
+                >
+                    Reviews
+                </Link>
+                <button
+                    onClick={() => {
+                        setContactModalOpen(true);
+                        setMobileNavOpen(false);
+                    }}
+                    className={`${styles.mobileNavLink} ${contactModalOpen ? styles.active : ''}`}
+                >
+                    Contact
+                </button>
+                <Link
+                    to="/about"
+                    className={`${styles.mobileNavLink} ${location.pathname === '/about' ? styles.active : ''}`}
+                >
+                    About Us
+                </Link>
             </div>
 
 

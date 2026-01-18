@@ -5,6 +5,7 @@ import styles from './SessionModal.module.css';
 import { formatForInput, parseFromInput, getNowInIST } from '../../utils/format';
 import dayjs from 'dayjs';
 import { API_BASE_URL, ADMIN_ENDPOINTS } from '../../api/endpoints';
+import DateTimeInput from './DateTimeInput';
 
 
 interface SessionModalProps {
@@ -140,7 +141,7 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
         return err;
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | { target: { name: string; value: any } }) => {
         const { name, value } = e.target;
 
         const newFormData = {
@@ -373,33 +374,25 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                     </div>
 
                     <div className={styles.row}>
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Start Time</label>
-                            <input
-                                type="datetime-local"
-                                name="startTime"
-                                value={formData.startTime}
-                                onChange={handleChange}
-                                className={styles.input}
-                                min={minStartTime}
-                                required
-                            />
-                            {fieldErrors.startTime && <span className={styles.errorText}>{fieldErrors.startTime}</span>}
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>End Time</label>
-                            <input
-                                type="datetime-local"
-                                name="endTime"
-                                value={formData.endTime}
-                                onChange={handleChange}
-                                className={styles.input}
-                                min={minEndTime}
-                                disabled={!formData.startTime}
-                                required
-                            />
-                            {fieldErrors.endTime && <span className={styles.errorText}>{fieldErrors.endTime}</span>}
-                        </div>
+                        <DateTimeInput
+                            name="startTime"
+                            label="Start Time"
+                            value={formData.startTime || ''}
+                            onChange={handleChange}
+                            min={minStartTime}
+                            error={fieldErrors.startTime}
+                            styles={styles}
+                        />
+                        <DateTimeInput
+                            name="endTime"
+                            label="End Time"
+                            value={formData.endTime || ''}
+                            onChange={handleChange}
+                            min={minEndTime}
+                            error={fieldErrors.endTime}
+                            disabled={!formData.startTime}
+                            styles={styles}
+                        />
                     </div>
 
                     <div className={styles.row}>

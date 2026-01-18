@@ -205,7 +205,13 @@ const SessionDetails: React.FC = () => {
         const s = new Date(start).getTime();
         const e = new Date(end).getTime();
         const diffMinutes = Math.round((e - s) / 60000);
-        return `${diffMinutes} mins`;
+        const hours = Math.floor(diffMinutes / 60);
+        const mins = diffMinutes % 60;
+
+        if (hours > 0) {
+            return `${hours} hr${hours > 1 ? 's' : ''}${mins > 0 ? ` ${mins} min${mins > 1 ? 's' : ''}` : ''}`;
+        }
+        return `${mins} min${mins > 1 ? 's' : ''}`;
     };
 
     if (loading) {
