@@ -1,7 +1,9 @@
 import axios from 'axios';
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import { API_BASE_URL } from './endpoints';
 import { getToken, removeToken } from '../utils/authStorage';
+
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+export const API_BASE_URL = isLocal ? 'http://localhost:8080/api/v1' : '/api/v1';
 
 const axiosInstance: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,
