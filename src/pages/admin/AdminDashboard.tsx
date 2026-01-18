@@ -928,10 +928,37 @@ const AdminDashboard: React.FC = () => {
     ];
 
 
+    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+    // Close mobile sidebar on route change
+    useEffect(() => {
+        setMobileSidebarOpen(false);
+    }, [location]);
+
     return (
         <div className={styles.container}>
+            {/* Mobile Header / Toggle */}
+            <div className={styles.mobileHeader}>
+                <button
+                    className={styles.mobileToggleBtn}
+                    onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+                    aria-label="Toggle Menu"
+                >
+                    ☰
+                </button>
+                <div className={styles.logoMobile}>DivineSpark Admin</div>
+            </div>
+
+            {/* Sidebar Overlay */}
+            {mobileSidebarOpen && (
+                <div
+                    className={styles.sidebarOverlay}
+                    onClick={() => setMobileSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className={styles.sidebar}>
+            <aside className={`${styles.sidebar} ${mobileSidebarOpen ? styles.sidebarOpen : ''}`}>
                 <div className={styles.logo}>DivineSpark Admin</div>
                 <nav className={styles.nav}>
                     {navItems.map(item => (
@@ -939,9 +966,10 @@ const AdminDashboard: React.FC = () => {
                             key={item.path}
                             onClick={() => navigate(item.path)}
                             className={`${styles.navLink} ${location.pathname.includes(item.path) ? styles.activeLink : ''}`}
+                            title={item.label}
                         >
-                            <span>{item.icon}</span>
-                            <span>{item.label}</span>
+                            <span className={styles.navIcon}>{item.icon}</span>
+                            <span className={styles.navLabel}>{item.label}</span>
                         </button>
                     ))}
                 </nav>

@@ -17,28 +17,26 @@
     width: 100%;
     overflow-x: hidden;
     background-color: transparent;
-    /* Changed from var(--color-bg-main) */
-    padding-top: 100px;
+    padding-top: 90px;
+    /* Match Header height */
     position: relative;
     z-index: 1;
+    min-height: 100vh;
 }
 
 /* Full-screen horizontal scroll container */
 .horizontalSection {
     width: 100%;
-    height: 80vh;
-    /* Rectangular aspect ratio */
+    height: calc(100vh - 90px);
+    /* Fill remaining height */
     margin: 0;
-    /* Centered with top spacing */
     border-radius: 0;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
     display: flex;
     -webkit-overflow-scrolling: touch;
-    /* Hide scrollbar for immersive feel */
     scrollbar-width: none;
-    /* Firefox */
     position: relative;
     background: #000;
     box-shadow: var(--shadow-xl);
@@ -46,22 +44,18 @@
 
 .horizontalSection::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari */
 }
 
 /* Individual Slide */
 .slide {
     flex: 0 0 100%;
-    /* Fit the container, not the viewport width */
     height: 100%;
     margin: 0;
     scroll-snap-align: center;
-    /* Center snap */
     position: relative;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    /* Left aligned content */
     overflow: hidden;
 }
 
@@ -87,7 +81,6 @@
 }
 
 /* Content Area */
-/* Content Area */
 .content {
     position: relative;
     z-index: 10;
@@ -110,7 +103,6 @@
 
 .slide.active .bgImage {
     transform: scale(1.05);
-    /* Slow parallax-like zoom */
 }
 
 /* Typography & Elements */
@@ -142,7 +134,7 @@
 
 .title {
     font-family: var(--font-serif, serif);
-    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-size: clamp(2rem, 5vw, 4rem);
     line-height: 1.1;
     font-weight: 400;
     margin-bottom: 1rem;
@@ -196,7 +188,6 @@
     gap: 1.5rem;
     align-items: center;
     margin-top: auto;
-    /* Push to bottom if space permits, or just stay flow */
 }
 
 /* Dots Navigation */
@@ -217,6 +208,7 @@
     background: rgba(255, 255, 255, 0.3);
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .dot.active {
@@ -231,7 +223,6 @@
     align-items: center;
     justify-content: center;
     min-height: 70vh;
-    /* Centered in view */
     text-align: center;
     width: 100%;
     position: relative;
@@ -250,7 +241,6 @@
     font-size: 2.5rem;
     font-family: var(--font-serif, serif);
     color: #064e3b;
-    /* Dark Emerald */
     margin-bottom: 1rem;
     font-weight: 700;
 }
@@ -274,5 +264,86 @@
 
     100% {
         transform: translateY(0px);
+    }
+}
+
+/* Responsive Overrides */
+@media (max-width: 900px) {
+    .horizontalSection {
+        height: auto;
+        min-height: calc(100vh - 70px);
+        /* Allow it to grow if content is huge on tablet? No, keep horizontal */
+        height: calc(100vh - 70px);
+    }
+
+    .content {
+        padding: 3rem 4vw;
+        overflow-y: auto;
+        /* Enable vertical scroll ONLY inside content if needed */
+        justify-content: center;
+        /* Try center first */
+    }
+
+    .title {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .horizontalSection {
+        /* On mobile, full height minus header */
+        height: calc(100vh - 70px);
+    }
+
+    .overlay {
+        /* Make overlay darker on mobile for readability */
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 60%, rgba(0, 0, 0, 0.9) 100%);
+    }
+
+    .content {
+        padding: 2rem 1.5rem 5rem;
+        /* Add bottom padding for dots */
+        justify-content: flex-end;
+        /* Align to bottom usually looks better on mobile with image bg */
+        text-align: left;
+    }
+
+    .badge {
+        margin-bottom: 1rem;
+        padding: 0.4rem 1rem;
+        font-size: 0.75rem;
+    }
+
+    .title {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .description {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        /* Limit lines just in case */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .meta {
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-top: 1rem;
+    }
+
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    /* Adjust dots to not overlap content */
+    .dots {
+        bottom: 1.5rem;
     }
 }
