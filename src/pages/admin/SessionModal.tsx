@@ -216,6 +216,12 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
             return;
         }
 
+        // Validate File Size on Submit
+        if (thumbnailFile && thumbnailFile.size > 5 * 1024 * 1024) {
+            setError("Image size cannot exceed 5MB.");
+            return;
+        }
+
         setIsLoading(true);
         setError(null); // Clear any previous general errors before submission
         try {
@@ -354,6 +360,7 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                                         className={`${styles.input} ${styles.inputWithIcon}`}
                                         min="0"
                                         step="0.01"
+                                        onWheel={(e) => e.currentTarget.blur()}
                                         required
                                     />
                                 </div>
@@ -405,6 +412,7 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                                 onChange={handleChange}
                                 className={styles.input}
                                 min="1"
+                                onWheel={(e) => e.currentTarget.blur()}
                                 required
                             />
                         </div>
