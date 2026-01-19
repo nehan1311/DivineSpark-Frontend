@@ -228,7 +228,7 @@ const DonationsTable: React.FC = () => {
 
                                     <td>
                                         <div>{donation.userName}</div>
-                                        <div>{donation.userPhone || donation.phoneNumber || donation.contactNumber || '-'}</div>
+                                        <div>{donation.contactNumber || '-'}</div>
                                     </td>
                                     <td>{formatCurrency(donation.amount, donation.currency)}</td>
                                     <td>{donation.note || '-'}</td>
