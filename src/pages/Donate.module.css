@@ -34,29 +34,41 @@
     flex-direction: column;
     justify-content: center;
     padding: 0 4rem;
-    background: linear-gradient(to right, rgba(13, 31, 26, 0.05), rgba(13, 31, 26, 0));
-    /* Subtle overlay like Home */
-    color: var(--color-text-primary);
-    /* Dark text to match Home Hero */
     position: relative;
+    overflow: hidden;
+    background-color: #0f1c18;
+    /* Dark base */
+    color: #ffffff;
+}
+
+/* Faint Background Image */
+.leftPanel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../assets/image-2.png') no-repeat center center;
+    background-size: cover;
+    opacity: 0.4;
+    z-index: 0;
+    filter: brightness(0.6) grayscale(20%);
 }
 
 .leftContent {
     max-width: 500px;
     position: relative;
-    z-index: 2;
+    z-index: 1;
 }
 
 .brandLabel {
     font-family: var(--font-family-body);
     font-size: 0.75rem;
-    /* Reduced */
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--color-text-body);
-    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.6);
     margin-bottom: 1.5rem;
-    /* Reduced */
     display: block;
     font-weight: 600;
 }
@@ -64,31 +76,28 @@
 .title {
     font-family: var(--font-family-heading);
     font-size: clamp(2.5rem, 3.5vw, 3.5rem);
-    /* Reduced from 4.5rem max */
     line-height: 1.1;
     margin-bottom: 1.5rem;
-    /* Reduced */
-    color: var(--color-text-primary);
+    color: #ffffff;
     letter-spacing: -0.02em;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .missionText {
     font-size: clamp(0.95rem, 1vw, 1.05rem);
     line-height: 1.5;
-    color: #4a554a;
-    /* Matches Home subtitle color */
+    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 2rem;
-    /* Reduced */
-    font-weight: 500;
+    font-weight: 400;
     max-width: 450px;
 }
 
 .quote {
     font-style: italic;
-    color: var(--color-text-body);
-    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.8);
+    opacity: 1;
     font-size: 0.95rem;
-    border-left: 2px solid var(--color-primary);
+    border-left: 2px solid rgba(255, 255, 255, 0.3);
     padding-left: 1rem;
     margin-top: 1.5rem;
 }

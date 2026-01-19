@@ -15,6 +15,7 @@ import { motion, type Variants, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Section from '../components/ui/Section';
+import Contact from './Contact';
 import styles from './About.module.css';
 
 import slide1Img from '../assets/slide-1.png';
@@ -64,6 +65,7 @@ const carouselSlides = [
 
 const About: React.FC = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [isContactOpen, setIsContactOpen] = useState(false);
 
     const nextSlide = useCallback(() => {
         setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
@@ -115,11 +117,21 @@ const About: React.FC = () => {
 
                 <div className={styles.heroContent}>
                     <h1 className={styles.heroTitle}>About Us</h1>
-                    <Link to="/" className={styles.homeButton}>
-                        Home
-                    </Link>
+                    <div className={styles.heroLinks}>
+                        <Link to="/" className={styles.homeButton}>HOME</Link>
+                        <span>|</span>
+                        <button
+                            onClick={() => setIsContactOpen(true)}
+                            className={styles.homeButton}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, font: 'inherit' }}
+                        >
+                            CONTACT
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            <Contact isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
 
             {/* 2. WELCOME / STORY - Split Layout */}
             <Section className={styles.welcomeSection}>

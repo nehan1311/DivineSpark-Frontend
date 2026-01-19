@@ -103,6 +103,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
     }, [logout, showToast]);
 
+    // Check for token expiration and set timer
+    useEffect(() => {
+        const token = getToken();
+        if (!token || !isAuthenticated) return;
+
+        try {
+            const decoded: any = jwtDecode(token);
+            if (decoded.exp) {
+                const expiresAt = decoded.exp * 1000; // Convert to ms
+                const now = Date.now();
+                const timeout = expiresAt - now;
+
+                if (timeout <= 0) {
+                    // Already expired
+                    logout(false);
+                    showToast('Session expired. Please log in again.', 'error');
+                } else {
+                    // Set auto logout timer
+                    const timer = setTimeout(() => {
+                        logout(false);
+                        showToast('Session expired. Please log in again.', 'info');
+                    }, timeout);
+                    return () => clearTimeout(timer);
+                }
+            }
+        } catch (error) {
+            // Invalid token
+            logout(false);
+        }
+    }, [isAuthenticated, logout, showToast]);
+
     // Fetch profile on mount if authenticated
     useEffect(() => {
         if (isAuthenticated && !user) {

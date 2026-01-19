@@ -85,8 +85,8 @@ const Donate: React.FC = () => {
                         Join us in creating a more conscious and connected world.
                     </p>
                     <blockquote className={styles.quote}>
-                        "The best way to find yourself is to lose yourself in the service of others." <br />
-                        — Mahatma Gandhi
+                        "It is in giving that we receive." <br />
+                        — St. Francis of Assisi
                     </blockquote>
                 </div>
             </div>
