@@ -45,6 +45,12 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ onReviewSubmitted }) => 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!comment.trim()) {
+            showToast('Please write something in your review', 'error');
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             await reviewApi.submitPlatformReview({ rating, comment });

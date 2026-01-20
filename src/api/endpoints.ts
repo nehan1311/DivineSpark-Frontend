@@ -1,79 +1,83 @@
-// Use environment variable if set, otherwise default to relative path for production (Nginx proxy)
-// or standard localhost for local dev if not running behind proxy
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+// Base URL for all backend API calls
+export const API_BASE_URL = '/api/v1';
 
+/* ---------------- AUTH ---------------- */
 export const AUTH_ENDPOINTS = {
-    REQUEST_OTP: '/auth/request-otp',
-    VERIFY_OTP: '/auth/verify-otp',
-    REGISTER: '/auth/register',
-    LOGIN: '/auth/login',
-    GOOGLE_LOGIN: '/auth/google',
-    GET_PROFILE: '/profile',
-    UPDATE_PROFILE: '/profile',
-    RESET_PASSWORD: '/auth/reset-password',
+    REQUEST_OTP: `${API_BASE_URL}/auth/request-otp`,
+    VERIFY_OTP: `${API_BASE_URL}/auth/verify-otp`,
+    REGISTER: `${API_BASE_URL}/auth/register`,
+    LOGIN: `${API_BASE_URL}/auth/login`,
+    GOOGLE_LOGIN: `${API_BASE_URL}/auth/google`,
+    GET_PROFILE: `${API_BASE_URL}/profile`,
+    UPDATE_PROFILE: `${API_BASE_URL}/profile`,
+    RESET_PASSWORD: `${API_BASE_URL}/auth/reset-password`,
 };
 
+/* ---------------- SESSIONS (Public/User) ---------------- */
 export const SESSION_ENDPOINTS = {
-    BASE: '/sessions',
-    MY_BOOKINGS: '/user/bookings',
-    WHATSAPP_LINK: (id: string | number) => `/sessions/${id}/whatsapp-link`,
+    BASE: `${API_BASE_URL}/sessions`,                         // GET upcoming sessions
+    MY_BOOKINGS: `${API_BASE_URL}/user/bookings`,            // GET user bookings
+    WHATSAPP_LINK: (id: string | number) =>
+        `${API_BASE_URL}/sessions/${id}/whatsapp-link`,      // WhatsApp join link
 };
 
+/* ---------------- REVIEWS ---------------- */
 export const REVIEW_ENDPOINTS = {
-    GET_ALL: '/user/review/all',
-    SUBMIT: '/user/review',
+    GET_ALL: `${API_BASE_URL}/user/review/all`,
+    SUBMIT: `${API_BASE_URL}/user/review`,
 };
 
+/* ---------------- PUBLIC ---------------- */
 export const PUBLIC_ENDPOINTS = {
-    THUMBNAIL: (id: string | number) => `/public/thumbnail/${id}`,
+    THUMBNAIL: (id: string | number) =>
+        `${API_BASE_URL}/public/thumbnail/${id}`,
 };
 
+/* ---------------- ADMIN ---------------- */
 export const ADMIN_ENDPOINTS = {
+    STATS: `${API_BASE_URL}/admin/stats`,
+    REVENUE: `${API_BASE_URL}/admin/revenue`,
 
-    STATS: '/admin/stats',
-    REVENUE: '/admin/revenue',
+    // Users
+    USERS: `${API_BASE_URL}/admin/users`,
+    GET_USER: (id: string) => `${API_BASE_URL}/admin/users/${id}`,
+    BLOCK_USER: (id: string) => `${API_BASE_URL}/admin/users/${id}/block`,
+    UNBLOCK_USER: (id: string) => `${API_BASE_URL}/admin/users/${id}/unblock`,
 
-    // User Management
-    USERS: '/admin/users',
-    GET_USER: (id: string) => `/admin/users/${id}`,
-    BLOCK_USER: (id: string) => `/admin/users/${id}/block`,
-    UNBLOCK_USER: (id: string) => `/admin/users/${id}/unblock`,
+    // Sessions
+    SESSIONS: `${API_BASE_URL}/admin/sessions`,
+    SESSION_DETAILS: (id: string) => `${API_BASE_URL}/admin/sessions/${id}`,
+    SESSION_STATUS: (id: string) => `${API_BASE_URL}/admin/sessions/${id}/status`,
+    SESSION_RESOURCES: (id: string) => `${API_BASE_URL}/admin/sessions/${id}/resources`,
+    SESSION_USERS: (id: string) => `${API_BASE_URL}/admin/sessions/${id}/users`,
+    SESSION_BOOKINGS: (id: string) => `${API_BASE_URL}/admin/sessions/${id}/bookings`,
+    PAST_SESSIONS: `${API_BASE_URL}/admin/sessions/past`,
 
-    // Session Management
-    SESSIONS: '/admin/sessions', // GET (list), POST (create)
-    SESSION_DETAILS: (id: string) => `/admin/sessions/${id}`, // GET, PUT (update), DELETE
-    SESSION_STATUS: (id: string) => `/admin/sessions/${id}/status`, // PATCH
-    SESSION_RESOURCES: (id: string) => `/admin/sessions/${id}/resources`, // POST
-    SESSION_USERS: (id: string) => `/admin/sessions/${id}/users`, // GET
-    SESSION_BOOKINGS: (id: string) => `/admin/sessions/${id}/bookings`, // GET
-    PAST_SESSIONS: '/admin/sessions/past', // GET
-
-    // Payment Management
-    PAYMENTS: '/admin/payments', // GET (list with pagination)
-    THUMBNAIL: (id: string) => `/admin/thumbnail/${id}`, // POST, PUT, DELETE, GET
+    // Payments
+    PAYMENTS: `${API_BASE_URL}/admin/payments`,
+    THUMBNAIL: (id: string) => `${API_BASE_URL}/admin/thumbnail/${id}`,
 };
+
+/* ---------------- PAYMENTS ---------------- */
 export const PAYMENT_ENDPOINTS = {
-    // Note: These paths were hardcoded with /api/v1 prefix, but should ideally be relative to API_BASE_URL
-    // However, if the axios instance already appends API_BASE_URL, we should remove /api/v1 from here.
-    // Assuming standard axios setup where baseURL is API_BASE_URL.
-
-    // If your axios request uses the baseURL, these should just be:
-    INITIATE: (sessionId: number) => `/sessions/${sessionId}/pay`,
-    CALLBACK: '/payments/verify'
+    INITIATE: (sessionId: number) =>
+        `${API_BASE_URL}/sessions/${sessionId}/pay`,
+    CALLBACK: `${API_BASE_URL}/payments/verify`,
 };
 
-
+/* ---------------- DONATIONS ---------------- */
 export const DONATION_ENDPOINTS = {
-    INITIATE: '/donations', // POST { amount, note }
-};
-
-export const CONTACT_ENDPOINTS = {
-    SEND: '/contact',
+    INITIATE: `${API_BASE_URL}/donations`,
 };
 
 export const ADMIN_DONATION_ENDPOINTS = {
-    LIST: '/admin/donations', // GET
-    STATS: '/admin/donations/stats', // GET
+    LIST: `${API_BASE_URL}/admin/donations`,
+    STATS: `${API_BASE_URL}/admin/donations/stats`,
+};
+
+/* ---------------- CONTACT ---------------- */
+export const CONTACT_ENDPOINTS = {
+    SEND: `${API_BASE_URL}/contact`,
 };
 
 

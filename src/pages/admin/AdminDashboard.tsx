@@ -22,6 +22,7 @@ import {
     getAdminPayments
 } from '../../api/admin.api';
 import { API_BASE_URL } from '../../api/endpoints';
+import axiosInstance from '../../api/axios';
 import { getToken } from '../../utils/authStorage';
 import { formatFullDateTime } from '../../utils/format';
 import type {
@@ -152,20 +153,12 @@ const SessionsTable: React.FC<{
                                                 try {
                                                     showToast("Download started...", "info");
 
-                                                    const response = await fetch(
+                                                    const response = await axiosInstance.get(
                                                         `${API_BASE_URL}/admin/sessions/${session.id}/users/download`,
-                                                        {
-                                                            headers: {
-                                                                Authorization: `Bearer ${token}`,
-                                                            },
-                                                        }
+                                                        { responseType: 'blob' }
                                                     );
 
-                                                    if (!response.ok) {
-                                                        throw new Error("Download failed");
-                                                    }
-
-                                                    const blob = await response.blob();
+                                                    const blob = response.data;
                                                     const url = window.URL.createObjectURL(blob);
 
                                                     const link = document.createElement("a");
