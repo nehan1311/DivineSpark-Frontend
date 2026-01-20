@@ -9,9 +9,18 @@ import type {
 import { getToken, removeToken } from '../utils/authStorage';
 import { API_BASE_URL } from './endpoints';   // ✅ Use correct base URL from central file
 
+<<<<<<< HEAD
 // Create axios instance with Nginx reverse-proxy friendly API base path
 const axiosInstance: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,                     // ✅ All requests automatically go to /api/v1/*
+=======
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+// Endpoints from endpoints.ts now include '/api/v1', so we only need the origin for local dev
+const AXIOS_BASE = isLocal ? 'http://localhost:8080' : '';
+
+const axiosInstance: AxiosInstance = axios.create({
+    baseURL: AXIOS_BASE,
+>>>>>>> 9c80cbd (Review issue !)
     headers: {
         'Content-Type': 'application/json',
     },
