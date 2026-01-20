@@ -1,12 +1,13 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import styles from './RetreatContentSection.module.css';
+import peacefullMomentImg from '../../assets/image.png';
 
 const CONTENT = [
     {
         title: "Every Arhatic Yoga Retreat is a Time for Renewal.",
         subtitle: "\"The purpose of the retreat is to purify your vehicles, to recharge your body, and to clarify your mind. It is a sacred time to reconnect with your higher soul and the divine spark within.\"",
-        author: "— Grand Master Choa Kok Sui",
+        author: null,
         img: "https://images.unsplash.com/photo-1545389336-cf090694435e?auto=format&fit=crop&w=800&q=80",
         alt: "Meditation Retreat"
     },
@@ -21,7 +22,7 @@ const CONTENT = [
         title: "A Journey Back to Your True Self.",
         subtitle: "Leave behind the noise of the daily world. Step into a space of serenity where you can focus entirely on your inner growth, healing, and spiritual realization.",
         author: null,
-        img: "https://images.unsplash.com/photo-1599447421405-0c174ac25163?auto=format&fit=crop&w=800&q=80",
+        img: peacefullMomentImg,
         alt: "Peaceful Moment"
     }
 ];

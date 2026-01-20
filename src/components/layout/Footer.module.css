@@ -3,7 +3,6 @@
     color: #fff;
     padding: var(--space-16) 0;
     margin-top: auto;
-    /* Push to bottom if content is short */
 }
 
 .footerContainer {
@@ -41,6 +40,28 @@
 }
 
 .column a:hover {
+    opacity: 1;
+}
+
+/* Social Icons */
+.socialRow {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    align-items: center;
+}
+
+.socialIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0.8;
+}
+
+.socialIcon:hover {
+    transform: translateY(-2px);
     opacity: 1;
 }
 

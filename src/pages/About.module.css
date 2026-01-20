@@ -92,34 +92,40 @@
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
+/* Text-only style for Home link */
+/* Text-only style for Hero links */
 .homeButton {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem 3rem;
-    /* Significantly larger padding */
-    background-color: #ffffff;
-    color: var(--color-primary);
-    border-radius: 9999px;
+    display: inline-block;
+    color: #ffffff;
     text-decoration: none;
-    font-weight: 800;
-    font-size: 1.25rem;
-    /* Larger font size */
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    font-weight: 500;
+    /* Reduced from 600/800 */
+    font-size: 1rem;
+    transition: opacity 0.2s ease;
+    opacity: 0.85;
+    letter-spacing: 0.05em;
+    /* Normal spacing */
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    margin-top: var(--space-6);
-    min-width: 160px;
-    /* Minimum width for presence */
-    text-align: center;
 }
 
 .homeButton:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    background-color: var(--color-primary);
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    background: none;
     color: white;
+    transform: none;
+    box-shadow: none;
+}
+
+.heroLinks {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: var(--space-4);
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    /* Separator color */
 }
 
 .breadcrumbSeparator {
