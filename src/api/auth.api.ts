@@ -1,5 +1,6 @@
 import axiosInstance from './axios';
 import { AUTH_ENDPOINTS } from './endpoints';
+
 import type {
     RequestOtpPayload,
     VerifyOtpPayload,
@@ -12,14 +13,14 @@ import type {
 } from '../types/auth.types';
 
 /**
- * Request an OTP for a given identifier (e.g. email).
+ * Request OTP
  */
 export const requestOtp = async (payload: RequestOtpPayload): Promise<void> => {
     await axiosInstance.post(AUTH_ENDPOINTS.REQUEST_OTP, payload);
 };
 
 /**
- * Verify the OTP to complete login or verification.
+ * Verify OTP → login/register
  */
 export const verifyOtp = async (payload: VerifyOtpPayload): Promise<AuthResponse> => {
     const response = await axiosInstance.post<AuthResponse>(AUTH_ENDPOINTS.VERIFY_OTP, payload);
@@ -27,7 +28,7 @@ export const verifyOtp = async (payload: VerifyOtpPayload): Promise<AuthResponse
 };
 
 /**
- * Register a new user.
+ * Register new user
  */
 export const register = async (payload: RegisterPayload): Promise<AuthResponse> => {
     const response = await axiosInstance.post<AuthResponse>(AUTH_ENDPOINTS.REGISTER, payload);
@@ -35,38 +36,39 @@ export const register = async (payload: RegisterPayload): Promise<AuthResponse> 
 };
 
 /**
- * Login an existing user (standard password flow).
+ * Standard login
  */
 export const login = async (payload: LoginPayload) => {
     const response = await axiosInstance.post(AUTH_ENDPOINTS.LOGIN, payload);
 
+    // Support flexible backend token shapes
     const token =
-        response.data.token ||
-        response.data.accessToken ||
-        response.data.jwt ||
-        response.data; // fallback if backend returns raw string
-
-    return { token };
-};
-
-/**
- * Login with Google Authorization Code.
- */
-export const googleLogin = async (code: string) => {
-    const response = await axiosInstance.post(`${AUTH_ENDPOINTS.GOOGLE_LOGIN}?code=${code}`);
-
-    // Accommodate different potential response structures
-    const token =
-        response.data.token ||
-        response.data.accessToken ||
-        response.data.jwt ||
+        response.data?.token ||
+        response.data?.accessToken ||
+        response.data?.jwt ||
         response.data;
 
     return { token };
 };
 
 /**
- * Fetch the logged-in user's profile.
+ * Google OAuth Login
+ */
+export const googleLogin = async (code: string) => {
+    const url = `${AUTH_ENDPOINTS.GOOGLE_LOGIN}?code=${encodeURIComponent(code)}`;
+    const response = await axiosInstance.post(url);
+
+    const token =
+        response.data?.token ||
+        response.data?.accessToken ||
+        response.data?.jwt ||
+        response.data;
+
+    return { token };
+};
+
+/**
+ * Get logged-in user's profile
  */
 export const getUserProfile = async (): Promise<User> => {
     const response = await axiosInstance.get<User>(AUTH_ENDPOINTS.GET_PROFILE);
@@ -74,14 +76,14 @@ export const getUserProfile = async (): Promise<User> => {
 };
 
 /**
- * Update the logged-in user's profile.
+ * Update profile
  */
 export const updateUserProfile = async (payload: UpdateProfilePayload): Promise<void> => {
     await axiosInstance.put(AUTH_ENDPOINTS.UPDATE_PROFILE, payload);
 };
 
 /**
- * Reset password with OTP.
+ * Reset password
  */
 export const resetPassword = async (payload: ResetPasswordPayload): Promise<void> => {
     await axiosInstance.post(AUTH_ENDPOINTS.RESET_PASSWORD, payload);

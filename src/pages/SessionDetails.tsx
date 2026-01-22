@@ -9,6 +9,7 @@ import { useToast } from '../context/ToastContext';
 import styles from './SessionDetails.module.css';
 import { formatDate, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
+import { WhatsAppConfirmationModal } from '../components/ui/WhatsAppConfirmationModal';
 
 
 const SessionDetails: React.FC = () => {
@@ -29,6 +30,7 @@ const SessionDetails: React.FC = () => {
     const [isBooked, setIsBooked] = useState(false);
 
     const [waLoading, setWaLoading] = useState(false);
+    const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
 
     useEffect(() => {
         if (sessionId) {
@@ -98,7 +100,7 @@ const SessionDetails: React.FC = () => {
         }
     };
 
-    const handleAction = async () => {
+    const handleBookClick = () => {
         if (!session) return;
 
         if (isBooked) {
@@ -109,6 +111,18 @@ const SessionDetails: React.FC = () => {
         if (!isAuthenticated) {
             showToast('Please login to continue', 'info');
             navigate('/login', { state: { from: location } });
+            return;
+        }
+
+        setShowWhatsAppModal(true);
+    };
+
+    const executeBooking = async () => {
+        if (!session) return;
+
+        // Double check auth just in case
+        if (!isAuthenticated) {
+            showToast('Please login to continue', 'info');
             return;
         }
 
@@ -291,7 +305,8 @@ const SessionDetails: React.FC = () => {
                             <Button
                                 size="lg"
                                 variant="primary"
-                                onClick={handleAction}
+
+                                onClick={handleBookClick}
                                 disabled={actionLoading || isExpired || isBooked}
                                 className={styles.actionButton}
                                 style={{ width: '100%', cursor: isBooked ? 'not-allowed' : 'pointer' }}
@@ -326,6 +341,11 @@ const SessionDetails: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <WhatsAppConfirmationModal
+                isOpen={showWhatsAppModal}
+                onClose={() => setShowWhatsAppModal(false)}
+                onConfirm={executeBooking}
+            />
         </Section >
     );
 };
