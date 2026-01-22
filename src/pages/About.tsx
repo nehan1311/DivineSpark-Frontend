@@ -25,7 +25,7 @@ import slide4Img from '../assets/slide-4.png';
 import slide5Img from '../assets/slide-5.png';
 import slide6Img from '../assets/slide-6.png';
 import slide7Img from '../assets/slide-7.png';
-import divineSparkLogo from '../assets/divinespark logo.jpeg';
+import divineSparkLogo from '../assets/divinespark logo.png';
 import suvirImg from '../assets/SuvirSabnis.jpeg';
 import healingImg from '../assets/healing.jpg';
 

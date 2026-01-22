@@ -210,7 +210,7 @@ const Home: React.FC = () => {
                             >
                                 <Flower size={32} strokeWidth={1.5} color="currentColor" />
                             </motion.div>
-                            <h3 className={styles.serviceTitle}>Healing & Yoga Sessions</h3>
+                            <h3 className={styles.serviceTitle}>Healing Sessions</h3>
                             <p className={styles.serviceDesc}>Guided sessions that focus on restoring balance, improving well-being, and supporting inner harmony through mindful healing practices.</p>
 
                             <div className={styles.cardFooter}>

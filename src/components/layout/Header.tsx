@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../ui/Button';
 import styles from './Header.module.css';
-import logoImg from '../../assets/divinespark logo.jpeg';
+import logoImg from '../../assets/divinespark logo.png';
 import { ConfirmationModal } from '../../components/ui/Modal';
 
 import ProfileModal from '../../pages/Profile';
@@ -48,7 +48,7 @@ const Header: React.FC = () => {
                 <div className={styles.logo}>
                     <Link to="/" className={styles.brandLink}>
                         <img src={logoImg} alt="DivineSpark Logo" className={styles.logoImage} />
-                        <span className={styles.brandName}>DivineSpark</span>
+
                     </Link>
                 </div>
 

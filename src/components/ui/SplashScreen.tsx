@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './SplashScreen.module.css';
 // @ts-ignore
-import logo from '../../assets/divinespark logo.jpeg';
+import logo from '../../assets/divinespark logo.png';
 
 interface SplashScreenProps {
     onComplete: () => void;

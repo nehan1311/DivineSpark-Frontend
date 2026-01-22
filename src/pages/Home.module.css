@@ -38,8 +38,8 @@
     background-color: transparent;
     position: relative;
     overflow: hidden;
-    padding-top: 80px;
-    /* Header clearance only */
+    padding-top: 140px;
+    /* Header clearance only - Adjusted for 120px header */
     padding-bottom: 0;
 }
 
