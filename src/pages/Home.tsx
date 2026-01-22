@@ -102,13 +102,13 @@ const Home: React.FC = () => {
                             >
                                 {/* Masked Lines */}
                                 <span className={styles.mask}>
-                                    <motion.span className={styles.maskedText} variants={revealVariant}>Transform</motion.span>
+                                    <motion.span className={styles.maskedText} variants={revealVariant}>Spritual way</motion.span>
                                 </span>
                                 <span className={styles.mask}>
-                                    <motion.span className={styles.maskedText} variants={revealVariant}>Your Body</motion.span>
+                                    <motion.span className={styles.maskedText} variants={revealVariant}>transform</motion.span>
                                 </span>
                                 <span className={styles.mask}>
-                                    <motion.span className={styles.maskedText} variants={revealVariant}>and Mind</motion.span>
+                                    <motion.span className={styles.maskedText} variants={revealVariant}>your life</motion.span>
                                 </span>
                             </motion.h1>
 
@@ -156,7 +156,7 @@ const Home: React.FC = () => {
                     variants={staggerContainerVariant}
                 >
                     <motion.div className={styles.statItem} variants={fadeInUpVariant}>
-                        <span className={styles.statNumber}>3000+</span>
+                        <span className={styles.statNumber}>5000+</span>
                         <span className={styles.statLabel}>Lives Touched</span>
                     </motion.div>
                     <motion.div className={styles.statItem} variants={fadeInUpVariant}>

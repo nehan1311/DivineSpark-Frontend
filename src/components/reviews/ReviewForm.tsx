@@ -96,6 +96,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({ onReviewSubmitted }) => 
                     ))}
                 </div>
                 <textarea
+                    required
                     className={styles.textarea}
                     placeholder="What did you enjoy most about DivineSpark?"
                     value={comment}
