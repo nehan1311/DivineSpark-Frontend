@@ -1,6 +1,8 @@
 .header {
-    height: 90px;
-    background-color: transparent;
+    height: 120px;
+    background-color: rgba(26, 60, 52, 0.85);
+    /* Dark Forest Green with transparency */
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     position: fixed;
@@ -8,17 +10,15 @@
     left: 0;
     right: 0;
     z-index: 100;
-    border-bottom: 1px solid transparent;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .scrolled {
-    background-color: rgba(227, 233, 223, 0.95);
-    /* Increased opacity for better readibility on mobile */
-    backdrop-filter: blur(12px);
-    height: 70px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    background-color: rgba(26, 60, 52, 0.98);
+    height: 90px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
 }
 
 .headerContainer {
@@ -47,10 +47,15 @@
 }
 
 .logoImage {
-    height: 50px;
+    height: 115px;
     width: auto;
     object-fit: contain;
-    margin-bottom: 4px;
+    margin-bottom: 0;
+    transition: height 0.4s ease;
+}
+
+.scrolled .logoImage {
+    height: 80px;
 }
 
 .brandName {
@@ -69,20 +74,22 @@
 }
 
 .navLink {
-    color: var(--color-text-body);
+    color: rgba(255, 255, 255, 0.85);
     font-weight: 500;
     font-size: 0.95rem;
-    transition: color 0.2s;
+    transition: all 0.2s;
     position: relative;
     text-decoration: none;
     background: none;
     border: none;
     cursor: pointer;
     font-family: inherit;
+    letter-spacing: 0.02em;
 }
 
 .navLink:hover {
-    color: var(--color-text-primary);
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
 .navLink::after {
@@ -92,7 +99,7 @@
     left: 0;
     width: 0;
     height: 1px;
-    background-color: var(--color-text-primary);
+    background-color: #E3E9DF;
     transition: width 0.3s ease;
 }
 
@@ -102,7 +109,7 @@
 }
 
 .navLink.active {
-    color: var(--color-text-primary);
+    color: #ffffff;
 }
 
 /* Actions */
@@ -118,20 +125,21 @@
     font-family: var(--font-family-body);
     font-weight: 600;
     letter-spacing: 0.02em;
-    background-color: var(--color-primary);
+    background-color: rgba(227, 233, 223, 0.15);
     color: #ffffff;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .loginBtn:hover {
     transform: translateY(-2px);
+    background-color: var(--color-bg-main);
+    color: var(--color-primary);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    filter: brightness(1.1);
 }
 
 .userMenu {
@@ -216,7 +224,7 @@
     border: none;
     cursor: pointer;
     padding: 0.5rem;
-    color: var(--color-text-primary);
+    color: #ffffff;
     z-index: 101;
     /* Above mobile menu */
 }
@@ -295,7 +303,7 @@
 
 @media (max-width: 768px) {
     .header {
-        height: 70px;
+        height: 80px;
         /* Smaller header on mobile */
     }
 
@@ -304,7 +312,7 @@
     }
 
     .logoImage {
-        height: 40px;
+        height: 70px;
     }
 
     .brandName {

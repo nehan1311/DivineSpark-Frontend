@@ -11,7 +11,7 @@ import { razorpayService } from '../services/razorpay.service';
 import RetreatContentSection from '../components/sessions/RetreatContentSection';
 import defaultThumbnail from '../assets/defaultthumbnail.jpg';
 
-import { API_BASE_URL, PUBLIC_ENDPOINTS } from '../api/endpoints';
+import { PUBLIC_ENDPOINTS } from '../api/endpoints';
 
 
 
@@ -313,7 +313,7 @@ const Sessions: React.FC = () => {
                         >
                             <div className={styles.background}>
                                 <img
-                                    src={`${API_BASE_URL}${PUBLIC_ENDPOINTS.THUMBNAIL(session.id)}`}
+                                    src={PUBLIC_ENDPOINTS.THUMBNAIL(session.id)}
                                     onError={(e) => {
                                         const target = e.currentTarget;
                                         if (session.imageUrl && target.src !== session.imageUrl) {

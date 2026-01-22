@@ -102,13 +102,13 @@ const Home: React.FC = () => {
                             >
                                 {/* Masked Lines */}
                                 <span className={styles.mask}>
-                                    <motion.span className={styles.maskedText} variants={revealVariant}>Transform</motion.span>
+                                    <motion.span className={styles.maskedText} variants={revealVariant}>Spritual way</motion.span>
                                 </span>
                                 <span className={styles.mask}>
-                                    <motion.span className={styles.maskedText} variants={revealVariant}>Your Body</motion.span>
+                                    <motion.span className={styles.maskedText} variants={revealVariant}>transform</motion.span>
                                 </span>
                                 <span className={styles.mask}>
-                                    <motion.span className={styles.maskedText} variants={revealVariant}>and Mind</motion.span>
+                                    <motion.span className={styles.maskedText} variants={revealVariant}>your life</motion.span>
                                 </span>
                             </motion.h1>
 
@@ -156,7 +156,7 @@ const Home: React.FC = () => {
                     variants={staggerContainerVariant}
                 >
                     <motion.div className={styles.statItem} variants={fadeInUpVariant}>
-                        <span className={styles.statNumber}>3000+</span>
+                        <span className={styles.statNumber}>5000+</span>
                         <span className={styles.statLabel}>Lives Touched</span>
                     </motion.div>
                     <motion.div className={styles.statItem} variants={fadeInUpVariant}>
@@ -210,7 +210,7 @@ const Home: React.FC = () => {
                             >
                                 <Flower size={32} strokeWidth={1.5} color="currentColor" />
                             </motion.div>
-                            <h3 className={styles.serviceTitle}>Healing & Yoga Sessions</h3>
+                            <h3 className={styles.serviceTitle}>Healing Sessions</h3>
                             <p className={styles.serviceDesc}>Guided sessions that focus on restoring balance, improving well-being, and supporting inner harmony through mindful healing practices.</p>
 
                             <div className={styles.cardFooter}>
