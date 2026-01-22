@@ -173,7 +173,7 @@
 .statNumber {
     font-family: var(--font-family-heading);
     font-size: var(--font-size-2xl);
-    color: #fff;
+    color: var(--color-accent);
     line-height: 1;
     margin-bottom: var(--space-2);
 }
@@ -284,7 +284,7 @@
     right: 2px;
     width: 6px;
     height: 6px;
-    background-color: var(--color-primary);
+    background-color: var(--color-accent);
     border-radius: 50%;
     opacity: 0.6;
 }

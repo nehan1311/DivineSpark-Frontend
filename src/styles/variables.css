@@ -19,6 +19,9 @@
     --color-primary-hover: #132F28;
     --color-secondary: #E3E9DF;
     /* Light sage for secondary buttons */
+    --color-accent: #D4AF37;
+    /* Golden touch for logo and highlights */
+    --color-accent-light: #F3E5AB;
 
     --color-border: #C8D3C5;
 
