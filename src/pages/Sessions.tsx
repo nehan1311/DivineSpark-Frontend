@@ -12,6 +12,7 @@ import RetreatContentSection from '../components/sessions/RetreatContentSection'
 import defaultThumbnail from '../assets/defaultthumbnail.jpg';
 
 import { PUBLIC_ENDPOINTS } from '../api/endpoints';
+import { WhatsAppConfirmationModal } from '../components/ui/WhatsAppConfirmationModal';
 
 
 
@@ -30,6 +31,7 @@ const Sessions: React.FC = () => {
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [activeIndex, setActiveIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
+    const [confirmationSession, setConfirmationSession] = useState<Session | null>(null);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const observerRef = useRef<IntersectionObserver | null>(null);
@@ -126,10 +128,18 @@ const Sessions: React.FC = () => {
         }
     };
 
-    const handleSessionAction = async (session: Session) => {
+    const initiateBooking = (session: Session) => {
         if (!isAuthenticated) {
             showToast('Please login to join this session', 'info');
             navigate('/login', { state: { from: location } });
+            return;
+        }
+        setConfirmationSession(session);
+    };
+
+    const executeSessionBooking = async (session: Session) => {
+        if (!isAuthenticated) {
+            showToast('Please login to join this session', 'info');
             return;
         }
 
@@ -369,7 +379,7 @@ const Sessions: React.FC = () => {
                                             size="lg"
                                             variant="primary"
                                             onClick={() => {
-                                                if (!isBooked) handleSessionAction(session);
+                                                if (!isBooked) initiateBooking(session);
                                             }}
                                             disabled={disabled}
                                             style={
@@ -420,6 +430,17 @@ const Sessions: React.FC = () => {
             </div>
 
             <RetreatContentSection />
+
+            <WhatsAppConfirmationModal
+                isOpen={!!confirmationSession}
+                onClose={() => setConfirmationSession(null)}
+                onConfirm={() => {
+                    if (confirmationSession) {
+                        executeSessionBooking(confirmationSession);
+                        setConfirmationSession(null);
+                    }
+                }}
+            />
         </div>
     );
 };
