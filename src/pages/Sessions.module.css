@@ -17,7 +17,7 @@
     width: 100%;
     overflow-x: hidden;
     background-color: transparent;
-    padding-top: 90px;
+    padding-top: var(--header-height);
     /* Match Header height */
     position: relative;
     z-index: 1;
@@ -27,7 +27,7 @@
 /* Full-screen horizontal scroll container */
 .horizontalSection {
     width: 100%;
-    height: calc(100vh - 90px);
+    height: calc(100vh - var(--header-height));
     /* Fill remaining height */
     margin: 0;
     border-radius: 0;
@@ -271,9 +271,9 @@
 @media (max-width: 900px) {
     .horizontalSection {
         height: auto;
-        min-height: calc(100vh - 70px);
+        min-height: calc(100vh - var(--header-height-mobile));
         /* Allow it to grow if content is huge on tablet? No, keep horizontal */
-        height: calc(100vh - 70px);
+        height: calc(100vh - var(--header-height-mobile));
     }
 
     .content {
@@ -292,7 +292,7 @@
 @media (max-width: 600px) {
     .horizontalSection {
         /* On mobile, full height minus header */
-        height: calc(100vh - 70px);
+        height: calc(100vh - var(--header-height-mobile));
     }
 
     .overlay {
