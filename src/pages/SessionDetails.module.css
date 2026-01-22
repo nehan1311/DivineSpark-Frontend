@@ -14,7 +14,7 @@
 
 /* Page Wrapper to account for Fixed Header */
 .pageWrapper {
-    padding-top: 100px;
+    padding-top: var(--header-height);
     /* Adjust based on navbar height */
     padding-bottom: 4rem;
     min-height: 100vh;
@@ -169,7 +169,7 @@
 /* Action Column & Card */
 .actionColumn {
     position: sticky;
-    top: 120px;
+    top: var(--header-height);
     /* Stick when scrolling */
 }
 

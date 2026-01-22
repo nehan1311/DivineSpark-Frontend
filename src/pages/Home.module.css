@@ -38,8 +38,8 @@
     background-color: transparent;
     position: relative;
     overflow: hidden;
-    padding-top: 140px;
-    /* Header clearance only - Adjusted for 120px header */
+    padding-top: calc(var(--header-height) + 20px);
+    /* Header clearance only - Adjusted for dynamic header */
     padding-bottom: 0;
 }
 
@@ -411,7 +411,7 @@
         height: auto;
         /* Allow scroll on mobile */
         min-height: 100vh;
-        padding-top: 100px;
+        padding-top: calc(var(--header-height-mobile) + 20px);
     }
 
     .heroWrapper {
