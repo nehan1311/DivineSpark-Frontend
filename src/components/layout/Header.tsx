@@ -65,13 +65,13 @@ const Header: React.FC = () => {
                         to="/sessions"
                         className={`${styles.navLink} ${location.pathname === '/sessions' ? styles.active : ''}`}
                     >
-                        Book a Session
+                        Meditation Sessions
                     </Link>
                     <Link
                         to="/donate"
                         className={`${styles.navLink} ${location.pathname === '/donate' ? styles.active : ''}`}
                     >
-                        Donate
+                        Contribute
                     </Link>
                     <Link
                         to="/reviews"
