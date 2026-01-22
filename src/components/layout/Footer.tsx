@@ -51,7 +51,7 @@ const Footer: React.FC = () => {
                     <div className={styles.column}>
                         <h4>Community</h4>
                         <Link to="/about">About Us</Link>
-                        <Link to="/donate">Donate</Link>
+                        <Link to="/donate">Contribute</Link>
                     </div>
                 </div>
             </div>

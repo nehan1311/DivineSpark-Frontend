@@ -22,7 +22,7 @@
     position: relative;
     z-index: 1;
     overflow: hidden;
-    padding-top: 90px;
+    padding-top: var(--header-height);
     /* Header Offset matching Header height */
     box-sizing: border-box;
 }
