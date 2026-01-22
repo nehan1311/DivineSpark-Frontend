@@ -16,6 +16,11 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+::selection {
+    background-color: var(--color-accent);
+    color: var(--color-bg-dark);
+}
+
 h1,
 h2,
 h3,

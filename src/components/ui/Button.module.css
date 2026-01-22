@@ -22,7 +22,7 @@
 
 .primary:hover {
     background-color: var(--color-primary-hover);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
 }
 
 .secondary {

@@ -99,7 +99,7 @@
     left: 0;
     width: 0;
     height: 1px;
-    background-color: #E3E9DF;
+    background-color: var(--color-accent);
     transition: width 0.3s ease;
 }
 
@@ -109,7 +109,7 @@
 }
 
 .navLink.active {
-    color: #ffffff;
+    color: var(--color-accent);
 }
 
 /* Actions */
@@ -138,7 +138,7 @@
 .loginBtn:hover {
     transform: translateY(-2px);
     background-color: var(--color-bg-main);
-    color: var(--color-primary);
+    color: var(--color-accent);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
