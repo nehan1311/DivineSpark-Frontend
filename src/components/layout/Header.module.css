@@ -1,5 +1,5 @@
 .header {
-    height: 120px;
+    height: 90px;
     background-color: rgba(26, 60, 52, 0.85);
     /* Dark Forest Green with transparency */
     backdrop-filter: blur(8px);
@@ -16,7 +16,7 @@
 
 .scrolled {
     background-color: rgba(26, 60, 52, 0.98);
-    height: 90px;
+    height: 70px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
 }
@@ -47,7 +47,7 @@
 }
 
 .logoImage {
-    height: 115px;
+    height: 80px;
     width: auto;
     object-fit: contain;
     margin-bottom: 0;
@@ -55,7 +55,7 @@
 }
 
 .scrolled .logoImage {
-    height: 80px;
+    height: 60px;
 }
 
 .brandName {
@@ -303,7 +303,7 @@
 
 @media (max-width: 768px) {
     .header {
-        height: 80px;
+        height: 64px;
         /* Smaller header on mobile */
     }
 
@@ -312,7 +312,7 @@
     }
 
     .logoImage {
-        height: 70px;
+        height: 50px;
     }
 
     .brandName {
