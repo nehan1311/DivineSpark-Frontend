@@ -41,8 +41,8 @@
     --font-size-display: 4.5rem;
 
     /* Header Heights */
-    --header-height: 120px;
-    --header-height-mobile: 80px;
+    --header-height: 90px;
+    --header-height-mobile: 64px;
 
     /* Spacing */
     --space-2: 0.5rem;
