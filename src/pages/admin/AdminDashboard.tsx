@@ -7,6 +7,7 @@ import { useToast } from '../../context/ToastContext';
 import { ConfirmationModal, Modal } from '../../components/ui/Modal';
 import SessionModal from './SessionModal';
 import DonationsTable from './DonationsTable';
+import AdminReviews from './AdminReviews';
 
 import {
     getDashboardStats,
@@ -774,7 +775,7 @@ const AdminDashboard: React.FC = () => {
 
     // Determine active view based on path
     const path = location.pathname.split('/').pop() || 'dashboard';
-    const activeView = ['dashboard', 'sessions', 'users', 'payments', 'donations'].includes(path) ? path : 'dashboard';
+    const activeView = ['dashboard', 'sessions', 'users', 'payments', 'donations', 'reviews'].includes(path) ? path : 'dashboard';
 
 
     const fetchData = useCallback(async () => {
@@ -919,6 +920,7 @@ const AdminDashboard: React.FC = () => {
         { label: 'Users', path: '/admin/users', icon: '👥' },
         { label: 'Payments', path: '/admin/payments', icon: '💳' },
         { label: 'Donations', path: '/admin/donations', icon: '❤️' },
+        { label: 'Reviews', path: '/admin/reviews', icon: '⭐' },
     ];
 
 
@@ -990,6 +992,7 @@ const AdminDashboard: React.FC = () => {
                             {activeView === 'users' && 'Session Participants'}
                             {activeView === 'payments' && 'Financial Overview'}
                             {activeView === 'donations' && 'Donations Overview'}
+                            {activeView === 'reviews' && 'Reviews Moderation'}
                         </h1>
 
                         <p className={styles.headerSubtitle}>
@@ -998,6 +1001,7 @@ const AdminDashboard: React.FC = () => {
                             {activeView === 'users' && 'View participants enrolled in each session.'}
                             {activeView === 'payments' && 'Track revenue and transaction history.'}
                             {activeView === 'donations' && 'Track all donations and donor details.'}
+                            {activeView === 'reviews' && 'Moderate user reviews and testimonials.'}
                         </p>
 
                     </div>
@@ -1065,6 +1069,10 @@ const AdminDashboard: React.FC = () => {
 
                 {activeView === 'donations' && (
                     <DonationsTable />
+                )}
+
+                {activeView === 'reviews' && (
+                    <AdminReviews />
                 )}
             </main>
 

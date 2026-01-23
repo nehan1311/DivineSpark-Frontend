@@ -56,6 +56,13 @@ export const ADMIN_ENDPOINTS = {
     // Payments
     PAYMENTS: `${API_BASE_URL}/admin/payments`,
     THUMBNAIL: (id: string) => `${API_BASE_URL}/admin/thumbnail/${id}`,
+
+    // Reviews
+    REVIEWS_PENDING: `${API_BASE_URL}/admin/reviews/pending`,
+    REVIEW_DETAILS: (id: string | number) => `${API_BASE_URL}/admin/reviews/${id}`,
+    APPROVE_REVIEW: (id: string | number) => `${API_BASE_URL}/admin/reviews/${id}/approve`,
+    REJECT_REVIEW: (id: string | number) => `${API_BASE_URL}/admin/reviews/${id}/reject`,
+    REVIEW_EDIT: (id: string | number) => `${API_BASE_URL}/admin/reviews/${id}`,
 };
 
 /* ---------------- PAYMENTS ---------------- */
