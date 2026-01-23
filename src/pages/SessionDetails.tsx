@@ -10,6 +10,7 @@ import styles from './SessionDetails.module.css';
 import { formatDate, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
 import { WhatsAppConfirmationModal } from '../components/ui/WhatsAppConfirmationModal';
+import { ReviewsSection } from '../components/reviews/ReviewsSection';
 
 
 const SessionDetails: React.FC = () => {
@@ -346,6 +347,10 @@ const SessionDetails: React.FC = () => {
                 onClose={() => setShowWhatsAppModal(false)}
                 onConfirm={executeBooking}
             />
+
+            <div className={styles.container}>
+                <ReviewsSection />
+            </div>
         </Section >
     );
 };
