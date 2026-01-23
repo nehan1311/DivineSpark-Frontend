@@ -1,24 +1,19 @@
 import axios from 'axios';
-import type {
-    AxiosInstance,
-    InternalAxiosRequestConfig,
-    AxiosResponse,
-    AxiosError,
-} from 'axios';
-
+import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { getToken, removeToken } from '../utils/authStorage';
-import { API_BASE_URL } from './endpoints';   // ✅ Use correct base URL from central file
 
-// Create axios instance with Nginx reverse-proxy friendly API base path
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+// Endpoints from endpoints.ts now include '/api/v1', so we only need the origin for local dev
+const AXIOS_BASE = isLocal ? 'http://localhost:8080' : '';
+
 const axiosInstance: AxiosInstance = axios.create({
-    baseURL: API_BASE_URL,                     // ✅ All requests automatically go to /api/v1/*
+    baseURL: AXIOS_BASE,
     headers: {
         'Content-Type': 'application/json',
     },
-    withCredentials: true,                     // ✅ Allow cookies if backend uses them
 });
 
-// ---------------------- REQUEST INTERCEPTOR ----------------------
+// Request Interceptor: Attach Token
 axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         const token = getToken();
@@ -27,19 +22,23 @@ axiosInstance.interceptors.request.use(
         }
         return config;
     },
-    (error: AxiosError) => Promise.reject(error)
+    (error: AxiosError) => {
+        return Promise.reject(error);
+    }
 );
 
-// ---------------------- RESPONSE INTERCEPTOR ----------------------
+// Response Interceptor: Handle Errors (401, 403)
 axiosInstance.interceptors.response.use(
-    (response: AxiosResponse) => response,
+    (response: AxiosResponse) => {
+        return response;
+    },
     (error: AxiosError) => {
         if (error.response) {
-            const { status } = error.response;
-
+            const status = error.response.status;
             if (status === 401) {
-                // Token invalid or expired → remove & notify app
+                // Token is invalid or expired
                 removeToken();
+                // Dispatch event so AuthProvider can handle the UI transition/state clearing
                 window.dispatchEvent(new CustomEvent('auth:unauthorized'));
             }
         }
