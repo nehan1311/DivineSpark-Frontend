@@ -102,7 +102,7 @@ const Home: React.FC = () => {
                             >
                                 {/* Masked Lines */}
                                 <span className={styles.mask}>
-                                    <motion.span className={styles.maskedText} variants={revealVariant}>Spritual way</motion.span>
+                                    <motion.span className={styles.maskedText} variants={revealVariant}>Spiritual way</motion.span>
                                 </span>
                                 <span className={styles.mask}>
                                     <motion.span className={styles.maskedText} variants={revealVariant}>transform</motion.span>
