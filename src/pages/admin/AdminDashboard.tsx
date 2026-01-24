@@ -8,6 +8,7 @@ import { ConfirmationModal, Modal } from '../../components/ui/Modal';
 import SessionModal from './SessionModal';
 import DonationsTable from './DonationsTable';
 import AdminReviews from './AdminReviews';
+import AdminBlogs from './AdminBlogs';
 
 import {
     getDashboardStats,
@@ -775,7 +776,7 @@ const AdminDashboard: React.FC = () => {
 
     // Determine active view based on path
     const path = location.pathname.split('/').pop() || 'dashboard';
-    const activeView = ['dashboard', 'sessions', 'users', 'payments', 'donations', 'reviews'].includes(path) ? path : 'dashboard';
+    const activeView = ['dashboard', 'sessions', 'users', 'payments', 'donations', 'reviews', 'blogs'].includes(path) ? path : 'dashboard';
 
 
     const fetchData = useCallback(async () => {
@@ -921,6 +922,7 @@ const AdminDashboard: React.FC = () => {
         { label: 'Payments', path: '/admin/payments', icon: '💳' },
         { label: 'Donations', path: '/admin/donations', icon: '❤️' },
         { label: 'Reviews', path: '/admin/reviews', icon: '⭐' },
+        { label: 'Blogs', path: '/admin/blogs', icon: '✍️' },
     ];
 
 
@@ -993,6 +995,7 @@ const AdminDashboard: React.FC = () => {
                             {activeView === 'payments' && 'Financial Overview'}
                             {activeView === 'donations' && 'Donations Overview'}
                             {activeView === 'reviews' && 'Reviews Moderation'}
+                            {activeView === 'blogs' && 'Manage Blogs'}
                         </h1>
 
                         <p className={styles.headerSubtitle}>
@@ -1002,6 +1005,7 @@ const AdminDashboard: React.FC = () => {
                             {activeView === 'payments' && 'Track revenue and transaction history.'}
                             {activeView === 'donations' && 'Track all donations and donor details.'}
                             {activeView === 'reviews' && 'Moderate user reviews and testimonials.'}
+                            {activeView === 'blogs' && 'Create and manage blog posts.'}
                         </p>
 
                     </div>
@@ -1073,6 +1077,10 @@ const AdminDashboard: React.FC = () => {
 
                 {activeView === 'reviews' && (
                     <AdminReviews />
+                )}
+
+                {activeView === 'blogs' && (
+                    <AdminBlogs />
                 )}
             </main>
 

@@ -63,6 +63,11 @@ export const ADMIN_ENDPOINTS = {
     APPROVE_REVIEW: (id: string | number) => `${API_BASE_URL}/admin/reviews/${id}/approve`,
     REJECT_REVIEW: (id: string | number) => `${API_BASE_URL}/admin/reviews/${id}/reject`,
     REVIEW_EDIT: (id: string | number) => `${API_BASE_URL}/admin/reviews/${id}`,
+
+    // Blogs
+    BLOGS: `${API_BASE_URL}/admin/blogs`,
+    BLOG_DETAILS: (id: string | number) => `${API_BASE_URL}/admin/blogs/${id}`,
+    PUBLISH_BLOG: (id: string | number) => `${API_BASE_URL}/admin/blogs/${id}/publish`,
 };
 
 /* ---------------- PAYMENTS ---------------- */
@@ -85,6 +90,12 @@ export const ADMIN_DONATION_ENDPOINTS = {
 /* ---------------- CONTACT ---------------- */
 export const CONTACT_ENDPOINTS = {
     SEND: `${API_BASE_URL}/contact`,
+};
+
+/* ---------------- BLOGS ---------------- */
+export const BLOG_ENDPOINTS = {
+    GET_ALL: `${API_BASE_URL}/blogs`,
+    GET_BY_SLUG: (slug: string) => `${API_BASE_URL}/blogs/${slug}`,
 };
 
 
