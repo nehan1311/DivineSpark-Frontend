@@ -1,0 +1,183 @@
+import React, { useEffect, useState } from 'react';
+import styles from './Admin.module.css';
+import { useToast } from '../../context/ToastContext';
+import { adminBlogApi, type AdminBlogPost, type CreateBlogRequest, type UpdateBlogRequest } from '../../api/admin.blog.api';
+import { formatFullDateTime } from '../../utils/format';
+import Button from '../../components/ui/Button';
+import BlogModal from './BlogModal';
+import { ConfirmationModal } from '../../components/ui/Modal';
+
+const AdminBlogs: React.FC = () => {
+    const { showToast } = useToast();
+    const [blogs, setBlogs] = useState<AdminBlogPost[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Modal States
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingBlog, setEditingBlog] = useState<AdminBlogPost | null>(null);
+
+    // Delete Confirmation
+    const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; blogId: number | null }>({
+        isOpen: false,
+        blogId: null
+    });
+
+    const fetchBlogs = async () => {
+        setIsLoading(true);
+        try {
+            const data = await adminBlogApi.getAllBlogs();
+            setBlogs(data);
+        } catch (error) {
+            console.error(error);
+            showToast('Failed to load blogs', 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchBlogs();
+    }, []);
+
+    const handleCreate = () => {
+        setEditingBlog(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEdit = (blog: AdminBlogPost) => {
+        setEditingBlog(blog);
+        setIsModalOpen(true);
+    };
+
+    const handleSave = async (data: CreateBlogRequest | UpdateBlogRequest): Promise<void> => {
+        try {
+            if (editingBlog) {
+                await adminBlogApi.updateBlog(editingBlog.id, data);
+            } else {
+                await adminBlogApi.createBlog(data as CreateBlogRequest);
+            }
+            fetchBlogs();
+        } catch (error) {
+            throw error; // Let modal handle error logging
+        }
+    };
+
+    const handlePublishToggle = async (id: number) => {
+        try {
+            await adminBlogApi.publishBlog(id);
+            showToast('Blog status updated', 'success');
+            fetchBlogs();
+        } catch (error) {
+            showToast('Failed to update status', 'error');
+        }
+    };
+
+    const handleDeleteClick = (id: number) => {
+        setDeleteModal({ isOpen: true, blogId: id });
+    };
+
+    const confirmDelete = async () => {
+        if (deleteModal.blogId) {
+            try {
+                await adminBlogApi.deleteBlog(deleteModal.blogId);
+                showToast('Blog deleted successfully', 'success');
+                fetchBlogs();
+            } catch (error) {
+                showToast('Failed to delete blog', 'error');
+            } finally {
+                setDeleteModal({ isOpen: false, blogId: null });
+            }
+        }
+    };
+
+    if (isLoading) {
+        return <div className={styles.loadingState}>Loading blogs...</div>;
+    }
+
+    return (
+        <div className={styles.section}>
+            <div className={styles.sectionHeader}>
+                <h3 className={styles.sectionTitle}>Manage Blogs</h3>
+                <Button onClick={handleCreate} size="sm">
+                    + Create Blog
+                </Button>
+            </div>
+
+            {blogs.length === 0 ? (
+                <div className={styles.emptyState}>No blogs found. Create one to get started.</div>
+            ) : (
+                <table className={styles.table}>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {blogs.map(blog => (
+                            <tr key={blog.id}>
+                                <td>
+                                    <div style={{ fontWeight: 500 }}>{blog.title}</div>
+                                    <small style={{ color: '#888' }}>/{blog.slug}</small>
+                                </td>
+                                <td>{blog.authorName}</td>
+                                <td>
+                                    <span className={`${styles.badge} ${blog.isPublished ? styles.badgeSuccess : styles.badgeWarning}`}>
+                                        {blog.isPublished ? 'Published' : 'Draft'}
+                                    </span>
+                                </td>
+                                <td>{formatFullDateTime(blog.createdAt)}</td>
+                                <td>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <button
+                                            className={styles.actionBtn}
+                                            onClick={() => handleEdit(blog)}
+                                            title="Edit"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            className={styles.actionBtn}
+                                            onClick={() => handlePublishToggle(blog.id)}
+                                            title={blog.isPublished ? 'Unpublish' : 'Publish'}
+                                        >
+                                            {blog.isPublished ? 'Unpublish' : 'Publish'}
+                                        </button>
+                                        <button
+                                            className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                                            onClick={() => handleDeleteClick(blog.id)}
+                                            title="Delete"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+
+            <BlogModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSave}
+                blog={editingBlog}
+            />
+
+            <ConfirmationModal
+                isOpen={deleteModal.isOpen}
+                onClose={() => setDeleteModal({ isOpen: false, blogId: null })}
+                onConfirm={confirmDelete}
+                title="Delete Blog"
+                message="Are you sure you want to delete this blog? This action cannot be undone."
+                confirmText="Delete"
+            />
+        </div>
+    );
+};
+
+export default AdminBlogs;

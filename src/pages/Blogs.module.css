@@ -1,0 +1,194 @@
+/* Main container wrapper */
+.pageWrapper {
+    width: 100%;
+    min-height: 100vh;
+    padding: 6rem 1.5rem;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Subtle Fixed Background */
+.pageWrapper::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../assets/home_bg.jpg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.15;
+    /* Less visible as requested */
+    z-index: -1;
+    pointer-events: none;
+}
+
+.container {
+    max-width: 900px;
+    width: 100%;
+    padding: 0;
+    background-color: transparent;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 4rem;
+    color: #1a1a1a;
+}
+
+.title {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+    /* Removed text-shadow for cleaner look on light bg */
+}
+
+.subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.25rem;
+    color: #666;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+}
+
+.blogList {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.blogItem {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    padding: 3.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.blogItem:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.blogItem::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #2c5530, #5a8c60);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.blogItem:hover::before {
+    opacity: 1;
+}
+
+.blogTitle {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    line-height: 1.2;
+    transition: color 0.3s ease;
+}
+
+.blogTitle:hover {
+    color: var(--primary-color, #2c5530);
+}
+
+.meta {
+    display: flex;
+    gap: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.excerpt {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #444;
+    margin-bottom: 2rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-weight: 300;
+}
+
+.readMore {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-color, #2c5530);
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid rgba(44, 85, 48, 0.2);
+    border-radius: 50px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.readMore:hover {
+    background: #2c5530;
+    color: white;
+    transform: translateX(4px);
+    border-color: #2c5530;
+    box-shadow: 0 4px 12px rgba(44, 85, 48, 0.2);
+}
+
+.emptyState,
+.loadingState,
+.errorState {
+    text-align: center;
+    padding: 4rem 2rem;
+    font-family: 'Inter', sans-serif;
+    color: #666;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(5px);
+    border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+    .pageWrapper {
+        padding: 4rem 1rem;
+    }
+
+    .title {
+        font-size: 2.75rem;
+    }
+
+    .blogTitle {
+        font-size: 1.75rem;
+    }
+
+    .blogItem {
+        padding: 2rem;
+    }
+}

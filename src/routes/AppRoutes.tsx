@@ -17,6 +17,8 @@ import Donate from '../pages/Donate';
 import About from '../pages/About';
 import MyBookings from '../pages/MyBookings';
 import ReviewsPage from '../pages/ReviewsPage';
+import Blogs from '../pages/Blogs';
+import BlogDetails from '../pages/BlogDetails';
 
 
 
@@ -55,6 +57,9 @@ const AppRoutes: React.FC = () => {
                 <Route path="sessions/:sessionId" element={<SessionDetails />} />
                 <Route path="about" element={<About />} />
                 <Route path="reviews" element={<ReviewsPage />} />
+                <Route path="blogs" element={<Blogs />} />
+                <Route path="blogs/:slug" element={<BlogDetails />} />
+
 
 
                 {/* Guest Routes (Redirects if authenticated) */}
@@ -84,6 +89,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="payments" element={<AdminDashboard />} />
                 <Route path="donations" element={<AdminDashboard />} />
                 <Route path="reviews" element={<AdminDashboard />} />
+                <Route path="blogs" element={<AdminDashboard />} />
             </Route>
 
         </Routes>

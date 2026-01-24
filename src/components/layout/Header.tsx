@@ -79,6 +79,12 @@ const Header: React.FC = () => {
                     >
                         Reviews
                     </Link>
+                    <Link
+                        to="/blogs"
+                        className={`${styles.navLink} ${location.pathname === '/blogs' ? styles.active : ''}`}
+                    >
+                        Blog
+                    </Link>
                     <button
                         onClick={() => setContactModalOpen(true)}
                         className={`${styles.navLink} ${contactModalOpen ? styles.active : ''}`}
@@ -224,6 +230,12 @@ const Header: React.FC = () => {
                     className={`${styles.mobileNavLink} ${location.pathname === '/reviews' ? styles.active : ''}`}
                 >
                     Reviews
+                </Link>
+                <Link
+                    to="/blogs"
+                    className={`${styles.mobileNavLink} ${location.pathname === '/blogs' ? styles.active : ''}`}
+                >
+                    Blog
                 </Link>
                 <button
                     onClick={() => {
