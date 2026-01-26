@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { getToken, setToken, removeToken } from '../utils/authStorage';
+import { getToken, setToken, removeToken, cleanupLegacyTokens } from '../utils/authStorage';
 import { jwtDecode } from 'jwt-decode';
 import { useToast } from './ToastContext';
 import axiosInstance from '../api/axios';
@@ -20,16 +20,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { showToast } = useToast();
 
+    // Cleanup legacy tokens on mount
+    useEffect(() => {
+        cleanupLegacyTokens();
+    }, []);
+
     // Helper to decode token safely
     const getRoleFromToken = (token: string | null): string | null => {
         if (!token || token.split('.').length !== 3) return null;
 
         try {
             const decoded: any = jwtDecode(token);
-
-            if (token === '__DEV_ADMIN_TOKEN__') {
-                return 'ADMIN';
-            }
 
             // Spring Security common formats
             if (Array.isArray(decoded.authorities)) {

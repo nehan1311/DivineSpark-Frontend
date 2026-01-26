@@ -40,6 +40,7 @@ export const register = async (payload: RegisterPayload): Promise<AuthResponse> 
  */
 export const login = async (payload: LoginPayload) => {
     const response = await axiosInstance.post(AUTH_ENDPOINTS.LOGIN, payload);
+    console.log('[Auth API Debug] Raw Axios Response Data:', response.data);
 
     // Support flexible backend token shapes
     const token =

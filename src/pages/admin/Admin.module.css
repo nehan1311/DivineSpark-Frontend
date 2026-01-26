@@ -22,6 +22,8 @@
     z-index: 50;
     transition: transform 0.3s ease, width 0.3s ease;
     flex-shrink: 0;
+    overflow: hidden;
+    /* Ensure no spillover */
 }
 
 .logo {
@@ -41,6 +43,28 @@
     flex-direction: column;
     gap: var(--space-2);
     flex: 1;
+    overflow-y: auto;
+    /* Allow scrolling if items are too many */
+    min-height: 0;
+    /* Required for flex scrolling */
+    margin-right: -8px;
+    /* Offset scrollbar padding */
+    padding-right: 8px;
+    /* Add padding for scrollbar */
+}
+
+/* Custom Scrollbar for Nav */
+.nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.nav::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }
 
 .navLink {
@@ -82,10 +106,12 @@
 }
 
 .activeLink {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.2);
+    /* Increased contrast */
     color: var(--color-text-inverse);
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .userProfile {
@@ -93,9 +119,14 @@
     align-items: center;
     gap: var(--space-4);
     padding: var(--space-4);
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(0, 0, 0, 0.2);
+    /* Darker contrast */
     border-radius: var(--radius-md);
-    margin-top: auto;
+    margin-top: var(--space-4);
+    /* Ensure spacing from nav */
+    flex-shrink: 0;
+    /* Prevent shrinking */
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .avatar {
@@ -549,6 +580,7 @@
     flex-direction: column;
     gap: 0.5rem;
     position: relative;
+    margin-bottom: 1rem;
 }
 
 .formLabel {
@@ -557,6 +589,7 @@
     color: #374151;
     /* Neutral 700 */
     letter-spacing: 0.01em;
+    margin-bottom: 0.25rem;
 }
 
 .formInput {
@@ -667,6 +700,7 @@
 
 .inputWithPrefix:focus {
     box-shadow: none;
+    padding-left: 0.75rem;
 }
 
 /* Textareas */
@@ -866,4 +900,65 @@ textarea.formInput {
     align-items: center;
     gap: var(--space-2);
     margin-top: auto;
+}
+
+/* Date Time Input Specific */
+.dateTimeContainer {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.dateTimeSegment {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0 0.5rem;
+    height: 48px;
+    /* Match formInput height approx */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.dateTimeSegment:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.15);
+}
+
+.timeInput {
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-family: inherit;
+    font-size: 0.95rem;
+    width: 3rem;
+    padding: 0.5rem 0;
+    color: #111827;
+}
+
+.timeInput:focus {
+    outline: none;
+}
+
+.timeSeparator {
+    font-weight: bold;
+    color: #6b7280;
+    margin: 0 0.1rem;
+}
+
+.periodSelect {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #111827;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.periodSelect:focus {
+    outline: none;
 }

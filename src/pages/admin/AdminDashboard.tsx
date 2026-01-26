@@ -9,6 +9,10 @@ import SessionModal from './SessionModal';
 import DonationsTable from './DonationsTable';
 import AdminReviews from './AdminReviews';
 import AdminBlogs from './AdminBlogs';
+import AdminEvents from './AdminEvents';
+import EventModal from './EventModal';
+import { getEvents, createEvent, updateEvent, deleteEvent } from '../../api/admin.events.api';
+import type { AdminEvent, EventRequest } from '../../types/admin.events.types';
 
 import {
     getDashboardStats,
@@ -740,7 +744,7 @@ const PaymentsTable: React.FC = () => {
 // --- MAIN PAGE ---
 
 const AdminDashboard: React.FC = () => {
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
     const location = useLocation();
@@ -774,9 +778,14 @@ const AdminDashboard: React.FC = () => {
         onConfirm: () => { },
     });
 
+    // Events State
+    const [adminEvents, setAdminEvents] = useState<AdminEvent[]>([]);
+    const [eventModalOpen, setEventModalOpen] = useState(false);
+    const [editingEvent, setEditingEvent] = useState<AdminEvent | null>(null);
+
     // Determine active view based on path
     const path = location.pathname.split('/').pop() || 'dashboard';
-    const activeView = ['dashboard', 'sessions', 'users', 'payments', 'donations', 'reviews', 'blogs'].includes(path) ? path : 'dashboard';
+    const activeView = ['dashboard', 'sessions', 'users', 'payments', 'donations', 'reviews', 'blogs', 'events'].includes(path) ? path : 'dashboard';
 
 
     const fetchData = useCallback(async () => {
@@ -806,6 +815,9 @@ const AdminDashboard: React.FC = () => {
                 // No need to fetch here
             } else if (activeView === 'donations') {
                 // Donations are fetched by DonationsTable
+            } else if (activeView === 'events') {
+                const eventsData = await getEvents();
+                setAdminEvents(eventsData);
             }
         } catch (error) {
 
@@ -862,6 +874,26 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
+    // Events Handlers
+    const handleSaveEvent = async (eventData: EventRequest) => {
+        try {
+            if (editingEvent) {
+                await updateEvent(editingEvent.id, eventData);
+                showToast('Event updated successfully', 'success');
+            } else {
+                await createEvent(eventData);
+                showToast('Event created successfully', 'success');
+            }
+            fetchData();
+            setEventModalOpen(false);
+            setEditingEvent(null);
+        } catch (error: any) {
+            const msg = error.response?.data?.message || 'Failed to save event';
+            showToast(msg, 'error');
+            throw error;
+        }
+    };
+
     const handleAction = (action: string, item: any) => {
         if (action === 'cancel_session') {
             setConfirmModal({
@@ -907,12 +939,37 @@ const AdminDashboard: React.FC = () => {
                     }
                 }
             });
+        } else if (action === 'delete_event') {
+            setConfirmModal({
+                isOpen: true,
+                title: 'Delete Event',
+                message: `Are you sure you want to delete "${item.title}"?`,
+                variant: 'danger',
+                onConfirm: async () => {
+                    try {
+                        await deleteEvent(item.id);
+                        showToast('Event deleted successfully', 'success');
+                        fetchData();
+                        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                    } catch (e) {
+                        showToast('Failed to delete event', 'error');
+                    }
+                }
+            });
+        } else if (action === 'edit_event') {
+            setEditingEvent(item);
+            setEventModalOpen(true);
         }
     };
 
     const openCreateModal = () => {
         setEditingSession(null);
         setSessionModalOpen(true);
+    };
+
+    const openCreateEventModal = () => {
+        setEditingEvent(null);
+        setEventModalOpen(true);
     };
 
     const navItems = [
@@ -922,6 +979,7 @@ const AdminDashboard: React.FC = () => {
         { label: 'Payments', path: '/admin/payments', icon: '💳' },
         { label: 'Donations', path: '/admin/donations', icon: '❤️' },
         { label: 'Reviews', path: '/admin/reviews', icon: '⭐' },
+        { label: 'Events', path: '/admin/events', icon: '📢' },
         { label: 'Blogs', path: '/admin/blogs', icon: '✍️' },
     ];
 
@@ -973,10 +1031,10 @@ const AdminDashboard: React.FC = () => {
                 </nav>
 
                 <div className={styles.userProfile}>
-                    <div className={styles.avatar}>AD</div>
+                    <div className={styles.avatar}>{user?.username?.substring(0, 2).toUpperCase() || 'AD'}</div>
                     <div className={styles.userInfo}>
-                        <div style={{ fontWeight: 600 }}>Admin User</div>
-                        <div className={styles.userEmail}>admin@divinespark.com</div>
+                        <div style={{ fontWeight: 600 }}>{user?.username || 'Admin'}</div>
+                        <div className={styles.userEmail}>{user?.email || 'admin@divinespark.com'}</div>
                     </div>
                     <button onClick={() => setLogoutModalOpen(true)} className={styles.logoutBtn} title="Sign Out">
                         ⏻
@@ -995,6 +1053,7 @@ const AdminDashboard: React.FC = () => {
                             {activeView === 'payments' && 'Financial Overview'}
                             {activeView === 'donations' && 'Donations Overview'}
                             {activeView === 'reviews' && 'Reviews Moderation'}
+                            {activeView === 'events' && 'Events Management'}
                             {activeView === 'blogs' && 'Manage Blogs'}
                         </h1>
 
@@ -1005,6 +1064,7 @@ const AdminDashboard: React.FC = () => {
                             {activeView === 'payments' && 'Track revenue and transaction history.'}
                             {activeView === 'donations' && 'Track all donations and donor details.'}
                             {activeView === 'reviews' && 'Moderate user reviews and testimonials.'}
+                            {activeView === 'events' && 'Create and manage workshops & events shown on the home page ticker.'}
                             {activeView === 'blogs' && 'Create and manage blog posts.'}
                         </p>
 
@@ -1012,6 +1072,9 @@ const AdminDashboard: React.FC = () => {
                     <div className={styles.headerActions}>
                         {activeView === 'sessions' && (
                             <Button onClick={openCreateModal}>+ Create Session</Button>
+                        )}
+                        {activeView === 'events' && (
+                            <Button onClick={openCreateEventModal}>+ Add Event</Button>
                         )}
                     </div>
                 </header>
@@ -1079,6 +1142,15 @@ const AdminDashboard: React.FC = () => {
                     <AdminReviews />
                 )}
 
+                {activeView === 'events' && (
+                    <AdminEvents
+                        events={adminEvents}
+                        isLoading={isLoading}
+                        onEdit={(e) => handleAction('edit_event', e)}
+                        onDelete={(e) => handleAction('delete_event', e)}
+                    />
+                )}
+
                 {activeView === 'blogs' && (
                     <AdminBlogs />
                 )}
@@ -1091,6 +1163,13 @@ const AdminDashboard: React.FC = () => {
                 onClose={() => setSessionModalOpen(false)}
                 onSave={handleSaveSession}
                 session={editingSession}
+            />
+
+            <EventModal
+                isOpen={eventModalOpen}
+                onClose={() => setEventModalOpen(false)}
+                onSave={handleSaveEvent}
+                event={editingEvent}
             />
 
             <ConfirmationModal
