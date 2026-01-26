@@ -116,3 +116,18 @@ export interface DonationStats {
         amount: number;
     }[];
 }
+
+export interface AdminProgram {
+    id: number;
+    title: string;
+    description: string;
+    imageUrl: string;
+    category: 'ENERGY_WORKSHOPS' | 'SPIRITUAL_TRIPS';
+}
+
+export interface ProgramRequest {
+    title: string;
+    description: string;
+    imageUrl: string;
+    category: 'ENERGY_WORKSHOPS' | 'SPIRITUAL_TRIPS';
+}

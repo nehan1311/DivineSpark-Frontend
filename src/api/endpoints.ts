@@ -32,6 +32,7 @@ export const PUBLIC_ENDPOINTS = {
     THUMBNAIL: (id: string | number) =>
         `${API_BASE_URL}/public/thumbnail/${id}`,
     EVENTS: `${API_BASE_URL}/public/events`,
+    PROGRAMS: `${API_BASE_URL}/public/programs`,
 };
 
 /* ---------------- ADMIN ---------------- */
@@ -73,6 +74,10 @@ export const ADMIN_ENDPOINTS = {
     // Events (Ticker)
     EVENTS: `${API_BASE_URL}/admin/events`,
     EVENT_DETAILS: (id: string | number) => `${API_BASE_URL}/admin/events/${id}`,
+
+    // Programs
+    PROGRAMS: `${API_BASE_URL}/admin/programs`,
+    PROGRAM_DETAILS: (id: string | number) => `${API_BASE_URL}/admin/programs/${id}`,
 };
 
 /* ---------------- PAYMENTS ---------------- */

@@ -19,6 +19,8 @@ import MyBookings from '../pages/MyBookings';
 import ReviewsPage from '../pages/ReviewsPage';
 import Blogs from '../pages/Blogs';
 import BlogDetails from '../pages/BlogDetails';
+import EnergyWorkshops from '../pages/programs/EnergyWorkshops';
+import SpiritualTrips from '../pages/programs/SpiritualTrips';
 
 
 
@@ -60,6 +62,10 @@ const AppRoutes: React.FC = () => {
                 <Route path="blogs" element={<Blogs />} />
                 <Route path="blogs/:slug" element={<BlogDetails />} />
 
+                {/* Programs */}
+                <Route path="programs/energy-workshops" element={<EnergyWorkshops />} />
+                <Route path="programs/spiritual-trips" element={<SpiritualTrips />} />
+
 
 
                 {/* Guest Routes (Redirects if authenticated) */}
@@ -91,6 +97,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="reviews" element={<AdminDashboard />} />
                 <Route path="blogs" element={<AdminDashboard />} />
                 <Route path="events" element={<AdminDashboard />} />
+                <Route path="programs" element={<AdminDashboard />} />
             </Route>
 
         </Routes>
