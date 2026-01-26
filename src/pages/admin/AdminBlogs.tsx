@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Admin.module.css';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { adminBlogApi, type AdminBlogPost, type CreateBlogRequest, type UpdateBlogRequest } from '../../api/admin.blog.api';
 import { formatFullDateTime } from '../../utils/format';
@@ -8,6 +9,7 @@ import BlogModal from './BlogModal';
 import { ConfirmationModal } from '../../components/ui/Modal';
 
 const AdminBlogs: React.FC = () => {
+    const { isAuthenticated } = useAuth();
     const { showToast } = useToast();
     const [blogs, setBlogs] = useState<AdminBlogPost[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -36,8 +38,12 @@ const AdminBlogs: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchBlogs();
-    }, []);
+        if (isAuthenticated) {
+            fetchBlogs();
+        } else {
+            setIsLoading(false);
+        }
+    }, [isAuthenticated]);
 
     const handleCreate = () => {
         setEditingBlog(null);
@@ -63,12 +69,18 @@ const AdminBlogs: React.FC = () => {
     };
 
     const handlePublishToggle = async (id: number) => {
+        if (!id) return;
         try {
             await adminBlogApi.publishBlog(id);
-            showToast('Blog status updated', 'success');
-            fetchBlogs();
+
+            // Update local state immediately for instant UI feedback
+            setBlogs(prevBlogs => prevBlogs.map(blog =>
+                blog.id === id ? { ...blog, isPublished: true } : blog
+            ));
+
+            showToast('Blog published successfully', 'success');
         } catch (error) {
-            showToast('Failed to update status', 'error');
+            showToast('Failed to publish blog', 'error');
         }
     };
 
@@ -117,7 +129,7 @@ const AdminBlogs: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {blogs.map(blog => (
+                        {blogs.map((blog) => (
                             <tr key={blog.id}>
                                 <td>
                                     <div style={{ fontWeight: 500 }}>{blog.title}</div>
@@ -142,9 +154,11 @@ const AdminBlogs: React.FC = () => {
                                         <button
                                             className={styles.actionBtn}
                                             onClick={() => handlePublishToggle(blog.id)}
-                                            title={blog.isPublished ? 'Unpublish' : 'Publish'}
+                                            disabled={blog.isPublished}
+                                            style={blog.isPublished ? { opacity: 0.5, cursor: 'not-allowed', borderColor: 'transparent' } : {}}
+                                            title={blog.isPublished ? 'Already Published' : 'Publish Blog'}
                                         >
-                                            {blog.isPublished ? 'Unpublish' : 'Publish'}
+                                            {blog.isPublished ? 'Published' : 'Publish'}
                                         </button>
                                         <button
                                             className={`${styles.actionBtn} ${styles.deleteBtn}`}

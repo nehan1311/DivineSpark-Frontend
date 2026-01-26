@@ -97,6 +97,11 @@ const BlogModal: React.FC<BlogModalProps> = ({ isOpen, onClose, onSave, blog }) 
         }
     };
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await handleSaveLoop(false);
+    };
+
     return (
         <Modal
             isOpen={isOpen}
@@ -110,7 +115,7 @@ const BlogModal: React.FC<BlogModalProps> = ({ isOpen, onClose, onSave, blog }) 
                 </p>
             </div>
 
-            <form onSubmit={(e) => e.preventDefault()} className={styles.formStack}>
+            <form onSubmit={handleSubmit} className={styles.formStack}>
                 <div className={styles.formGroup}>
                     <label className={styles.formLabel}>Title</label>
                     <input

@@ -97,7 +97,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     useEffect(() => {
         const handleUnauthorized = () => {
             logout(false);
-            showToast('Session expired. Please log in again.', 'error');
+            // Redirect to Google OAuth for re-authentication as requested
+            window.location.href = "http://localhost:8080/oauth2/authorization/google";
         };
 
         window.addEventListener('auth:unauthorized', handleUnauthorized);
