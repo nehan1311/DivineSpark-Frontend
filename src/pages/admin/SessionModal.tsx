@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { AdminSession } from '../../types/admin.types';
 import Button from '../../components/ui/Button';
 import styles from './SessionModal.module.css';
-import { formatForInput, parseFromInput, getNowInIST } from '../../utils/format';
+import { formatForInput, getNowInIST } from '../../utils/format';
 import dayjs from 'dayjs';
 import { ADMIN_ENDPOINTS } from '../../api/endpoints';
 import DateTimeInput from './DateTimeInput';
@@ -87,6 +87,7 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
 
     const validateField = (name: string, value: any, currentFormData: Partial<AdminSession>) => {
         let err = '';
+        if (!value) return '';
         const now = getNowInIST();
 
         if (name === 'startTime') {
@@ -229,8 +230,8 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                 ...formData,
                 // We keep existing imageUrl if available, or it might be updated by parent after upload
                 // If creating, this might be empty initially
-                startTime: parseFromInput(formData.startTime!),
-                endTime: parseFromInput(formData.endTime!),
+                startTime: new Date(formData.startTime!).toISOString(),
+                endTime: new Date(formData.endTime!).toISOString(),
             };
 
             // If creating, ensure availableSeats matches maxSeats (since input is hidden)

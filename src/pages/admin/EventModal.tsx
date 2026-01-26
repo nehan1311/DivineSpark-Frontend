@@ -79,7 +79,11 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSave, event 
 
         setIsSubmitting(true);
         try {
-            await onSave(formData);
+            const payload = {
+                ...formData,
+                startTime: selectedDate.toISOString(),
+            };
+            await onSave(payload);
             onClose();
         } catch (error) {
             // Error handling is done in parent or onSave
