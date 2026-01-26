@@ -1,0 +1,308 @@
+.galleryWrapper {
+    width: 100%;
+    min-height: 100vh;
+    padding-top: calc(var(--header-height) + var(--space-8));
+    position: relative;
+    padding-bottom: var(--space-16);
+}
+
+.meshContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: url('../../assets/home_bg.jpg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.3;
+}
+
+/* Section Header */
+.sectionHeader {
+    text-align: center;
+    margin-bottom: var(--space-12);
+    position: relative;
+    z-index: 1;
+}
+
+.overline {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-accent);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+}
+
+.overline::before,
+.overline::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background-color: var(--color-accent);
+    opacity: 0.6;
+}
+
+.mainTitle {
+    font-family: var(--font-family-heading);
+    font-size: 3.5rem;
+    color: var(--color-text-primary);
+    font-weight: 700;
+}
+
+/* Split Layout */
+.splitSection {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+    position: relative;
+    z-index: 2;
+}
+
+/* Main Layout for Programs List */
+.programsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24);
+    /* Generous vertical spacing between sections */
+}
+
+.splitGrid {
+    display: grid;
+    /* Left smaller, Right dominant (Hero) */
+    grid-template-columns: 0.7fr 1.3fr;
+    grid-template-areas: "text image";
+    gap: var(--space-12);
+    /* Increased gap for separation */
+    align-items: center;
+    /* Center vertically, don't stretch */
+    min-height: 500px;
+}
+
+.splitGrid.reversed {
+    /* Image (Left - Large), Content (Right - Small) */
+    grid-template-columns: 1.3fr 0.7fr;
+    grid-template-areas: "image text";
+}
+
+/* Left Content Panel */
+/* Increased padding for breathing room */
+.contentPanel {
+    grid-area: text;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    color: var(--color-text-primary);
+    padding: var(--space-8) var(--space-8);
+    /* Slightly reduced horizontal padding slightly to fit narrower width */
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
+    height: auto;
+    /* Allow height to fit content */
+    align-self: center;
+    /* Ensure it stays centered */
+    position: relative;
+    transition: all 0.5s ease;
+}
+
+/* Remove Inner decorative line */
+.contentPanel::before {
+    display: none;
+}
+
+/* Vertical Anchor & Wrapper */
+.textWrapper {
+    position: relative;
+    padding-left: var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    /* Golden vertical anchor */
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+/* New Eyebrow Label */
+.eyebrow {
+    font-size: 0.7rem;
+    /* Very small */
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    /* Wide spacing */
+    color: var(--color-accent);
+    /* Muted gold */
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    opacity: 0.9;
+}
+
+.programTitle {
+    font-family: var(--font-family-heading);
+    font-size: 3.25rem;
+    /* Larger size */
+    margin-bottom: var(--space-4);
+    line-height: 1.05;
+    color: var(--color-primary);
+    /* Deep Forest Green */
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    /* Tighter letter spacing */
+}
+
+.programDescription {
+    font-family: var(--font-family-body);
+    font-size: 1.05rem;
+    /* Smaller than title, distinct hierarchy */
+    line-height: 1.9;
+    /* Increased line-height */
+    color: var(--color-text-body);
+    /* Muted/Soft Green-Grey */
+    margin-bottom: var(--space-6);
+    max-width: 85%;
+    /* Do not stretch full width */
+}
+
+/* Closing Line */
+.closingLine {
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--color-text-body);
+    opacity: 0.7;
+    margin-top: var(--space-4);
+    font-family: var(--font-family-heading);
+    /* Serif for poetic feel */
+    font-weight: 400;
+}
+
+/* Right Carousel */
+.carouselWrapper {
+    grid-area: image;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    background-color: #fff;
+    /* Fallback */
+}
+
+.carouselSlide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.slideImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Navigation */
+.navButton {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    z-index: 10;
+}
+
+.navButton:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.prevButton {
+    left: 20px;
+}
+
+.nextButton {
+    right: 20px;
+}
+
+.indicators {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicatorActive {
+    background-color: white;
+    transform: scale(1.2);
+}
+
+/* Loading State */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    color: var(--color-text-body);
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .splitGrid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "text"
+            "image";
+        /* Stack */
+        gap: var(--space-6);
+    }
+
+    .splitGrid.reversed {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "text"
+            "image";
+    }
+
+    /* Force Content First on Mobile using Areas */
+    /* Order is handled by grid-template-areas "text" "image" */
+
+    .mainTitle {
+        font-size: 2.5rem;
+    }
+
+    .programTitle {
+        font-size: 2rem;
+    }
+}

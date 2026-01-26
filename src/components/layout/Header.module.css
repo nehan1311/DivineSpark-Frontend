@@ -112,6 +112,24 @@
     color: var(--color-accent);
 }
 
+.navItemWrapper {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.chevron {
+    display: inline-block;
+    margin-left: 4px;
+    transition: transform 0.3s ease;
+    font-size: 0.8em;
+}
+
+.rotate180 {
+    transform: rotate(180deg);
+}
+
 /* Actions */
 .actions {
     display: flex;
@@ -181,31 +199,51 @@
 
 .dropdown {
     position: absolute;
-    top: 120%;
-    right: 0;
+    top: 100%;
+    /* Align right below the triggering element */
+    /* right: 0; REMOVE this so it can be controlled by inline style or left context */
     background-color: #fff;
-    min-width: 180px;
+    min-width: 220px;
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-xl);
+    /* Stronger shadow */
     padding: 0.5rem 0;
     z-index: 1000;
     animation: fadeIn 0.2s ease-out;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(26, 60, 52, 0.08);
+    /* Subtle colored border */
+    overflow: hidden;
+    /* Ensure rounded corners clip content */
+    margin-top: 0.5rem;
+    /* Slight gap from header */
 }
 
 .dropdownItem {
-    padding: 0.75rem 1rem;
-    color: var(--color-text-body);
-    font-size: 0.9rem;
+    display: block;
+    /* CRITICAL FIX: Forces separate lines */
+    width: 100%;
+    /* Takes full width */
+    padding: 0.85rem 1.25rem;
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+    /* Slightly larger text */
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
     text-align: left;
+    text-decoration: none;
+    /* Ensure no underline */
+    border-left: 3px solid transparent;
+    /* Prepare for hover effect */
 }
 
 .dropdownItem:hover {
     background-color: var(--color-bg-surface);
     color: var(--color-primary);
+    border-left-color: var(--color-primary);
+    /* Accent on hover */
+    padding-left: 1.5rem;
+    /* Slight movement on hover */
 }
 
 .dropdownDivider {

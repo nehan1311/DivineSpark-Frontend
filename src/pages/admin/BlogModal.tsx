@@ -71,7 +71,10 @@ const BlogModal: React.FC<BlogModalProps> = ({ isOpen, onClose, onSave, blog }) 
         }
     };
 
-    const handleSaveLoop = async (shouldPublish: boolean = false) => {
+    const handleSubmit = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        const shouldPublish = false; // Default to draft/standard save
+
         setIsLoading(true);
         try {
             // 1. Create or Update
@@ -97,10 +100,7 @@ const BlogModal: React.FC<BlogModalProps> = ({ isOpen, onClose, onSave, blog }) 
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        await handleSaveLoop(false);
-    };
+
 
     return (
         <Modal

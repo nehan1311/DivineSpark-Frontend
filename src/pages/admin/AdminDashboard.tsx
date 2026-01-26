@@ -11,6 +11,7 @@ import AdminReviews from './AdminReviews';
 import AdminBlogs from './AdminBlogs';
 import AdminEvents from './AdminEvents';
 import EventModal from './EventModal';
+import AdminPrograms from './AdminPrograms';
 import { getEvents, createEvent, updateEvent, deleteEvent } from '../../api/admin.events.api';
 import type { AdminEvent, EventRequest } from '../../types/admin.events.types';
 
@@ -23,8 +24,7 @@ import {
     uploadSessionThumbnail,
     updateSessionThumbnail,
     cancelSession as cancelSessionApi, // Using alias to avoid conflict
-    blockUser,
-    unblockUser,
+
     getSessionBookings,
     getAdminPayments
 } from '../../api/admin.api';
@@ -211,7 +211,7 @@ const SessionsTable: React.FC<{
                 <div className={styles.emptyState}>No {activeTab.toLowerCase()} sessions found.</div>
             )
             }
-        </div >
+        </div>
     );
 };
 
@@ -756,6 +756,7 @@ const AdminDashboard: React.FC = () => {
     // UI State
     const [sessionTab, setSessionTab] = useState<'Upcoming' | 'Past'>('Upcoming');
     const [isLoading, setIsLoading] = useState(false);
+    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
     // Modals state
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
@@ -785,7 +786,7 @@ const AdminDashboard: React.FC = () => {
 
     // Determine active view based on path
     const path = location.pathname.split('/').pop() || 'dashboard';
-    const activeView = ['dashboard', 'sessions', 'users', 'payments', 'donations', 'reviews', 'blogs', 'events'].includes(path) ? path : 'dashboard';
+    const activeView = ['dashboard', 'sessions', 'users', 'payments', 'donations', 'reviews', 'blogs', 'events', 'programs'].includes(path) ? path : 'dashboard';
 
 
     const fetchData = useCallback(async () => {
@@ -795,33 +796,21 @@ const AdminDashboard: React.FC = () => {
                 const statsData = await getDashboardStats();
                 setStats(statsData);
             } else if (activeView === 'sessions') {
-                // Fetch All Sessions and filter client-side to strictly enforce tab rules
-                // This ensures Cancelled/Completed appear ONLY in Past, and Upcoming ONLY in Upcoming.
-                const response = await getAdminSessions({ size: 100 }); // Fetching a larger batch to facilitate client filtering
+                const response = await getAdminSessions({ size: 100 });
                 const allSessions = response.sessions || [];
 
                 if (sessionTab === 'Upcoming') {
                     setSessions(allSessions.filter(s => s.status === 'UPCOMING' || !s.status));
                 } else {
-                    // Past Tab: Completed or Cancelled
                     setSessions(allSessions.filter(s => s.status === 'COMPLETED' || s.status === 'CANCELLED'));
                 }
 
-            } else if (activeView === 'users') {
-                // Session participants are now fetched by the SessionParticipants component
-                // No need to fetch here
-            } else if (activeView === 'payments') {
-                // Payments are now fetched by the PaymentsTable component
-                // No need to fetch here
-            } else if (activeView === 'donations') {
-                // Donations are fetched by DonationsTable
             } else if (activeView === 'events') {
                 const eventsData = await getEvents();
                 setAdminEvents(eventsData);
             }
+            // Programs logic handled in component
         } catch (error) {
-
-
             showToast('Failed to fetch admin data', 'error');
             if (activeView === 'dashboard') {
                 setStats({ totalSessions: 0, upcomingSessions: 0, totalUsers: 0, totalBookings: 0 });
@@ -844,24 +833,16 @@ const AdminDashboard: React.FC = () => {
     const handleSaveSession = async (sessionData: Partial<AdminSession>, thumbnailFile?: File | null) => {
         try {
             if (editingSession) {
-                // Update Session
                 await updateSession(editingSession.id, sessionData);
-
-                // Update Thumbnail if provided
                 if (thumbnailFile) {
                     await updateSessionThumbnail(editingSession.id, thumbnailFile);
                 }
-
                 showToast('Session updated successfully', 'success');
             } else {
-                // Create Session
                 const newSession = await createSession(sessionData);
-
-                // Upload Thumbnail if provided (using new session ID)
                 if (thumbnailFile && newSession.id) {
                     await uploadSessionThumbnail(newSession.id, thumbnailFile);
                 }
-
                 showToast('Session created successfully', 'success');
             }
             fetchData();
@@ -874,7 +855,6 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
-    // Events Handlers
     const handleSaveEvent = async (eventData: EventRequest) => {
         try {
             if (editingEvent) {
@@ -917,29 +897,7 @@ const AdminDashboard: React.FC = () => {
             setEditingSession(item);
             setSessionModalOpen(true);
         }
-        else if (action === 'toggle_block_user') {
-            const isBlocking = item.status !== 'BLOCKED';
-            setConfirmModal({
-                isOpen: true,
-                title: isBlocking ? 'Block User' : 'Unblock User',
-                message: isBlocking
-                    ? `Are you sure you want to block ${item.name}? They will no longer be able to login.`
-                    : `Unblock ${item.name}? They will regain access to the platform.`,
-                variant: isBlocking ? 'danger' : 'primary',
-                onConfirm: async () => {
-                    try {
-                        if (isBlocking) await blockUser(item.id);
-                        else await unblockUser(item.id);
-
-                        showToast(`${item.name} has been ${isBlocking ? 'blocked' : 'unblocked'}.`, 'success');
-                        fetchData(); // Refresh data
-                        setConfirmModal(prev => ({ ...prev, isOpen: false }));
-                    } catch (e) {
-                        showToast(`Failed to ${isBlocking ? 'block' : 'unblock'} user`, 'error');
-                    }
-                }
-            });
-        } else if (action === 'delete_event') {
+        else if (action === 'delete_event') {
             setConfirmModal({
                 isOpen: true,
                 title: 'Delete Event',
@@ -956,7 +914,8 @@ const AdminDashboard: React.FC = () => {
                     }
                 }
             });
-        } else if (action === 'edit_event') {
+        }
+        else if (action === 'edit_event') {
             setEditingEvent(item);
             setEventModalOpen(true);
         }
@@ -980,16 +939,9 @@ const AdminDashboard: React.FC = () => {
         { label: 'Donations', path: '/admin/donations', icon: '❤️' },
         { label: 'Reviews', path: '/admin/reviews', icon: '⭐' },
         { label: 'Events', path: '/admin/events', icon: '📢' },
+        { label: 'Programs', path: '/admin/programs', icon: '📸' },
         { label: 'Blogs', path: '/admin/blogs', icon: '✍️' },
     ];
-
-
-    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
-    // Close mobile sidebar on route change
-    useEffect(() => {
-        setMobileSidebarOpen(false);
-    }, [location]);
 
     return (
         <div className={styles.container}>
@@ -1042,7 +994,6 @@ const AdminDashboard: React.FC = () => {
                 </div>
             </aside>
 
-            {/* Main Content */}
             <main className={styles.main}>
                 <header className={styles.header}>
                     <div className={styles.headerTitle}>
@@ -1055,6 +1006,7 @@ const AdminDashboard: React.FC = () => {
                             {activeView === 'reviews' && 'Reviews Moderation'}
                             {activeView === 'events' && 'Events Management'}
                             {activeView === 'blogs' && 'Manage Blogs'}
+                            {activeView === 'programs' && 'Manage Programs'}
                         </h1>
 
                         <p className={styles.headerSubtitle}>
@@ -1066,6 +1018,7 @@ const AdminDashboard: React.FC = () => {
                             {activeView === 'reviews' && 'Moderate user reviews and testimonials.'}
                             {activeView === 'events' && 'Create and manage workshops & events shown on the home page ticker.'}
                             {activeView === 'blogs' && 'Create and manage blog posts.'}
+                            {activeView === 'programs' && 'Manage content for Energy Workshops & Spiritual Trips pages.'}
                         </p>
 
                     </div>
@@ -1151,11 +1104,14 @@ const AdminDashboard: React.FC = () => {
                     />
                 )}
 
+                {activeView === 'programs' && (
+                    <AdminPrograms />
+                )}
+
                 {activeView === 'blogs' && (
                     <AdminBlogs />
                 )}
             </main>
-
 
             {/* Modals */}
             <SessionModal
@@ -1190,7 +1146,7 @@ const AdminDashboard: React.FC = () => {
                 message={confirmModal.message}
                 variant={confirmModal.variant}
             />
-        </div>
+        </div >
     );
 };
 

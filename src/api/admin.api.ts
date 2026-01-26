@@ -10,7 +10,9 @@ import type {
     AdminSessionBookingResponse,
     PaginatedPaymentsResponse,
     AdminDonation,
-    DonationStats
+    DonationStats,
+    AdminProgram,
+    ProgramRequest
 } from '../types/admin.types';
 
 /* ----------------------- DASHBOARD STATS ----------------------- */
@@ -195,6 +197,26 @@ export const getDonationStats = async (): Promise<DonationStats> => {
     return response.data;
 };
 
+
+/* ----------------------- PROGRAM MANAGEMENT ----------------------- */
+export const getAdminPrograms = async (): Promise<AdminProgram[]> => {
+    const response = await axiosInstance.get<AdminProgram[]>(ADMIN_ENDPOINTS.PROGRAMS);
+    return response.data;
+};
+
+export const createProgram = async (programData: ProgramRequest): Promise<AdminProgram> => {
+    const response = await axiosInstance.post<AdminProgram>(ADMIN_ENDPOINTS.PROGRAMS, programData);
+    return response.data;
+};
+
+export const updateProgram = async (id: number, programData: ProgramRequest): Promise<AdminProgram> => {
+    const response = await axiosInstance.put<AdminProgram>(ADMIN_ENDPOINTS.PROGRAM_DETAILS(id), programData);
+    return response.data;
+};
+
+export const deleteProgram = async (id: number): Promise<void> => {
+    await axiosInstance.delete(ADMIN_ENDPOINTS.PROGRAM_DETAILS(id));
+};
 
 export const cancelSession = async (sessionId: string): Promise<void> => {
     await updateSessionStatus(sessionId, 'CANCELLED');
