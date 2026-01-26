@@ -66,38 +66,39 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({ name, value, onChange, mi
 
     return (
         <div className={styles.formGroup}>
-            <label className={styles.label}>{label}</label>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <label className={styles.formLabel}>{label}</label>
+            <div className={styles.dateTimeContainer}>
+                {/* Date Part - Using Standard Input Style */}
                 <input
                     type="date"
                     value={datePart}
                     min={min ? min.split('T')[0] : undefined}
                     onChange={(e) => handlePartChange('date', e.target.value)}
-                    className={styles.input}
+                    className={styles.formInput}
                     disabled={disabled}
                     required
-                    style={{ flex: '2 1 150px' }}
+                    style={{ flex: '2', minWidth: '140px' }}
                 />
-                <div style={{ display: 'flex', gap: '0.25rem', flex: '1 1 180px', alignItems: 'center' }}>
+
+                {/* Time Segment - Custom Styled Grouper */}
+                <div className={styles.dateTimeSegment} style={{ flex: '1' }}>
                     <select
                         value={hour}
                         onChange={(e) => handlePartChange('hour', e.target.value)}
-                        className={styles.input}
+                        className={styles.timeInput}
                         disabled={disabled}
-                        style={{ flex: 1, paddingLeft: '0.2rem', paddingRight: '0.2rem', textAlign: 'center' }}
+                        style={{ width: 'auto', minWidth: '40px' }}
                     >
                         {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
                             <option key={h} value={h}>{h}</option>
                         ))}
                     </select>
-                    <span style={{ fontWeight: 'bold', color: '#666' }}>:</span>
+                    <span className={styles.timeSeparator}>:</span>
                     <input
                         type="text"
                         value={minute}
                         onChange={(e) => {
                             let val = e.target.value.replace(/[^0-9]/g, '');
-                            // If user is adding digits, we might want to slice only if it's strictly > 2
-                            // But better to just let them type and handle validation on blur or simple slice
                             if (val.length > 2) val = val.slice(0, 2);
                             handlePartChange('minute', val);
                         }}
@@ -110,17 +111,17 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({ name, value, onChange, mi
                             else val = intVal.toString().padStart(2, '0');
                             handlePartChange('minute', val);
                         }}
-                        className={styles.input}
+                        className={styles.timeInput}
                         disabled={disabled}
-                        style={{ flex: 1, textAlign: 'center', paddingLeft: '0.2rem', paddingRight: '0.2rem' }}
                         placeholder="MM"
+                        pattern="[0-5][0-9]"
+                        title="Minutes (00-59)"
                     />
                     <select
                         value={period}
                         onChange={(e) => handlePartChange('period', e.target.value)}
-                        className={styles.input}
+                        className={styles.periodSelect}
                         disabled={disabled}
-                        style={{ flex: 1, paddingLeft: '0.2rem', paddingRight: '0.2rem', textAlign: 'center' }}
                     >
                         <option value="AM">AM</option>
                         <option value="PM">PM</option>

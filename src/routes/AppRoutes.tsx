@@ -90,6 +90,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="donations" element={<AdminDashboard />} />
                 <Route path="reviews" element={<AdminDashboard />} />
                 <Route path="blogs" element={<AdminDashboard />} />
+                <Route path="events" element={<AdminDashboard />} />
             </Route>
 
         </Routes>

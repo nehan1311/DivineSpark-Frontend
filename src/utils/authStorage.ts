@@ -22,3 +22,16 @@ export const removeToken = (): void => {
     localStorage.removeItem(TOKEN_KEY);
 };
 
+/**
+ * Cleans up legacy tokens to ensure single source of truth.
+ */
+export const cleanupLegacyTokens = (): void => {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('authToken');
+    // Ensure we don't have "true" as a token
+    const current = localStorage.getItem(TOKEN_KEY);
+    if (current === 'true' || current === 'false') {
+        localStorage.removeItem(TOKEN_KEY);
+    }
+};
+

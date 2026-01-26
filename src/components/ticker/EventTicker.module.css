@@ -1,0 +1,104 @@
+.tickerWrapper {
+    width: 100%;
+    background-color: #183A33;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    /* Separator */
+    height: 44px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    user-select: none;
+}
+
+.tickerTrack {
+    display: flex;
+    gap: 32px;
+    width: fit-content;
+    /* Animation definition */
+    animation: scroll 38s linear infinite;
+    /* Hardware acceleration */
+    will-change: transform;
+}
+
+/* Pause on hover */
+.tickerWrapper:hover .tickerTrack {
+    animation-play-state: paused;
+    cursor: pointer;
+}
+
+.tickerItem {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    color: #E6EFEA;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    font-family: inherit;
+    /* Inherit site font */
+}
+
+.date {
+    color: #C9B36A;
+}
+
+.separator {
+    margin: 0 4px;
+    /* Space around middle dot */
+    color: #C9B36A;
+}
+
+/* Keyframes */
+@keyframes scroll {
+    0% {
+        transform: translateX(-50%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/* Fallback message */
+.staticMessage {
+    width: 100%;
+    text-align: center;
+    color: #E6EFEA;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* Responsive adjustments */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .tickerWrapper {
+        height: 40px;
+    }
+
+    .tickerTrack {
+        gap: 24px;
+    }
+
+    .tickerItem {
+        font-size: 13px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .tickerWrapper {
+        height: 36px;
+    }
+
+    .tickerTrack {
+        gap: 20px;
+        animation-duration: 45s;
+        /* Slower on mobile */
+    }
+
+    .tickerItem {
+        font-size: 12px;
+    }
+}

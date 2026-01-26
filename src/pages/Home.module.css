@@ -147,6 +147,17 @@
 }
 
 /* Stats Section */
+.impactSection {
+    background-color: #183A33;
+    width: 100%;
+    color: #fff;
+}
+
+.impactStatsContainer {
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-12);
+}
+
 .statsSection {
     padding-top: var(--space-12);
     padding-bottom: var(--space-12);

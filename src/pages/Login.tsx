@@ -31,11 +31,22 @@ const Login: React.FC = () => {
 
         try {
             const response = await loginApi({ email, password });
+            console.log('[Login Debug] API Response:', response);
+
             // Accept token as plain string or within an object
             let token: string | undefined;
-            if (!response) token = undefined;
-            else if (typeof response === 'string') token = response;
-            else token = (response as any).token || (response as any).accessToken || (response as any).access_token;
+            if (!response) {
+                console.error('[Login Debug] No response received');
+                token = undefined;
+            } else if (typeof response === 'string') {
+                console.log('[Login Debug] Response is string');
+                token = response;
+            } else {
+                console.log('[Login Debug] Response is object, checking keys...');
+                token = (response as any).token || (response as any).accessToken || (response as any).access_token || (response as any).jwt;
+                console.log('[Login Debug] Extracted Token:', token ? 'YES (Hidden)' : 'NO');
+                if (!token) console.log('Response keys:', Object.keys(response || {}));
+            }
 
             if (!token) {
                 const msg = 'Login succeeded but no token returned from server';

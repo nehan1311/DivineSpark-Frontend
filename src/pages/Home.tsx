@@ -6,6 +6,7 @@ import Button from '../components/ui/Button';
 import styles from './Home.module.css';
 import homePageImage from '../assets/home_page_image.jpg';
 import { Flower, Activity, Sparkles, ArrowRight } from 'lucide-react';
+import EventTicker from '../components/ticker/EventTicker';
 
 // Helper for Magnetic Button
 const MagneticWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -146,33 +147,39 @@ const Home: React.FC = () => {
                 </div>
             </section>
 
-            {/* Stats Section - Dark Forest Green */}
-            <Section bg="dark" className={styles.statsSection}>
-                <motion.div
-                    className={styles.statsContainer}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }}
-                    variants={staggerContainerVariant}
-                >
-                    <motion.div className={styles.statItem} variants={fadeInUpVariant}>
-                        <span className={styles.statNumber}>5000+</span>
-                        <span className={styles.statLabel}>Lives Touched</span>
-                    </motion.div>
-                    <motion.div className={styles.statItem} variants={fadeInUpVariant}>
-                        <span className={styles.statNumber}>90%</span>
-                        <span className={styles.statLabel}>Critical Care Support</span>
-                    </motion.div>
-                    <motion.div className={styles.statItem} variants={fadeInUpVariant}>
-                        <span className={styles.statNumber}>Across India & Abroad</span>
-                        <span className={styles.statLabel}>Workshops & Outreach</span>
-                    </motion.div>
-                    <motion.div className={styles.statsCta} variants={fadeInUpVariant}>
-                        <p>Over the years, our work has reached individuals and communities through healing sessions, meditation practices, and workshops, both locally and internationally.</p>
-                        <a href="/about" className={styles.linkCta} onClick={(e) => { e.preventDefault(); navigate('/about'); }}>Learn More</a>
-                    </motion.div>
-                </motion.div>
-            </Section>
+            {/* Impact Bar Section - Event Ticker + Stats */}
+            <section className={styles.impactSection}>
+                <EventTicker />
+
+                <div className="container">
+                    <div className={styles.impactStatsContainer}>
+                        <motion.div
+                            className={styles.statsContainer}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, margin: "-100px" }}
+                            variants={staggerContainerVariant}
+                        >
+                            <motion.div className={styles.statItem} variants={fadeInUpVariant}>
+                                <span className={styles.statNumber}>5000+</span>
+                                <span className={styles.statLabel}>Lives Touched</span>
+                            </motion.div>
+                            <motion.div className={styles.statItem} variants={fadeInUpVariant}>
+                                <span className={styles.statNumber}>90%</span>
+                                <span className={styles.statLabel}>Critical Care Support</span>
+                            </motion.div>
+                            <motion.div className={styles.statItem} variants={fadeInUpVariant}>
+                                <span className={styles.statNumber}>Across India & Abroad</span>
+                                <span className={styles.statLabel}>Workshops & Outreach</span>
+                            </motion.div>
+                            <motion.div className={styles.statsCta} variants={fadeInUpVariant}>
+                                <p>Over the years, our work has reached individuals and communities through healing sessions, meditation practices, and workshops, both locally and internationally.</p>
+                                <a href="/about" className={styles.linkCta} onClick={(e) => { e.preventDefault(); navigate('/about'); }}>Learn More</a>
+                            </motion.div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
 
             {/* Services Section */}
             <Section className={`${styles.servicesSection} section-padding`}>
