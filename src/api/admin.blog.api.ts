@@ -35,12 +35,12 @@ export interface UpdateBlogRequest {
 
 export const adminBlogApi = {
     getAllBlogs: async (): Promise<AdminBlogPost[]> => {
-        const response = await axiosInstance.get(ADMIN_ENDPOINTS.BLOGS);
+        const response = await axiosInstance.get<AdminBlogPost[]>(ADMIN_ENDPOINTS.BLOGS);
         return response.data;
     },
 
     getBlog: async (id: number): Promise<AdminBlogPost> => {
-        const response = await axiosInstance.get(ADMIN_ENDPOINTS.BLOG_DETAILS(id));
+        const response = await axiosInstance.get<AdminBlogPost>(ADMIN_ENDPOINTS.BLOG_DETAILS(id));
         return response.data;
     },
 
