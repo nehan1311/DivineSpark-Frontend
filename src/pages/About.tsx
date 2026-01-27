@@ -164,10 +164,10 @@ const About: React.FC = () => {
                         <h2 className={styles.heading}><span className={styles.highlightText}>DivineSpark</span></h2>
 
                         <p className={styles.bodyText}>
-                            Feed The Soul’s is an energy-based healing center focused on holistic wellbeing through ancient healing practices that work with life force energy.
+                            DivineSpark is a space dedicated to holistic well-being, inviting you to pause, reflect, and begin a journey inward toward healing and wholeness.
                         </p>
                         <p className={styles.bodyText}>
-                            The approach is completely non-invasive, involving no touch and no medication, and aims to improve immunity, health, happiness, and inner balance.
+                            Our work is rooted in the understanding that true healing occurs when the mind, body, and soul are brought into harmony, helping individuals awaken their inner power.
                         </p>
                     </motion.div>
                 </motion.div>
@@ -195,10 +195,13 @@ const About: React.FC = () => {
                         <h4 style={{ fontSize: '1.2rem', color: 'var(--color-primary)', fontWeight: 600 }}>Healer & Trainer</h4>
 
                         <p className={styles.bodyText}>
-                            Practicing energy healing since the age of 24, Suvir has helped thousands of people through healing. Nearly 90% of cases handled were critical (ICU-level), demonstrating the power of these ancient practices.
+                            Suvir Sabnis is a devoted Spiritual and Energy Healer trained in Prana Shakti Yoga Vidya and the subtle healing practices of Mahaguru Padmasambhava. With a deep respect for the body's innate intelligence, he works to cleanse the aura, balance chakras, and guide life force energy to restore harmony between mind, body, and soul.
                         </p>
                         <p className={styles.bodyText}>
-                            Committed to the well-being of society, the majority of his healing sessions are offered free of cost.
+                            His approach focuses on the root cause of ailments, supporting individuals in releasing energetic blockages and emotional burdens. To date, he has been an instrument in healing over 7000+ patients suffering from critical physical ailments like cancer and paralysis, as well as emotional challenges such as stress and depression.
+                        </p>
+                        <p className={styles.bodyText}>
+                            Viewing himself as a channel of the Divine, Suvir's life purpose is to transform lives and spread spirituality as a way of life, inviting everyone to begin their journey inward toward wholeness.
                         </p>
 
                         <div className={styles.statsRow}>
@@ -207,8 +210,8 @@ const About: React.FC = () => {
                                 <span className={styles.statLabel}>Years Practice</span>
                             </div>
                             <div className={styles.statItem}>
-                                <span className={styles.statNumber}>3000+</span>
-                                <span className={styles.statLabel}>Lives Healed</span>
+                                <span className={styles.statNumber}>7000+</span>
+                                <span className={styles.statLabel}>Patients Healed</span>
                             </div>
                             <div className={styles.statItem}>
                                 <span className={styles.statNumber}>90%</span>
@@ -245,7 +248,7 @@ const About: React.FC = () => {
                     </div>
                     <h2 className={styles.heading} style={{ marginBottom: '1.5rem' }}>Our Vision</h2>
                     <p className={styles.bodyText} style={{ fontSize: '1.1rem', textAlign: 'center' }}>
-                        “Feed The Soul energy healing is an ancient art and science of healing that works with life force energy. It is a no-touch, no-drug therapy designed to help individuals build immunity, maintain good health, and live a happy, peaceful life.”
+                        “We believe every individual carries the light and power needed for healing within themselves. Our role is simply to help awaken that awareness, guiding you toward self-healing, inner peace, and conscious living.”
                     </p>
                 </motion.div>
             </Section>
@@ -408,9 +411,9 @@ const About: React.FC = () => {
                         <span className={styles.overline}>OUR MISSION</span>
                         <div className={styles.headerLine}></div>
                     </div>
-                    <h2 className={styles.heading} style={{ marginBottom: '1.5rem' }}>Spreading Happiness</h2>
-                    <p className={styles.bodyText} style={{ fontSize: '1.2rem', textAlign: 'center', fontStyle: 'italic' }}>
-                        “The main purpose of our life is to spread happiness. Our mission is to teach energy healing to as many people as possible and contribute to a peaceful, healthy, and joyful society.”
+                    <h2 className={styles.heading} style={{ marginBottom: '1.5rem' }}>Mission Statement</h2>
+                    <p className={styles.bodyText} style={{ fontSize: '1.2rem', textAlign: 'center' }}>
+                        “To serve as a channel of healing energy and wisdom, helping individuals awaken their inner power and restore energetic balance. Through compassionate healing and spiritual education, we aim to support humanity’s journey toward harmony, health, and higher consciousness.”
                     </p>
                 </motion.div>
             </Section>

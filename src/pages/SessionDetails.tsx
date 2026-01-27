@@ -256,10 +256,20 @@ const SessionDetails: React.FC = () => {
                     currency: 'INR' // Assuming INR as per requirements
                 },
                 session,
-                () => {
+                async () => {
                     showToast('First installment paid. You have access.', 'success');
                     setShowPaymentModal(false);
-                    checkBookingStatus(); // Refresh to get booking & installments
+
+                    // Verify payment first
+                    await sessionApi.verifyInstallmentPayment(orderData.razorpayOrderId);
+
+                    // Fetch plan immediately using the new booking ID
+                    if (orderData.bookingId) {
+                        fetchInstallments(orderData.bookingId);
+                    }
+
+                    // Refresh global booking state
+                    checkBookingStatus();
                 },
                 (errorMsg) => {
                     showToast(errorMsg || 'Payment failed', 'error');

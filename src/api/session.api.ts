@@ -148,6 +148,17 @@ export const sessionApi = {
         );
     },
 
+    verifyInstallmentPayment: async (orderId: string): Promise<void> => {
+        sessionApi._ensureAuth();
+        const headers = sessionApi._authHeaders();
+
+        await axiosInstance.post(
+            `/api/v1/payments/installment/verify?razorpayOrderId=${orderId}`,
+            {},
+            { headers }
+        );
+    },
+
     /* -------------------- CANCEL BOOKING -------------------- */
 
     cancelBooking: async (bookingId: number): Promise<void> => {
