@@ -60,17 +60,6 @@ export const sessionApi = {
         return response.data;
     },
 
-    getUserBookingForSession: async (sessionId: string | number): Promise<UserBooking> => {
-        sessionApi._ensureAuth();
-        const headers = sessionApi._authHeaders();
-
-        const response = await axiosInstance.get<UserBooking>(
-            SESSION_ENDPOINTS.USER_SESSION_BOOKING(sessionId),
-            { headers }
-        );
-        return response.data;
-    },
-
     /* -------------------- SESSION DETAILS -------------------- */
 
     getSession: async (sessionId: string): Promise<Session> => {

@@ -58,9 +58,14 @@ const SessionDetails: React.FC = () => {
 
     const checkBookingStatus = async () => {
         try {
-            if (!session) return;
-            // Use specific endpoint to get detailed booking (including paymentType)
-            const myBooking = await sessionApi.getUserBookingForSession(session.id);
+            const bookings = await sessionApi.getUserBookings();
+            const currentSessionId = Number(session?.id);
+
+            // Find specific booking for this session
+            const myBooking = bookings.find((b: any) => {
+                const bSid = Number(b.sessionId ?? b.session_id ?? b.session?.id);
+                return bSid === currentSessionId;
+            });
 
             if (myBooking) {
                 setBooking(myBooking);
@@ -75,10 +80,7 @@ const SessionDetails: React.FC = () => {
                 setBooking(null);
             }
         } catch (error) {
-            // If 404, it means not booked, so we reset state
-            setIsBooked(false);
-            setBooking(null);
-            // console.error('Checking status failed (likely no booking):', error);
+            console.error('Error checking booking status:', error);
         }
     };
 
@@ -398,8 +400,7 @@ const SessionDetails: React.FC = () => {
                                 </Button>
                             ) : (
                                 <>
-                                    {/* Case: Fully Paid (Full or Confirmed Installment) */}
-                                    {booking?.bookingStatus === 'CONFIRMED' && (
+                                    {booking?.paymentType === 'FULL' || booking?.bookingStatus === 'CONFIRMED' ? (
                                         <Button
                                             size="lg"
                                             variant="primary"
@@ -407,21 +408,11 @@ const SessionDetails: React.FC = () => {
                                             className={styles.actionButton}
                                             style={{ width: '100%', cursor: 'default' }}
                                         >
-                                            Fully Paid
+                                            {booking?.bookingStatus === 'CONFIRMED' ? 'Fully Paid' : 'Already Booked'}
                                         </Button>
-                                    )}
-
-                                    {/* Case: Full Payment Type (Non-Installment) but not confirmed? Should arguably not happen if paid, but fallback logic */}
-                                    {booking?.paymentType === 'FULL' && booking?.bookingStatus !== 'CONFIRMED' && (
-                                        <Button
-                                            size="lg"
-                                            variant="primary"
-                                            disabled={true}
-                                            className={styles.actionButton}
-                                            style={{ width: '100%', cursor: 'default' }}
-                                        >
-                                            Already Booked
-                                        </Button>
+                                    ) : (
+                                        // Case: Partial / Installment
+                                        null
                                     )}
                                 </>
                             )}

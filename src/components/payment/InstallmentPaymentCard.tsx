@@ -40,12 +40,7 @@ export const InstallmentPaymentCard: React.FC<InstallmentPaymentCardProps> = ({
                         <div key={inst.id} className={styles.item}>
                             <div className={styles.info}>
                                 <span className={styles.number}>Installment {inst.installmentNumber}</span>
-                                <div className={styles.detailsColumn}>
-                                    <span className={styles.amount}>{formatCurrency(inst.amount, currency)}</span>
-                                    {inst.dueDate && (
-                                        <span className={styles.dueDate}>Due: {new Date(inst.dueDate).toLocaleDateString()}</span>
-                                    )}
-                                </div>
+                                <span className={styles.amount}>{formatCurrency(inst.amount, currency)}</span>
                             </div>
                             <div className={styles.status}>
                                 {isPaid ? (
