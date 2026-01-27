@@ -164,6 +164,10 @@ const MyBookings: React.FC = () => {
             setSubmittingReview(true);
             await sessionApi.submitReview(ratingId, { rating, comment });
             showToast('Review submitted successfully', 'success');
+
+            // Mark this booking's review modal as shown for this session
+            sessionStorage.setItem(`review_modal_shown_${ratingId}`, 'true');
+
             setRatingId(null); // Close modal
             fetchBookings(); // Refetch
         } catch (error) {
@@ -171,6 +175,22 @@ const MyBookings: React.FC = () => {
             showToast('Failed to submit review', 'error');
         } finally {
             setSubmittingReview(false);
+        }
+    };
+
+    const handleCloseReviewModal = () => {
+        if (ratingId) {
+            // Mark this booking's review modal as shown for this session
+            sessionStorage.setItem(`review_modal_shown_${ratingId}`, 'true');
+        }
+        setRatingId(null);
+    };
+
+    const handleOpenReviewModal = (bookingId: number) => {
+        // Check if modal was already shown for this booking in this session
+        const wasShown = sessionStorage.getItem(`review_modal_shown_${bookingId}`);
+        if (!wasShown) {
+            setRatingId(bookingId);
         }
     };
 
@@ -322,7 +342,7 @@ const MyBookings: React.FC = () => {
                                                     <Button
                                                         variant="secondary"
                                                         size="sm"
-                                                        onClick={() => setRatingId(booking.bookingId)}
+                                                        onClick={() => handleOpenReviewModal(booking.bookingId)}
                                                     >
                                                         Write a Review
                                                     </Button>
@@ -370,7 +390,7 @@ const MyBookings: React.FC = () => {
                 {/* Review Modal */}
                 <ReviewModal
                     isOpen={!!ratingId}
-                    onClose={() => setRatingId(null)}
+                    onClose={handleCloseReviewModal}
                     onSubmit={handleSubmitReview}
                     isSubmitting={submittingReview}
                 />

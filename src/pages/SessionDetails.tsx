@@ -11,7 +11,8 @@ import { formatDate, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
 import { WhatsAppConfirmationModal } from '../components/ui/WhatsAppConfirmationModal';
 import { PaymentChoiceModal } from '../components/ui/PaymentChoiceModal';
-import { ReviewsSection } from '../components/reviews/ReviewsSection';
+import Contact from './Contact';
+
 import { InstallmentPaymentCard } from '../components/payment/InstallmentPaymentCard';
 import type { UserBooking, Installment } from '../types/session.types';
 
@@ -31,7 +32,7 @@ const SessionDetails: React.FC = () => {
     const { showToast } = useToast();
     const navigate = useNavigate();
 
-    const [isBooked, setIsBooked] = useState(false);
+
     const [booking, setBooking] = useState<UserBooking | null>(null);
     const [installments, setInstallments] = useState<Installment[]>([]);
     const [loadingInstallments, setLoadingInstallments] = useState(false);
@@ -41,6 +42,7 @@ const SessionDetails: React.FC = () => {
     const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [paymentLoading, setPaymentLoading] = useState<'full' | 'installment' | null>(null);
+    const [isContactOpen, setIsContactOpen] = useState(false);
 
     useEffect(() => {
         if (sessionId) {
@@ -51,32 +53,43 @@ const SessionDetails: React.FC = () => {
     useEffect(() => {
         if (isAuthenticated && session) {
             checkBookingStatus();
-        } else {
-            setIsBooked(false);
         }
     }, [isAuthenticated, session]);
+
+    useEffect(() => {
+        console.log("BOOKING STATE UPDATED 👉", booking);
+    }, [booking]);
+
+    useEffect(() => {
+        console.log("INSTALLMENTS STATE UPDATED 👉", installments);
+    }, [installments]);
 
     const checkBookingStatus = async () => {
         try {
             const bookings = await sessionApi.getUserBookings();
-            const currentSessionId = Number(session?.id);
+            console.log("ALL USER BOOKINGS 👉", bookings);
 
-            // Find specific booking for this session
+            // Find specific booking for this session using robust matching
             const myBooking = bookings.find((b: any) => {
-                const bSid = Number(b.sessionId ?? b.session_id ?? b.session?.id);
-                return bSid === currentSessionId;
+                const bookingSessionId = b.session?.id ?? b.sessionId ?? b.session_id;
+                return Number(bookingSessionId) === Number(session?.id);
             });
+
+            console.log("MATCHED BOOKING 👉", myBooking);
 
             if (myBooking) {
                 setBooking(myBooking);
-                setIsBooked(true);
 
-                // If installment payment type, fetch detailed installments
-                if (myBooking.paymentType === 'INSTALLMENT') {
+                console.log("Checking Installment Fetch Conditions:", {
+                    status: myBooking.status,
+                    bookingId: myBooking.bookingId
+                });
+
+                // Fetch installments if status is PARTIALLY_PAID
+                if (myBooking.status === 'PARTIALLY_PAID' && myBooking.bookingId) {
                     fetchInstallments(myBooking.bookingId);
                 }
             } else {
-                setIsBooked(false);
                 setBooking(null);
             }
         } catch (error) {
@@ -88,6 +101,7 @@ const SessionDetails: React.FC = () => {
         try {
             setLoadingInstallments(true);
             const data = await sessionApi.getBookingInstallments(bookingId);
+            console.log("INSTALLMENTS FROM API 👉", data);
             setInstallments(data);
         } catch (error) {
             console.error('Failed to fetch installments', error);
@@ -135,7 +149,7 @@ const SessionDetails: React.FC = () => {
     const handleBookClick = () => {
         if (!session) return;
 
-        if (isBooked) {
+        if (booking) {
             showToast('You have already booked this session.', 'info');
             return;
         }
@@ -167,7 +181,6 @@ const SessionDetails: React.FC = () => {
         try {
             await sessionApi.joinSession(session.id);
             showToast(`Successfully joined "${session.title}"`, 'success');
-            setIsBooked(true);
             setShowWhatsAppModal(false);
         } catch (error: any) {
             const data = error.response?.data;
@@ -203,7 +216,6 @@ const SessionDetails: React.FC = () => {
                 session,
                 () => {
                     showToast('Payment successful. Booking confirmed.', 'success');
-                    setIsBooked(true);
                     setShowPaymentModal(false);
                     navigate('/my-bookings');
                 },
@@ -246,7 +258,6 @@ const SessionDetails: React.FC = () => {
                 session,
                 () => {
                     showToast('First installment paid. You have access.', 'success');
-                    setIsBooked(true);
                     setShowPaymentModal(false);
                     checkBookingStatus(); // Refresh to get booking & installments
                 },
@@ -286,9 +297,12 @@ const SessionDetails: React.FC = () => {
                 session,
                 () => {
                     showToast(`Installment #${inst.installmentNumber} paid successfully`, 'success');
-                    // Refresh data
-                    if (booking) fetchInstallments(booking.bookingId);
-                    checkBookingStatus(); // To update main booking status if changed
+
+                    // Force refresh installments and booking status
+                    if (booking?.bookingId) {
+                        fetchInstallments(booking.bookingId);
+                    }
+                    checkBookingStatus();
                 },
                 (err) => showToast(err || 'Payment failed', 'error')
             );
@@ -371,15 +385,9 @@ const SessionDetails: React.FC = () => {
 
                 {/* Main Content Layout */}
                 <div className={styles.mainLayout}>
-                    {/* Left: Description */}
-                    <div className={styles.descriptionCard}>
-                        <h3 className={styles.cardTitle}>About this Session</h3>
-                        <p className={styles.descriptionText}>{session.description}</p>
-                    </div>
-
-                    {/* Right: Action/Booking Card */}
-                    <div className={styles.actionColumn}>
-                        <div className={styles.actionCard}>
+                    {/* Left: Payment & Booking (Primary) */}
+                    <div className={styles.paymentColumn}>
+                        <div className={styles.paymentCard}>
                             <div className={styles.priceTag}>
                                 <span className={styles.priceLabel}>{isFree ? 'Entry' : 'Price'}</span>
                                 <span className={styles.priceValue}>
@@ -387,7 +395,7 @@ const SessionDetails: React.FC = () => {
                                 </span>
                             </div>
 
-                            {!isBooked ? (
+                            {!booking && (
                                 <Button
                                     size="lg"
                                     variant="primary"
@@ -396,31 +404,33 @@ const SessionDetails: React.FC = () => {
                                     className={styles.actionButton}
                                     style={{ width: '100%' }}
                                 >
-                                    {isExpired ? 'Session Ended' : actionLoading ? 'Processing...' : (isFree ? 'Join Now' : 'Book Session')}
+                                    {isExpired ? 'Session Ended' : actionLoading ? 'Processing...' : 'Book Session'}
                                 </Button>
-                            ) : (
-                                <>
-                                    {booking?.paymentType === 'FULL' || booking?.bookingStatus === 'CONFIRMED' ? (
-                                        <Button
-                                            size="lg"
-                                            variant="primary"
-                                            disabled={true}
-                                            className={styles.actionButton}
-                                            style={{ width: '100%', cursor: 'default' }}
-                                        >
-                                            {booking?.bookingStatus === 'CONFIRMED' ? 'Fully Paid' : 'Already Booked'}
-                                        </Button>
-                                    ) : (
-                                        // Case: Partial / Installment
-                                        null
-                                    )}
-                                </>
                             )}
 
-                            {/* Show Installment Card if applicable */}
-                            {isBooked && booking?.paymentType === 'INSTALLMENT' && booking?.bookingStatus !== 'CONFIRMED' && (
-                                loadingInstallments ? (
-                                    <div style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-secondary)' }}>Loading plan...</div>
+                            {/* Booking Status Indicator */}
+                            {booking && (
+                                <Button
+                                    size="lg"
+                                    variant="primary"
+                                    disabled={true}
+                                    className={styles.actionButton}
+                                    style={{ width: '100%', cursor: 'default' }}
+                                >
+                                    Session Booked
+                                </Button>
+                            )}
+
+                            {isExpired && (
+                                <p className={styles.expiredNotice}>This session has ended</p>
+                            )}
+                        </div>
+
+                        {/* INSTALLMENT FLOW (Partially Paid) */}
+                        {booking?.status === 'PARTIALLY_PAID' && (
+                            <div className={styles.installmentSection}>
+                                {loadingInstallments ? (
+                                    <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>Loading plan...</div>
                                 ) : (
                                     <InstallmentPaymentCard
                                         installments={installments}
@@ -428,17 +438,20 @@ const SessionDetails: React.FC = () => {
                                         onPayInstallment={handleNextInstallmentPayment}
                                         loadingInstallmentId={payingInstallmentId}
                                     />
-                                )
-                            )}
+                                )}
+                            </div>
+                        )}
 
-                            {isBooked && (
+                        {/* WhatsApp CTA */}
+                        {booking && ['PARTIALLY_PAID', 'CONFIRMED'].includes(booking.status) && (
+                            <div className={styles.ctaSection}>
                                 <Button
                                     size="lg"
                                     variant="outline"
                                     onClick={handleWhatsAppJoin}
                                     disabled={waLoading}
                                     className={styles.actionButton}
-                                    style={{ width: '100%', marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                                 >
                                     {waLoading ? 'Fetching Link...' : (
                                         <>
@@ -449,11 +462,30 @@ const SessionDetails: React.FC = () => {
                                         </>
                                     )}
                                 </Button>
-                            )}
+                            </div>
+                        )}
+                    </div>
 
-                            {isExpired && (
-                                <p className={styles.expiredNotice}>This session has ended</p>
-                            )}
+                    {/* Right: Description (Secondary) */}
+                    <div className={styles.descriptionColumn}>
+                        <div className={styles.descriptionCard}>
+                            <h3 className={styles.cardTitle}>About this Session</h3>
+                            <p className={styles.descriptionText}>{session.description}</p>
+                        </div>
+
+                        <div className={styles.contactNote}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                            <span>
+                                Need assistance? Feel free to{' '}
+                                <button
+                                    onClick={() => setIsContactOpen(true)}
+                                    className={styles.contactLink}
+                                >
+                                    contact us directly
+                                </button>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -471,10 +503,9 @@ const SessionDetails: React.FC = () => {
                 loadingFull={paymentLoading === 'full'}
                 loadingInstallment={paymentLoading === 'installment'}
             />
+            <Contact isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
 
-            <div className={styles.container}>
-                <ReviewsSection />
-            </div>
+
         </Section >
     );
 };

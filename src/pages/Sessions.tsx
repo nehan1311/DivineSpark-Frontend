@@ -84,7 +84,7 @@ const Sessions: React.FC = () => {
 
     const isConfirmedBooking = (booking?: BookingLike) => {
         const status = String(booking?.status ?? '').toUpperCase().trim();
-        return status === 'CONFIRMED';
+        return ['CONFIRMED', 'PARTIALLY_PAID'].includes(status);
     };
 
     // Set up IntersectionObserver after sessions load
@@ -159,8 +159,8 @@ const Sessions: React.FC = () => {
 
             const booking = normalizedBookings.find(b => b.sessionId === Number(session.id));
 
-            if (booking && booking.status === 'CONFIRMED') {
-                showToast('Session already Booked! Please check your email.', 'info');
+            if (booking && ['CONFIRMED', 'PARTIALLY_PAID'].includes(booking.status)) {
+                showToast('Session already Booked! Please check details.', 'info');
                 setActionLoading(null);
                 return;
             }
@@ -394,7 +394,7 @@ const Sessions: React.FC = () => {
                                                     : { borderColor: 'white', color: 'white' }
                                             }
                                         >
-                                            {isBooked ? 'Session Booked' : isFree ? 'Join Now' : 'Book Session'}
+                                            {isBooked ? 'Session Booked' : 'Book Session'}
 
                                         </Button>
                                     </div>
