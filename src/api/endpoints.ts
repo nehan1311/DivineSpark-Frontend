@@ -19,10 +19,6 @@ export const SESSION_ENDPOINTS = {
     MY_BOOKINGS: `${API_BASE_URL}/user/bookings`,            // GET user bookings
     WHATSAPP_LINK: (id: string | number) =>
         `${API_BASE_URL}/sessions/${id}/whatsapp-link`,      // WhatsApp join link
-    USER_SESSION_BOOKING: (sessionId: string | number) =>
-        `${API_BASE_URL}/sessions/${sessionId}`,   // Get detailed booking for session
-    //        `${API_BASE_URL}/bookings/session/${sessionId}/me`,   // Get detailed booking for session
-
 };
 
 export const INSTALLMENT_ENDPOINTS = {

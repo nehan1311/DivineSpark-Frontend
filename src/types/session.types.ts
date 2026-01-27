@@ -53,5 +53,4 @@ export interface Installment {
     installmentNumber: number;
     amount: number;
     status: 'PAID' | 'PENDING';
-    dueDate?: string;
 }
