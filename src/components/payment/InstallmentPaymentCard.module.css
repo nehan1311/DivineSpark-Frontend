@@ -1,67 +1,291 @@
-.card {
-    background: var(--surface-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    margin-top: 1.5rem;
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
-.title {
+/* Summary Section */
+.summarySection {
+    background: linear-gradient(135deg, rgba(139, 195, 74, 0.08) 0%, rgba(139, 195, 74, 0.02) 100%);
+    border: 1px solid rgba(139, 195, 74, 0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.summaryTitle {
     font-family: var(--font-heading);
     font-size: 1.1rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.01em;
 }
 
-.list {
+.summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.summaryItem {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
-.item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    background: var(--surface-hover);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-subtle);
-}
-
-.info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.number {
-    font-size: 0.85rem;
+.summaryLabel {
+    font-size: 0.75rem;
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    font-weight: 600;
 }
 
-.amount {
+.summaryValue {
     font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+}
+
+.summaryValuePaid {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: #4caf50;
+    font-size: 1.25rem;
+}
+
+.summaryValueRemaining {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+}
+
+/* Timeline Section */
+.timelineSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.timelineTitle {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+}
+
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Timeline Item */
+.timelineItem {
+    position: relative;
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 1rem;
+    padding: 1.25rem 0;
+    transition: all 0.3s ease;
+}
+
+.timelineItem:first-child {
+    padding-top: 0;
+}
+
+.timelineItem:last-child {
+    padding-bottom: 0;
+}
+
+/* Timeline Dot */
+.timelineDot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-hover);
+    border: 2px solid var(--border-subtle);
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.timelineItem.paid .timelineDot {
+    background: #4caf50;
+    border-color: #4caf50;
+    color: white;
+}
+
+.timelineItem.active .timelineDot {
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(139, 195, 74, 0.15);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.timelineItem.locked .timelineDot {
+    background: var(--surface-card);
+    border-color: var(--border-subtle);
+    opacity: 0.5;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 4px rgba(139, 195, 74, 0.15);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(139, 195, 74, 0.05);
+    }
+}
+
+/* Timeline Connector */
+.timelineConnector {
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: -32px;
+    width: 2px;
+    background: var(--border-subtle);
+    z-index: 1;
+}
+
+.timelineItem.paid .timelineConnector {
+    background: #4caf50;
+}
+
+/* Timeline Content */
+.timelineContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+}
+
+.installmentHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.installmentInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.installmentNumber {
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--text-primary);
 }
 
-.paidBadge {
-    color: var(--success);
-    font-weight: 500;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
+.timelineItem.locked .installmentNumber {
+    color: var(--text-disabled);
 }
 
-.lockedBadge {
+.installmentAmount {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.timelineItem.locked .installmentAmount {
     color: var(--text-disabled);
-    font-size: 0.9rem;
+}
+
+.dueDate {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.timelineItem.locked .dueDate {
+    color: var(--text-disabled);
+}
+
+/* Installment Action */
+.installmentAction {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+}
+
+/* Status Badges */
+.statusBadgePaid {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.statusBadgeLocked {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    background: var(--surface-hover);
+    color: var(--text-disabled);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border-subtle);
+    opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .summaryGrid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .summaryItem {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(139, 195, 74, 0.15);
+    }
+
+    .summaryItem:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .timelineItem {
+        grid-template-columns: 28px 1fr;
+        gap: 0.75rem;
+    }
+
+    .timelineDot {
+        width: 28px;
+        height: 28px;
+    }
+
+    .timelineConnector {
+        left: 13px;
+    }
+
+    .installmentInfo {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
 }

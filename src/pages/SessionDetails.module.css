@@ -66,6 +66,8 @@
     color: var(--color-text-primary);
     line-height: 1.1;
     margin-bottom: 0.5rem;
+    font-family: var(--font-family-heading);
+    /* Ensure serif font */
 }
 
 .instructorRow {
@@ -112,8 +114,10 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.6);
+    /* Semi-transparent */
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 999px;
     /* Pill shape */
     font-size: 0.9rem;
@@ -132,91 +136,151 @@
     opacity: 0.7;
 }
 
-/* Main Layout: Split Columns */
+/* Main Layout: Split Columns - Payment Primary */
 .mainLayout {
     display: grid;
-    grid-template-columns: 1fr 340px;
-    /* Description takes available space, Action is fixed width */
-    gap: 3rem;
+    grid-template-columns: 2fr 1fr;
+    /* Payment takes more space, description is secondary */
+    gap: 2rem;
     align-items: start;
 }
 
-/* Description Card */
-.descriptionCard {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(10px);
-    padding: 2.5rem;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border);
-    box-shadow: var(--shadow-md);
-}
-
-.cardTitle {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--color-text-primary);
-    font-family: var(--font-family-heading);
-}
-
-.descriptionText {
-    font-size: 1.05rem;
-    line-height: 1.75;
-    color: var(--color-text-body);
-    white-space: pre-wrap;
-    /* Preserve line breaks */
-}
-
-/* Action Column & Card */
-.actionColumn {
-    position: sticky;
-    top: var(--header-height);
-    /* Stick when scrolling */
-}
-
-.actionCard {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(10px);
-    padding: 2rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--color-border);
+/* Payment Column (Left - Primary) */
+.paymentColumn {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.priceTag {
+.paymentCard {
+    background: rgba(255, 255, 255, 0.85);
+    /* More translucent */
+    backdrop-filter: blur(12px);
+    padding: 1.75rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    /* Softer shadow */
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    /* Subtle white border */
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 1rem;
-    border-bottom: 1px dashed var(--color-border);
+    flex-direction: column;
+    gap: 1.25rem;
 }
 
-.priceLabel {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--color-text-body);
+.installmentSection {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    padding: 1.75rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Description Column (Right - Secondary) */
+.descriptionColumn {
+    position: sticky;
+    top: calc(var(--header-height) + 1rem);
+}
+
+.descriptionCard {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    padding: 1.75rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+.cardTitle {
+    font-size: 1.35rem;
+    margin-bottom: 1rem;
+    color: var(--color-text-primary);
+    font-family: var(--font-family-heading);
     font-weight: 600;
 }
 
+.descriptionText {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text-body);
+    white-space: pre-wrap;
+    /* Preserve line breaks */
+}
+
+.contactNote {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    background: rgba(139, 195, 74, 0.05);
+    border: 1px solid rgba(139, 195, 74, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--color-text-body);
+    line-height: 1.5;
+}
+
+.contactNote svg {
+    flex-shrink: 0;
+    color: var(--color-primary);
+    opacity: 0.8;
+}
+
+.contactLink {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+    font-family: inherit;
+    transition: opacity 0.2s ease;
+}
+
+.contactLink:hover {
+    opacity: 0.7;
+}
+
+.priceTag {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    /* Softer separator */
+}
+
+.priceLabel {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-body);
+    font-weight: 600;
+    opacity: 0.7;
+}
+
 .priceValue {
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 800;
     color: var(--color-primary);
     font-family: var(--font-family-heading);
+    line-height: 1;
+    letter-spacing: -0.02em;
 }
 
 .actionButton {
     /* Main styling usually comes from component, but we can override specific needs */
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    font-weight: 600;
 }
 
-.actionButton:hover {
+.actionButton:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .expiredNotice {
@@ -224,6 +288,7 @@
     color: #e57373;
     font-size: 0.9rem;
     margin-top: -0.5rem;
+    font-weight: 500;
 }
 
 /* Responsive */
@@ -234,16 +299,23 @@
         gap: 2rem;
     }
 
-    .actionColumn {
+    .paymentColumn {
+        order: -1;
+        /* Show payment first on mobile */
+    }
+
+    .descriptionColumn {
         position: relative;
         /* Unstick */
         top: 0;
-        max-width: 500px;
-        margin: 0 auto;
-        width: 100%;
     }
 
     .descriptionCard {
+        padding: 2rem;
+    }
+
+    .paymentCard,
+    .installmentSection {
         padding: 2rem;
     }
 }
@@ -270,7 +342,17 @@
         padding: 1.5rem;
     }
 
-    .actionCard {
-        padding: 1.5rem;
+    .paymentCard,
+    .installmentSection {
+        padding: 1.75rem;
+        gap: 1.5rem;
+    }
+
+    .priceValue {
+        font-size: 2rem;
+    }
+
+    .priceTag {
+        padding-bottom: 1.25rem;
     }
 }

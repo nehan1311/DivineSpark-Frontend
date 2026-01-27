@@ -37,6 +37,7 @@ export interface UserBooking {
     sessionTitle: string;
     sessionType: SessionType;
     bookingStatus: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'PARTIALLY_PAID' | 'PENDING';
+    status: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'PARTIALLY_PAID' | 'PENDING'; // Backend uses 'status' instead of 'bookingStatus'
     startTime: string;
     endTime: string;
     guideName: string;
@@ -53,4 +54,6 @@ export interface Installment {
     installmentNumber: number;
     amount: number;
     status: 'PAID' | 'PENDING';
+    dueDate?: string;
+    paidAt?: string;
 }
