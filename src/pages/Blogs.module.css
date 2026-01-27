@@ -17,10 +17,10 @@
     left: 0;
     width: 100%;
     height: 100%;
+    /* Use a very subtle noise or gradient if image not available, keeping existing setup */
     background: url('../assets/home_bg.jpg') no-repeat center center;
     background-size: cover;
     opacity: 0.15;
-    /* Less visible as requested */
     z-index: -1;
     pointer-events: none;
 }
@@ -34,133 +34,179 @@
 
 .header {
     text-align: center;
-    margin-bottom: 4rem;
-    color: #1a1a1a;
+    margin-bottom: 5rem;
+    color: #1A3021;
 }
 
 .title {
-    font-family: 'Playfair Display', serif;
-    font-size: 4rem;
+    font-family: var(--font-family-heading);
+    font-size: 4.5rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1A3021;
+    /* Forest Green */
     margin-bottom: 1rem;
     letter-spacing: -0.02em;
-    /* Removed text-shadow for cleaner look on light bg */
 }
 
 .subtitle {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-family-body);
     font-size: 1.25rem;
-    color: #666;
+    color: var(--color-text-body);
     font-weight: 300;
     letter-spacing: 0.05em;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .blogList {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: 3rem;
+    /* Increased gap */
 }
 
+/* Elevated Card Look */
 .blogItem {
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(8px);
-    padding: 3.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 0;
+    /* Edge to edge image */
+    border-radius: 40px;
+    /* rounded-[40px] */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     position: relative;
     overflow: hidden;
+    text-align: left;
+    /* Ensure left alignment */
+}
+
+.heroImageContainer {
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    position: relative;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.heroImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.blogItem:hover .heroImage {
+    transform: scale(1.05);
+}
+
+.contentWrapper {
+    padding: 3rem;
 }
 
 .blogItem:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 40px rgba(26, 48, 33, 0.08);
+    /* slight green hint shadow */
     background: rgba(255, 255, 255, 0.95);
 }
 
-.blogItem::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(to bottom, #2c5530, #5a8c60);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.blogItem:hover::before {
-    opacity: 1;
-}
+/* Removed the harsh gradient sidebar ::before */
 
 .blogTitle {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin-bottom: 0.75rem;
+    font-family: var(--font-family-heading);
+    font-size: 2.5rem;
+    /* text-4xl approx */
+    font-weight: 700;
+    color: #1A3021;
+    /* Forest Green */
+    margin-bottom: 1.5rem;
     cursor: pointer;
-    line-height: 1.2;
+    line-height: 1.1;
     transition: color 0.3s ease;
 }
 
 .blogTitle:hover {
-    color: var(--primary-color, #2c5530);
+    color: #2c5530;
+    /* Slightly lighter on hover */
+}
+
+/* Gold Divider */
+.divider {
+    border: 0;
+    height: 1px;
+    background: #C5A059;
+    /* Muted Gold */
+    opacity: 0.3;
+    margin: 1.5rem 0;
+    width: 100px;
+    /* Small dash or full width? Prompt implied nice separator. Let's do small dash for elegance */
 }
 
 .meta {
     display: flex;
     gap: 1rem;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    color: #666;
+    font-family: var(--font-family-body);
+    font-size: 0.75rem;
+    /* text-xs */
+    color: #C5A059;
+    /* Muted Gold */
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 1.5rem;
-    font-weight: 500;
+    letter-spacing: 0.15em;
+    /* tracking-widest */
+    margin-bottom: 2rem;
+    font-weight: 600;
+    align-items: center;
+}
+
+.separator {
+    opacity: 0.5;
 }
 
 .excerpt {
-    font-family: 'Inter', sans-serif;
-    font-size: 1.1rem;
+    font-family: var(--font-family-body);
+    font-size: 1.125rem;
     line-height: 1.8;
-    color: #444;
-    margin-bottom: 2rem;
+    color: #4A5D55;
+    /* Body text color from vars */
+    margin-bottom: 2.5rem;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    font-weight: 300;
+    font-weight: 400;
+    max-width: 90%;
 }
 
 .readMore {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
+    font-family: var(--font-family-body);
+    font-size: 0.875rem;
+    /* text-sm */
     font-weight: 600;
-    color: var(--primary-color, #2c5530);
+    color: #1A3021;
     text-decoration: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     transition: all 0.3s ease;
-    padding: 0.75rem 1.5rem;
-    border: 1px solid rgba(44, 85, 48, 0.2);
-    border-radius: 50px;
+    padding: 0.75rem 2rem;
+    /* px-8 py-2 equivalent approx */
+    border: 1px solid #1A3021;
+    border-radius: 9999px;
+    /* rounded-full */
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
+    background: transparent;
 }
 
 .readMore:hover {
-    background: #2c5530;
-    color: white;
-    transform: translateX(4px);
-    border-color: #2c5530;
-    box-shadow: 0 4px 12px rgba(44, 85, 48, 0.2);
+    background: #1A3021;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(26, 48, 33, 0.2);
+    transform: translateY(-1px);
 }
 
 .emptyState,

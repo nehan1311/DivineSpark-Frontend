@@ -28,21 +28,34 @@ const BlogModal: React.FC<BlogModalProps> = ({ isOpen, onClose, onSave, blog }) 
         authorRole: 'Editor',
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [isFetching, setIsFetching] = useState(false);
 
     // Character limit for excerpt
     const EXCERPT_LIMIT = 200;
 
     useEffect(() => {
         if (isOpen) {
-            if (blog) {
-                setFormData({
-                    title: blog.title,
-                    slug: blog.slug,
-                    excerpt: blog.excerpt,
-                    content: blog.content,
-                    authorName: blog.authorName,
-                    authorRole: blog.authorRole || 'Editor',
-                });
+            if (blog?.id) {
+                // Fetch full details from API
+                setIsFetching(true);
+                adminBlogApi.getBlog(blog.id)
+                    .then((fullBlog) => {
+                        setFormData({
+                            title: fullBlog.title || blog.title || '',
+                            slug: fullBlog.slug || blog.slug || '',
+                            excerpt: fullBlog.excerpt || blog.excerpt || '',
+                            content: fullBlog.content || '',
+                            authorName: fullBlog.authorName || blog.authorName || '',
+                            authorRole: fullBlog.authorRole || blog.authorRole || 'Editor',
+                        });
+                    })
+                    .catch((err) => {
+                        console.error("Failed to fetch blog details", err);
+                        showToast("Failed to load blog content", "error");
+                    })
+                    .finally(() => {
+                        setIsFetching(false);
+                    });
             } else {
                 setFormData({
                     title: '',
@@ -54,7 +67,7 @@ const BlogModal: React.FC<BlogModalProps> = ({ isOpen, onClose, onSave, blog }) 
                 });
             }
         }
-    }, [isOpen, blog]);
+    }, [isOpen, blog]); // Only re-run if modal opens or selected blog changes
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -115,107 +128,113 @@ const BlogModal: React.FC<BlogModalProps> = ({ isOpen, onClose, onSave, blog }) 
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit} className={styles.formStack}>
-                <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Title</label>
-                    <input
-                        type="text"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        onBlur={handleTitleBlur}
-                        className={styles.formInput}
-                        required
-                        placeholder="e.g. The Power of Mindfulness"
-                    />
+            {isFetching ? (
+                <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+                    Loading content...
                 </div>
-
-                <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Slug</label>
-                    <div className={styles.inputGroup}>
-                        <span className={styles.inputPrefix}>/blogs/</span>
-                        <input
-                            type="text"
-                            name="slug"
-                            value={formData.slug}
-                            onChange={handleChange}
-                            className={`${styles.formInput} ${styles.inputWithPrefix}`}
-                            required
-                            placeholder="the-power-of-mindfulness"
-                        />
-                    </div>
-                    <p className={styles.helperText}>Auto-generated from title, editable. Must be unique.</p>
-                </div>
-
-                {/* Author Section - Grid Layout */}
-                <div className={styles.gridTwoCol}>
+            ) : (
+                <form onSubmit={handleSubmit} className={styles.formStack}>
                     <div className={styles.formGroup}>
-                        <label className={styles.formLabel}>Author Name</label>
+                        <label className={styles.formLabel}>Title</label>
                         <input
                             type="text"
-                            name="authorName"
-                            value={formData.authorName}
+                            name="title"
+                            value={formData.title}
                             onChange={handleChange}
+                            onBlur={handleTitleBlur}
                             className={styles.formInput}
                             required
-                            placeholder="e.g. John Doe"
+                            placeholder="e.g. The Power of Mindfulness"
                         />
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label className={styles.formLabel}>Author Role</label>
-                        <input
-                            type="text"
-                            name="authorRole"
-                            value={formData.authorRole}
+                        <label className={styles.formLabel}>Slug</label>
+                        <div className={styles.inputGroup}>
+                            <span className={styles.inputPrefix}>/blogs/</span>
+                            <input
+                                type="text"
+                                name="slug"
+                                value={formData.slug}
+                                onChange={handleChange}
+                                className={`${styles.formInput} ${styles.inputWithPrefix}`}
+                                required
+                                placeholder="the-power-of-mindfulness"
+                            />
+                        </div>
+                        <p className={styles.helperText}>Auto-generated from title, editable. Must be unique.</p>
+                    </div>
+
+                    {/* Author Section - Grid Layout */}
+                    <div className={styles.gridTwoCol}>
+                        <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>Author Name</label>
+                            <input
+                                type="text"
+                                name="authorName"
+                                value={formData.authorName}
+                                onChange={handleChange}
+                                className={styles.formInput}
+                                required
+                                placeholder="e.g. John Doe"
+                            />
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>Author Role</label>
+                            <input
+                                type="text"
+                                name="authorRole"
+                                value={formData.authorRole}
+                                onChange={handleChange}
+                                className={styles.formInput}
+                                placeholder="e.g. Certified Healer"
+                            />
+                        </div>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label className={styles.formLabel}>Excerpt</label>
+                        <textarea
+                            name="excerpt"
+                            value={formData.excerpt}
                             onChange={handleChange}
                             className={styles.formInput}
-                            placeholder="e.g. Certified Healer"
+                            rows={3}
+                            required
+                            maxLength={EXCERPT_LIMIT}
+                            placeholder="A brief summary that appears on the blog list page..."
+                        />
+                        <div className={`${styles.charCount} ${formData.excerpt.length > EXCERPT_LIMIT * 0.9 ? styles.warning : ''}`}>
+                            {formData.excerpt.length}/{EXCERPT_LIMIT} characters
+                        </div>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label className={styles.formLabel}>
+                            Content <span style={{ fontWeight: 400, color: '#6b7280', fontSize: '0.8rem' }}>(Markdown Supported)</span>
+                        </label>
+                        <textarea
+                            name="content"
+                            value={formData.content}
+                            onChange={handleChange}
+                            className={`${styles.formInput} ${styles.codeFont}`}
+                            rows={12}
+                            required
+                            placeholder="# Start writing your story here..."
                         />
                     </div>
-                </div>
 
-                <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Excerpt</label>
-                    <textarea
-                        name="excerpt"
-                        value={formData.excerpt}
-                        onChange={handleChange}
-                        className={styles.formInput}
-                        rows={3}
-                        required
-                        maxLength={EXCERPT_LIMIT}
-                        placeholder="A brief summary that appears on the blog list page..."
-                    />
-                    <div className={`${styles.charCount} ${formData.excerpt.length > EXCERPT_LIMIT * 0.9 ? styles.warning : ''}`}>
-                        {formData.excerpt.length}/{EXCERPT_LIMIT} characters
+                    <div className={styles.modalActions}>
+                        <Button variant="secondary" onClick={onClose} type="button">
+                            Cancel
+                        </Button>
+                        <Button variant="primary" type="submit" disabled={isLoading}>
+                            {isLoading ? 'Saving...' : (blog ? 'Update Blog' : 'Create Blog')}
+                        </Button>
                     </div>
-                </div>
-
-                <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>
-                        Content <span style={{ fontWeight: 400, color: '#6b7280', fontSize: '0.8rem' }}>(Markdown Supported)</span>
-                    </label>
-                    <textarea
-                        name="content"
-                        value={formData.content}
-                        onChange={handleChange}
-                        className={`${styles.formInput} ${styles.codeFont}`}
-                        rows={12}
-                        required
-                        placeholder="# Start writing your story here..."
-                    />
-                </div>
-
-                <div className={styles.modalActions}>
-                    <Button variant="secondary" onClick={onClose} type="button">
-                        Cancel
-                    </Button>
-                    <Button variant="primary" type="submit" disabled={isLoading}>
-                        {isLoading ? 'Saving...' : (blog ? 'Update Blog' : 'Create Blog')}
-                    </Button>
-                </div>
-            </form>
+                </form>
+            )}
         </Modal >
     );
 };

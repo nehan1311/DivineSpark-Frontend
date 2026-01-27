@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { blogApi, type BlogPost } from '../api/blog.api';
 import styles from './Blogs.module.css';
+import energyHealingImg from '../assets/energy_healing.jpg';
 
 const Blogs: React.FC = () => {
     const navigate = useNavigate();
@@ -90,30 +91,40 @@ const Blogs: React.FC = () => {
                     ) : (
                         blogs.map((blog) => (
                             <article key={blog.id} className={styles.blogItem}>
-                                <h1
-                                    className={styles.blogTitle}
-                                    onClick={() => handleBlogClick(blog.slug)}
-                                >
-                                    {blog.title}
-                                </h1>
-                                <div className={styles.meta}>
-                                    <span className={styles.author}>{blog.authorName || 'DivineSpark'}{blog.authorRole && ` (${blog.authorRole})`}</span>
-                                    <span className={styles.separator}>•</span>
-                                    <span className={styles.date}>
-                                        {formatDate(blog.createdAt || blog.publishedAt)}
-                                    </span>
+                                <div className={styles.heroImageContainer}>
+                                    <img
+                                        src={energyHealingImg}
+                                        alt={blog.title}
+                                        className={styles.heroImage}
+                                    />
                                 </div>
-                                <p className={styles.excerpt}>{blog.excerpt}</p>
-                                <a
-                                    className={styles.readMore}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handleBlogClick(blog.slug);
-                                    }}
-                                    href={`/blogs/${blog.slug}`}
-                                >
-                                    Read more
-                                </a>
+                                <div className={styles.contentWrapper}>
+                                    <h1
+                                        className={styles.blogTitle}
+                                        onClick={() => handleBlogClick(blog.slug)}
+                                    >
+                                        {blog.title}
+                                    </h1>
+                                    <hr className={styles.divider} />
+                                    <div className={styles.meta}>
+                                        <span className={styles.author}>{blog.authorName || 'DivineSpark'}{blog.authorRole && ` (${blog.authorRole})`}</span>
+                                        <span className={styles.separator}>•</span>
+                                        <span className={styles.date}>
+                                            {formatDate(blog.createdAt || blog.publishedAt)}
+                                        </span>
+                                    </div>
+                                    <p className={styles.excerpt}>{blog.excerpt}</p>
+                                    <a
+                                        className={styles.readMore}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleBlogClick(blog.slug);
+                                        }}
+                                        href={`/blogs/${blog.slug}`}
+                                    >
+                                        Read more
+                                    </a>
+                                </div>
                             </article>
                         ))
                     )}
