@@ -10,7 +10,10 @@ import styles from './SessionDetails.module.css';
 import { formatDate, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
 import { WhatsAppConfirmationModal } from '../components/ui/WhatsAppConfirmationModal';
+import { PaymentChoiceModal } from '../components/ui/PaymentChoiceModal';
 import { ReviewsSection } from '../components/reviews/ReviewsSection';
+import { InstallmentPaymentCard } from '../components/payment/InstallmentPaymentCard';
+import type { UserBooking, Installment } from '../types/session.types';
 
 
 const SessionDetails: React.FC = () => {
@@ -29,9 +32,15 @@ const SessionDetails: React.FC = () => {
     const navigate = useNavigate();
 
     const [isBooked, setIsBooked] = useState(false);
+    const [booking, setBooking] = useState<UserBooking | null>(null);
+    const [installments, setInstallments] = useState<Installment[]>([]);
+    const [loadingInstallments, setLoadingInstallments] = useState(false);
+    const [payingInstallmentId, setPayingInstallmentId] = useState<number | null>(null);
 
     const [waLoading, setWaLoading] = useState(false);
     const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [paymentLoading, setPaymentLoading] = useState<'full' | 'installment' | null>(null);
 
     useEffect(() => {
         if (sessionId) {
@@ -49,20 +58,40 @@ const SessionDetails: React.FC = () => {
 
     const checkBookingStatus = async () => {
         try {
-            const bookings = await sessionApi.getUserBookings();
-            const currentSessionId = Number(session?.id);
+            if (!session) return;
+            // Use specific endpoint to get detailed booking (including paymentType)
+            const myBooking = await sessionApi.getUserBookingForSession(session.id);
 
-            const hasBooking = bookings.some((b: any) => {
-                const bSid = Number(b.sessionId ?? b.session_id ?? b.session?.id);
-                // Check if session ID matches AND status is confirmed (or pending if you want to block duplicates too)
-                // Ususally confirmed is the strict check.
-                const status = String(b.status ?? '').toUpperCase().trim();
-                return bSid === currentSessionId && status === 'CONFIRMED';
-            });
+            if (myBooking) {
+                setBooking(myBooking);
+                setIsBooked(true);
 
-            setIsBooked(hasBooking);
+                // If installment payment type, fetch detailed installments
+                if (myBooking.paymentType === 'INSTALLMENT') {
+                    fetchInstallments(myBooking.bookingId);
+                }
+            } else {
+                setIsBooked(false);
+                setBooking(null);
+            }
         } catch (error) {
+            // If 404, it means not booked, so we reset state
+            setIsBooked(false);
+            setBooking(null);
+            // console.error('Checking status failed (likely no booking):', error);
+        }
+    };
 
+    const fetchInstallments = async (bookingId: number) => {
+        try {
+            setLoadingInstallments(true);
+            const data = await sessionApi.getBookingInstallments(bookingId);
+            setInstallments(data);
+        } catch (error) {
+            console.error('Failed to fetch installments', error);
+            showToast('Failed to load installment details', 'error');
+        } finally {
+            setLoadingInstallments(false);
         }
     };
 
@@ -115,10 +144,14 @@ const SessionDetails: React.FC = () => {
             return;
         }
 
-        setShowWhatsAppModal(true);
+        if (session.type === 'FREE') {
+            setShowWhatsAppModal(true);
+        } else {
+            setShowPaymentModal(true);
+        }
     };
 
-    const executeBooking = async () => {
+    const handleFreeBooking = async () => {
         if (!session) return;
 
         // Double check auth just in case
@@ -129,37 +162,25 @@ const SessionDetails: React.FC = () => {
 
         setActionLoading(true);
 
-        // 1. Pre-check: Verify booking status from backend fresh (Best Effort)
         try {
-            const bookings = await sessionApi.getUserBookings();
-            const currentSessionId = Number(session.id);
-            const freshIsBooked = bookings.some((b: any) => {
-                const bSid = Number(b.sessionId ?? b.session_id ?? b.session?.id);
-                const status = String(b.status ?? '').toUpperCase().trim();
-                return bSid === currentSessionId && status === 'CONFIRMED';
-            });
-
-            if (freshIsBooked) {
-                setIsBooked(true);
-                showToast('Session already Booked!', 'info');
-                setActionLoading(false);
-                return;
-            }
-        } catch (ignored) {
-
+            await sessionApi.joinSession(session.id);
+            showToast(`Successfully joined "${session.title}"`, 'success');
+            setIsBooked(true);
+            setShowWhatsAppModal(false);
+        } catch (error: any) {
+            const data = error.response?.data;
+            const message = data?.message || 'Unable to join session';
+            showToast(message, 'error');
+        } finally {
+            setActionLoading(false);
         }
+    };
+
+    const handleFullPayment = async () => {
+        if (!session) return;
+        setPaymentLoading('full');
 
         try {
-
-            if (session.type === 'FREE') {
-                await sessionApi.joinSession(session.id);
-                showToast(`Successfully joined "${session.title}"`, 'success');
-                setIsBooked(true); // Optimistically update
-                return;
-            }
-
-            // ---- PAID SESSION FLOW ----
-
             // Load Razorpay SDK
             const isLoaded = await razorpayService.loadRazorpay();
             if (!isLoaded) {
@@ -167,10 +188,10 @@ const SessionDetails: React.FC = () => {
                 return;
             }
 
-            //Create Razorpay order (backend)
+            // Create Razorpay order (backend)
             const orderData = await sessionApi.payForSession(session.id);
 
-            //Open Razorpay checkout
+            // Open Razorpay checkout
             razorpayService.initializePayment(
                 {
                     orderId: orderData.orderId,
@@ -179,13 +200,10 @@ const SessionDetails: React.FC = () => {
                 },
                 session,
                 () => {
-                    showToast(
-                        'Payment successful! You will receive session details shortly.',
-                        'success'
-                    );
-                    setIsBooked(true); // Optimistically update
-                    // Webhook will confirm booking
-                    // navigate('/sessions'); // Optional: stay on page to see "Booked" status
+                    showToast('Payment successful. Booking confirmed.', 'success');
+                    setIsBooked(true);
+                    setShowPaymentModal(false);
+                    navigate('/my-bookings');
                 },
                 (errorMsg) => {
                     showToast(errorMsg || 'Payment failed', 'error');
@@ -193,25 +211,89 @@ const SessionDetails: React.FC = () => {
             );
 
         } catch (error: any) {
-
-
-            // Extract error message from various possible locations
-            const status = error.response?.status;
             const data = error.response?.data;
-            const messageFromData = typeof data === 'string' ? data : (data?.message || data?.error);
-            const errorMsg = String(messageFromData || error.message || '').toLowerCase();
-
-            // Handle duplicate booking specific case
-            if ((status === 400 || status === 409) && (errorMsg.includes('already booked') || errorMsg.includes('duplicate'))) {
-                const displayMsg = messageFromData || 'You have already booked this session.';
-                showToast(displayMsg, 'info');
-                setIsBooked(true); // Sync state
-            } else {
-                const displayMsg = typeof messageFromData === 'string' ? messageFromData : 'Unable to book session. Please try again.';
-                showToast(displayMsg, 'error');
-            }
+            const message = data?.message || 'Payment initiation failed';
+            showToast(message, 'error');
         } finally {
-            setActionLoading(false);
+            setPaymentLoading(null);
+        }
+    };
+
+    const handleInstallmentPayment = async () => {
+        if (!session) return;
+        setPaymentLoading('installment');
+
+        try {
+            // Load Razorpay SDK
+            const isLoaded = await razorpayService.loadRazorpay();
+            if (!isLoaded) {
+                showToast('Razorpay SDK failed to load. Are you online?', 'error');
+                return;
+            }
+
+            // Create Razorpay order for installment
+            const orderData = await sessionApi.payForSessionInstallments(session.id);
+
+            // Open Razorpay checkout
+            razorpayService.initializePayment(
+                {
+                    orderId: orderData.razorpayOrderId,
+                    amount: orderData.amount,
+                    currency: 'INR' // Assuming INR as per requirements
+                },
+                session,
+                () => {
+                    showToast('First installment paid. You have access.', 'success');
+                    setIsBooked(true);
+                    setShowPaymentModal(false);
+                    checkBookingStatus(); // Refresh to get booking & installments
+                },
+                (errorMsg) => {
+                    showToast(errorMsg || 'Payment failed', 'error');
+                }
+            );
+
+        } catch (error: any) {
+            const data = error.response?.data;
+            const message = data?.message || 'Payment initiation failed';
+            showToast(message, 'error');
+        } finally {
+            setPaymentLoading(null);
+        }
+    };
+
+    const handleNextInstallmentPayment = async (inst: Installment) => {
+        if (!session) return;
+        setPayingInstallmentId(inst.id);
+
+        try {
+            const isLoaded = await razorpayService.loadRazorpay();
+            if (!isLoaded) {
+                showToast('Razorpay SDK failed to load', 'error');
+                return;
+            }
+
+            const orderData = await sessionApi.payNextInstallment(inst.id);
+
+            razorpayService.initializePayment(
+                {
+                    orderId: orderData.razorpayOrderId,
+                    amount: orderData.amount,
+                    currency: 'INR'
+                },
+                session,
+                () => {
+                    showToast(`Installment #${inst.installmentNumber} paid successfully`, 'success');
+                    // Refresh data
+                    if (booking) fetchInstallments(booking.bookingId);
+                    checkBookingStatus(); // To update main booking status if changed
+                },
+                (err) => showToast(err || 'Payment failed', 'error')
+            );
+        } catch (error: any) {
+            showToast(error.response?.data?.message || 'Payment failed', 'error');
+        } finally {
+            setPayingInstallmentId(null);
         }
     };
 
@@ -303,17 +385,60 @@ const SessionDetails: React.FC = () => {
                                 </span>
                             </div>
 
-                            <Button
-                                size="lg"
-                                variant="primary"
+                            {!isBooked ? (
+                                <Button
+                                    size="lg"
+                                    variant="primary"
+                                    onClick={handleBookClick}
+                                    disabled={actionLoading || isExpired}
+                                    className={styles.actionButton}
+                                    style={{ width: '100%' }}
+                                >
+                                    {isExpired ? 'Session Ended' : actionLoading ? 'Processing...' : (isFree ? 'Join Now' : 'Book Session')}
+                                </Button>
+                            ) : (
+                                <>
+                                    {/* Case: Fully Paid (Full or Confirmed Installment) */}
+                                    {booking?.bookingStatus === 'CONFIRMED' && (
+                                        <Button
+                                            size="lg"
+                                            variant="primary"
+                                            disabled={true}
+                                            className={styles.actionButton}
+                                            style={{ width: '100%', cursor: 'default' }}
+                                        >
+                                            Fully Paid
+                                        </Button>
+                                    )}
 
-                                onClick={handleBookClick}
-                                disabled={actionLoading || isExpired || isBooked}
-                                className={styles.actionButton}
-                                style={{ width: '100%', cursor: isBooked ? 'not-allowed' : 'pointer' }}
-                            >
-                                {isBooked ? 'Already Booked' : actionLoading ? 'Processing...' : (isFree ? 'Join Now' : 'Book Session')}
-                            </Button>
+                                    {/* Case: Full Payment Type (Non-Installment) but not confirmed? Should arguably not happen if paid, but fallback logic */}
+                                    {booking?.paymentType === 'FULL' && booking?.bookingStatus !== 'CONFIRMED' && (
+                                        <Button
+                                            size="lg"
+                                            variant="primary"
+                                            disabled={true}
+                                            className={styles.actionButton}
+                                            style={{ width: '100%', cursor: 'default' }}
+                                        >
+                                            Already Booked
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+
+                            {/* Show Installment Card if applicable */}
+                            {isBooked && booking?.paymentType === 'INSTALLMENT' && booking?.bookingStatus !== 'CONFIRMED' && (
+                                loadingInstallments ? (
+                                    <div style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-secondary)' }}>Loading plan...</div>
+                                ) : (
+                                    <InstallmentPaymentCard
+                                        installments={installments}
+                                        currency={session.currency}
+                                        onPayInstallment={handleNextInstallmentPayment}
+                                        loadingInstallmentId={payingInstallmentId}
+                                    />
+                                )
+                            )}
 
                             {isBooked && (
                                 <Button
@@ -345,7 +470,15 @@ const SessionDetails: React.FC = () => {
             <WhatsAppConfirmationModal
                 isOpen={showWhatsAppModal}
                 onClose={() => setShowWhatsAppModal(false)}
-                onConfirm={executeBooking}
+                onConfirm={handleFreeBooking}
+            />
+            <PaymentChoiceModal
+                isOpen={showPaymentModal}
+                onClose={() => setShowPaymentModal(false)}
+                onPayFull={handleFullPayment}
+                onPayInstallments={handleInstallmentPayment}
+                loadingFull={paymentLoading === 'full'}
+                loadingInstallment={paymentLoading === 'installment'}
             />
 
             <div className={styles.container}>

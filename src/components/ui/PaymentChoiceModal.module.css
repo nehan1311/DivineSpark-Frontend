@@ -1,0 +1,30 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+.optionWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.installmentsNote {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #666);
+    line-height: 1.4;
+    margin-top: 0.25rem;
+    background-color: rgba(var(--primary-rgb, 34, 197, 94), 0.1);
+    /* Subtle green tint or similar */
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border-left: 3px solid var(--primary-color, #22c55e);
+}
+
+.fullPaymentNote {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #888);
+    text-align: center;
+}
