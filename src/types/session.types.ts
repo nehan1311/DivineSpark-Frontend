@@ -36,11 +36,22 @@ export interface UserBooking {
     sessionId: number;
     sessionTitle: string;
     sessionType: SessionType;
-    bookingStatus: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+    bookingStatus: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'PARTIALLY_PAID' | 'PENDING';
     startTime: string;
     endTime: string;
     guideName: string;
     joinLink?: string;
     reviewSubmitted: boolean;
+    paymentType?: 'FULL' | 'INSTALLMENT';
+    totalAmount?: number;
+    paidAmount?: number;
+    remainingAmount?: number;
 }
 
+export interface Installment {
+    id: number;
+    installmentNumber: number;
+    amount: number;
+    status: 'PAID' | 'PENDING';
+    dueDate?: string;
+}
