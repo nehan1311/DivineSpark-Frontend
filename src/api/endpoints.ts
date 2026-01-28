@@ -36,7 +36,7 @@ export const REVIEW_ENDPOINTS = {
 export const PUBLIC_ENDPOINTS = {
     THUMBNAIL: (id: string | number) =>
         `${API_BASE_URL}/public/thumbnail/${id}`,
-    EVENTS: `${API_BASE_URL}/public/events`,
+    EVENTS: `${API_BASE_URL}/public/events/ticker`,
     PROGRAMS: `${API_BASE_URL}/public/programs`,
 };
 
@@ -110,8 +110,8 @@ export const CONTACT_ENDPOINTS = {
 
 /* ---------------- BLOGS ---------------- */
 export const BLOG_ENDPOINTS = {
-    GET_ALL: `${API_BASE_URL}/blogs`,
-    GET_BY_SLUG: (slug: string) => `${API_BASE_URL}/blogs/${slug}`,
+    GET_ALL: `${API_BASE_URL}/public/blogs`,
+    GET_BY_SLUG: (slug: string) => `${API_BASE_URL}/public/blogs/${slug}`,
 };
 
 
