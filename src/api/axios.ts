@@ -17,7 +17,13 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         const token = getToken();
-        if (token) {
+
+        // Check if the URL is public; if so, we generally prefer NOT to send the token
+        // to avoid "401" if the backend is picky about tokens on public routes,
+        // or if the token is arguably invalid but the user should still see public content.
+        const isPublicEndpoint = config.url?.includes('/public/');
+
+        if (token && !isPublicEndpoint) {
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
@@ -39,11 +45,18 @@ axiosInstance.interceptors.response.use(
     (error: AxiosError) => {
         if (error.response) {
             const status = error.response.status;
-            if (status === 401) {
+
+            // IGNORE 401s from public endpoints to prevent loops/auto-logout
+            const isPublicEndpoint = error.config?.url?.includes('/public/');
+
+            if (status === 401 && !isPublicEndpoint) {
+                console.error('[Axios Debug] 401 Unauthorized for URL:', error.config?.url);
                 // Token is invalid or expired
                 removeToken();
                 // Dispatch event so AuthProvider can handle the UI transition/state clearing
                 window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+            } else if (status === 401 && isPublicEndpoint) {
+                console.warn('[Axios Debug] Ignored 401 for public endpoint:', error.config?.url);
             }
         }
         return Promise.reject(error);
