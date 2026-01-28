@@ -540,6 +540,8 @@ const SessionDetails: React.FC = () => {
                 onPayInstallments={handleInstallmentPayment}
                 loadingFull={paymentLoading === 'full'}
                 loadingInstallment={paymentLoading === 'installment'}
+                amount={session.price}
+                currency={session.currency}
             />
             <Contact isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
 
