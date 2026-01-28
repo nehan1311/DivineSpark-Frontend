@@ -96,6 +96,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     useEffect(() => {
         const handleUnauthorized = () => {
+            console.warn('[Auth Debug] Received auth:unauthorized event. Logging out.');
             logout(false);
         };
 
@@ -115,13 +116,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 const now = Date.now();
                 const timeout = expiresAt - now;
 
+                console.log('[Auth Debug] Token Expiry Check:', { expiresAt: new Date(expiresAt).toISOString(), now: new Date(now).toISOString(), timeoutMs: timeout });
+
                 if (timeout <= 0) {
                     // Already expired
+                    console.warn('[Auth Debug] Token expired immediately. Logging out.');
                     logout(false);
                     showToast('Session expired. Please log in again.', 'error');
                 } else {
                     // Set auto logout timer
                     const timer = setTimeout(() => {
+                        console.warn('[Auth Debug] Token expired (timer). Logging out.');
                         logout(false);
                         showToast('Session expired. Please log in again.', 'info');
                     }, timeout);
@@ -130,6 +135,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }
         } catch (error) {
             // Invalid token
+            console.error('[Auth Debug] Invalid token decode:', error);
             logout(false);
         }
     }, [isAuthenticated, logout, showToast]);
