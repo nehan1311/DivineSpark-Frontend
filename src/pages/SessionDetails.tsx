@@ -10,9 +10,9 @@ import styles from './SessionDetails.module.css';
 import { formatDate, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
 import { WhatsAppConfirmationModal } from '../components/ui/WhatsAppConfirmationModal';
-import { PaymentChoiceModal } from '../components/ui/PaymentChoiceModal';
+import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import Contact from './Contact';
-
+import { PaymentChoiceModal } from '../components/ui/PaymentChoiceModal';
 import { InstallmentPaymentCard } from '../components/payment/InstallmentPaymentCard';
 import type { UserBooking, Installment } from '../types/session.types';
 
@@ -40,6 +40,7 @@ const SessionDetails: React.FC = () => {
 
     const [waLoading, setWaLoading] = useState(false);
     const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [paymentLoading, setPaymentLoading] = useState<'full' | 'installment' | null>(null);
     const [isContactOpen, setIsContactOpen] = useState(false);
@@ -162,6 +163,25 @@ const SessionDetails: React.FC = () => {
 
         if (session.type === 'FREE') {
             setShowWhatsAppModal(true);
+        } else {
+            // For paid sessions also, show WhatsApp modal first
+            setShowWhatsAppModal(true);
+        }
+    };
+
+    const handlePreBookingConfirm = () => {
+        // Did the user connect on WhatsApp? Yes (implied by step 2 of WA modal).
+        // Now ask for final confirmation "Do you really want to join?".
+        setShowConfirmModal(true);
+    };
+
+    const handleFinalProceed = () => {
+        if (!session) return;
+
+        setShowConfirmModal(false);
+
+        if (session.type === 'FREE') {
+            handleFreeBooking();
         } else {
             setShowPaymentModal(true);
         }
@@ -503,7 +523,15 @@ const SessionDetails: React.FC = () => {
             <WhatsAppConfirmationModal
                 isOpen={showWhatsAppModal}
                 onClose={() => setShowWhatsAppModal(false)}
-                onConfirm={handleFreeBooking}
+                onConfirm={handlePreBookingConfirm}
+            />
+            <ConfirmationModal
+                isOpen={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                onConfirm={handleFinalProceed}
+                title="Confirm Booking"
+                message={`Do you really want to join "${session.title}"?`}
+                confirmText="Yes, Proceed"
             />
             <PaymentChoiceModal
                 isOpen={showPaymentModal}
