@@ -131,3 +131,25 @@ export interface ProgramRequest {
     imageUrl: string;
     category: 'ENERGY_WORKSHOPS' | 'SPIRITUAL_TRIPS';
 }
+
+export interface InstallmentInfo {
+    installmentId: number;
+    installmentNumber: number;
+    amount: number;
+    dueDate?: string;
+    status: string;
+    paidAt?: string;
+}
+
+export interface UserInstallmentSummary {
+    bookingId: number;
+    userId: number | string;
+    username: string;
+    email: string;
+    contactNumber?: string;
+    totalAmount: number;
+    paidAmount: number;
+    remainingAmount: number;
+    bookingStatus: string;
+    installments: InstallmentInfo[];
+}

@@ -8,6 +8,7 @@ interface ModalProps {
     title?: string;
     children: React.ReactNode;
     footer?: React.ReactNode;
+    maxWidth?: string;
 }
 
 interface ConfirmationModalProps {
@@ -21,7 +22,7 @@ interface ConfirmationModalProps {
     variant?: 'danger' | 'primary';
 }
 
-export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, footer }) => {
+export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, footer, maxWidth }) => {
     const modalRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -46,7 +47,13 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
         <div className={styles.overlay} onClick={(e) => {
             if (e.target === e.currentTarget) onClose();
         }}>
-            <div className={styles.modal} role="dialog" aria-modal="true" ref={modalRef}>
+            <div
+                className={styles.modal}
+                role="dialog"
+                aria-modal="true"
+                ref={modalRef}
+                style={maxWidth ? { maxWidth } : undefined}
+            >
                 <button className={styles.closeButton} onClick={onClose} aria-label="Close">
                     &times;
                 </button>

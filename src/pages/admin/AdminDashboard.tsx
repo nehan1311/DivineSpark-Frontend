@@ -12,6 +12,7 @@ import AdminBlogs from './AdminBlogs';
 import AdminEvents from './AdminEvents';
 import EventModal from './EventModal';
 import AdminPrograms from './AdminPrograms';
+import SessionInstallmentsModal from './SessionInstallmentsModal';
 import { getEvents, createEvent, updateEvent, deleteEvent } from '../../api/admin.events.api';
 import type { AdminEvent, EventRequest } from '../../types/admin.events.types';
 
@@ -26,6 +27,7 @@ import {
     cancelSession as cancelSessionApi, // Using alias to avoid conflict
 
     getSessionBookings,
+    getSessionInstallments,
     getAdminPayments
 } from '../../api/admin.api';
 import { API_BASE_URL } from '../../api/endpoints';
@@ -37,7 +39,8 @@ import type {
     AdminSession,
     SessionUser,
     AdminSessionBookingResponse,
-    AdminPayment
+    AdminPayment,
+    UserInstallmentSummary
 } from '../../types/admin.types';
 
 // --- COMPONENTS ---
@@ -191,6 +194,17 @@ const SessionsTable: React.FC<{
                                             Download CSV
                                         </button>
 
+                                        {(session.type === 'PAID' || session.type?.trim().toUpperCase() === 'PAID') && (
+                                            <button
+                                                className={styles.actionBtn}
+                                                onClick={() => onAction('view_installments', session)}
+                                                title="View Installments"
+                                                style={{ border: '1px solid var(--color-primary)', color: 'var(--color-primary)' }}
+                                            >
+                                                Installments
+                                            </button>
+                                        )}
+
                                         {!isCancelled && (
                                             <button
                                                 className={`${styles.actionBtn} ${styles.deleteBtn}`}
@@ -221,6 +235,7 @@ const SessionParticipants: React.FC = () => {
     const [sessions, setSessions] = useState<AdminSession[]>([]);
     const [selectedSessionId, setSelectedSessionId] = useState<string>('');
     const [sessionUsers, setSessionUsers] = useState<SessionUser[]>([]);
+    const [installmentsData, setInstallmentsData] = useState<UserInstallmentSummary[]>([]);
     const [isLoadingSessions, setIsLoadingSessions] = useState(false);
     const [isLoadingUsers, setIsLoadingUsers] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -247,6 +262,7 @@ const SessionParticipants: React.FC = () => {
             setSearchQuery(''); // Reset search when session changes
         } else {
             setSessionUsers([]);
+            setInstallmentsData([]);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedSessionId]);
@@ -280,13 +296,23 @@ const SessionParticipants: React.FC = () => {
     const fetchSessionUsers = async (sessionId: string) => {
         setIsLoadingUsers(true);
         setError(null);
+        setInstallmentsData([]);
         try {
             const bookingsData = await getSessionBookings(sessionId);
+            const selectedSession = sessions.find(s => s.id === sessionId);
+
+            // Fetch installments if PAID
+            if (selectedSession && (selectedSession.type === 'PAID' || selectedSession.type?.trim().toUpperCase() === 'PAID')) {
+                try {
+                    const instData = await getSessionInstallments(sessionId);
+                    setInstallmentsData(instData || []);
+                } catch (e) {
+                    console.warn("Could not fetch installments for paid session", e);
+                }
+            }
 
             // Map users with booking information
             const usersWithBookings: SessionUser[] = bookingsData.map((booking: AdminSessionBookingResponse) => {
-                const selectedSession = sessions.find(s => s.id === sessionId);
-
                 return {
                     id: booking.id,
                     name: booking.username,
@@ -404,32 +430,71 @@ const SessionParticipants: React.FC = () => {
                                         <th>Email</th>
                                         <th>Contact Number</th>
                                         <th>Booking Type</th>
+                                        <th>Installment Summary (If Applicable)</th>
                                         <th>Booking Status</th>
                                         <th>Joined Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredUsers.map(user => (
-                                        <tr key={user.id}>
-                                            <td>{user.name}</td>
-                                            <td>{user.email}</td>
-                                            <td>{user.phoneNumber || '-'}</td>
-                                            <td>
-                                                <span className={`${styles.badge} ${user.bookingType === 'FREE' ? styles.badgeSuccess : styles.badgeWarning}`}>
-                                                    {user.bookingType}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span className={`${styles.badge} ${user.bookingStatus === 'CONFIRMED' ? styles.badgeSuccess :
-                                                    user.bookingStatus === 'CANCELLED' ? styles.badgeError :
-                                                        styles.badgeWarning
-                                                    }`}>
-                                                    {user.bookingStatus}
-                                                </span>
-                                            </td>
-                                            <td>{formatFullDateTime(user.joinedDate)}</td>
-                                        </tr>
-                                    ))}
+                                    {filteredUsers.map(user => {
+                                        // Find installment info for this user
+                                        // Note: user.id is the BOOKING id or USER id?
+                                        // getSessionBookings returns 'userId' inside. AdminSessionBookingResponse has userId.
+                                        // getSessionInstallments returns 'userId'.
+                                        // But SessionUser mapped `id` to `booking.id`. We need the actual user ID.
+                                        // Wait, SessionUser.id IS booking.id in the map above.
+                                        // AdminSessionBookingResponse has `userId` field.
+                                        // SessionUser needs `userId` field to match.
+                                        // Let's assume we can match by email for now if ID is tricky, or fix the type.
+                                        // But looking at the map: `id: booking.id`. Use email as fallback or we need to add userId to SessionUser.
+
+                                        const installmentInfo = installmentsData.find(i => i.email === user.email);
+
+                                        return (
+                                            <tr key={user.id}>
+                                                <td>{user.name}</td>
+                                                <td>{user.email}</td>
+                                                <td>{user.phoneNumber || '-'}</td>
+                                                <td>
+                                                    <span className={`${styles.badge} ${user.bookingType === 'FREE' ? styles.badgeSuccess : styles.badgeWarning}`}>
+                                                        {user.bookingType}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {installmentInfo ? (
+                                                        <div style={{ fontSize: '0.85em' }}>
+                                                            <div>
+                                                                <span style={{ fontWeight: 600 }}>Total: </span>
+                                                                {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(installmentInfo.totalAmount)}
+                                                            </div>
+                                                            <div style={{ color: 'var(--color-success)' }}>
+                                                                Paid: {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(installmentInfo.paidAmount)}
+                                                            </div>
+                                                            {installmentInfo.remainingAmount > 0 && (
+                                                                <div style={{ color: 'var(--color-error)' }}>
+                                                                    Due: {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(installmentInfo.remainingAmount)}
+                                                                </div>
+                                                            )}
+                                                            <div style={{ marginTop: '0.2rem', color: 'var(--color-text-light)' }}>
+                                                                {installmentInfo.installments.filter(i => i.status === 'PAID').length} / {installmentInfo.installments.length} Paid
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <span style={{ color: 'var(--color-text-light)' }}>-</span>
+                                                    )}
+                                                </td>
+                                                <td>
+                                                    <span className={`${styles.badge} ${user.bookingStatus === 'CONFIRMED' ? styles.badgeSuccess :
+                                                        user.bookingStatus === 'CANCELLED' ? styles.badgeError :
+                                                            styles.badgeWarning
+                                                        }`}>
+                                                        {user.bookingStatus}
+                                                    </span>
+                                                </td>
+                                                <td>{formatFullDateTime(user.joinedDate)}</td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         ) : (
@@ -764,6 +829,9 @@ const AdminDashboard: React.FC = () => {
     const [sessionModalOpen, setSessionModalOpen] = useState(false);
     const [editingSession, setEditingSession] = useState<AdminSession | null>(null);
 
+    const [installmentsModalOpen, setInstallmentsModalOpen] = useState(false);
+    const [selectedInstallmentSession, setSelectedInstallmentSession] = useState<AdminSession | null>(null);
+
     // Generic confirmation state
     const [confirmModal, setConfirmModal] = useState<{
         isOpen: boolean;
@@ -875,6 +943,12 @@ const AdminDashboard: React.FC = () => {
     };
 
     const handleAction = (action: string, item: any) => {
+        if (action === 'view_installments') {
+            setSelectedInstallmentSession(item);
+            setInstallmentsModalOpen(true);
+            return;
+        }
+
         if (action === 'cancel_session') {
             setConfirmModal({
                 isOpen: true,
@@ -1127,6 +1201,19 @@ const AdminDashboard: React.FC = () => {
                 onSave={handleSaveEvent}
                 event={editingEvent}
             />
+
+            {/* Installments Modal */}
+            {selectedInstallmentSession && (
+                <SessionInstallmentsModal
+                    isOpen={installmentsModalOpen}
+                    onClose={() => {
+                        setInstallmentsModalOpen(false);
+                        setSelectedInstallmentSession(null);
+                    }}
+                    sessionId={selectedInstallmentSession.id}
+                    sessionTitle={selectedInstallmentSession.title}
+                />
+            )}
 
             <ConfirmationModal
                 isOpen={logoutModalOpen}
