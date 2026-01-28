@@ -116,9 +116,9 @@ const Sessions: React.FC = () => {
             setLoading(true);
             const data: any = await sessionApi.getSessions({ page: 0, size: 20 });
 
-            if (Array.isArray(data)) setSessions(data);
-            else if (data?.sessions) setSessions(data.sessions);
-            else if (data?.content) setSessions(data.content);
+            if (Array.isArray(data)) setSessions(data.slice(0, 6));
+            else if (data?.sessions) setSessions(data.sessions.slice(0, 6));
+            else if (data?.content) setSessions(data.content.slice(0, 6));
             else setSessions([]);
         } catch (error) {
             showToast('Failed to load upcoming sessions', 'error');
@@ -298,124 +298,126 @@ const Sessions: React.FC = () => {
         <div className={styles.pageWrapper}>
             <div className={styles.meshContainer}></div>
 
-            <div
-                className={styles.horizontalSection}
-                ref={containerRef}
-                onMouseEnter={() => setIsPaused(true)}
-                onMouseLeave={() => setIsPaused(false)}
-            >
-                {sessions.map((session, index) => {
-                    const isActive = index === activeIndex;
-                    const isFree = session.type === 'FREE';
-                    const isExpired = new Date(session.startTime) < new Date();
+            <div className={styles.carouselWrapper}>
+                <div
+                    className={styles.horizontalSection}
+                    ref={containerRef}
+                    onMouseEnter={() => setIsPaused(true)}
+                    onMouseLeave={() => setIsPaused(false)}
+                >
+                    {sessions.map((session, index) => {
+                        const isActive = index === activeIndex;
+                        const isFree = session.type === 'FREE';
+                        const isExpired = new Date(session.startTime) < new Date();
 
-                    const booking = bookingBySessionId.get(Number(session.id));
-                    const isBooked = isConfirmedBooking(booking);
+                        const booking = bookingBySessionId.get(Number(session.id));
+                        const isBooked = isConfirmedBooking(booking);
 
-                    // Disable if expired OR currently processing OR already booked
-                    const disabled = actionLoading === session.id || isExpired || isBooked;
+                        // Disable if expired OR currently processing OR already booked
+                        const disabled = actionLoading === session.id || isExpired || isBooked;
 
-                    return (
-                        <div
-                            key={session.id}
-                            className={`${styles.slide} ${isActive ? styles.active : ''}`}
-                            data-index={index}
-                        >
-                            <div className={styles.background}>
-                                <img
-                                    src={PUBLIC_ENDPOINTS.THUMBNAIL(session.id)}
-                                    onError={(e) => {
-                                        const target = e.currentTarget;
-                                        if (session.imageUrl && target.src !== session.imageUrl) {
-                                            target.src = session.imageUrl;
-                                        } else {
-                                            target.src = defaultThumbnail;
-                                        }
-                                    }}
-                                    alt={session.title}
-                                    className={styles.bgImage}
-                                />
-                                <div className={styles.overlay} />
-                            </div>
-
-                            <div className={styles.content}>
-                                <h1 className={styles.title}>{session.title}</h1>
-                                <p className={styles.description}>{session.description}</p>
-
-                                <div className={styles.meta}>
-                                    <div className={styles.metaItem}>
-                                        <span className={styles.metaLabel}>Instructor</span>
-                                        <span className={styles.metaValue}>{session.guideName}</span>
-                                    </div>
-
-                                    <div className={styles.metaItem}>
-                                        <span className={styles.metaLabel}>Date & Time</span>
-                                        <span className={styles.metaValue}>{formatFullDateTime(session.startTime)}</span>
-                                    </div>
-
-                                    {!isFree && (
-                                        <div className={styles.metaItem}>
-                                            <span className={styles.metaLabel}>Price</span>
-                                            <span className={styles.metaValue}>
-                                                {formatCurrency(session.price, session.currency)}
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className={styles.actions}>
-                                    {/* Wrapper allows showing toast even when Button is disabled */}
-                                    <div
-                                        onClick={() => {
-                                            if (isBooked) {
-                                                showToast(
-                                                    'Already booked. Please check your email/WhatsApp for details.',
-                                                    'info'
-                                                );
+                        return (
+                            <div
+                                key={session.id}
+                                className={`${styles.slide} ${isActive ? styles.active : ''}`}
+                                data-index={index}
+                            >
+                                <div className={styles.background}>
+                                    <img
+                                        src={PUBLIC_ENDPOINTS.THUMBNAIL(session.id)}
+                                        onError={(e) => {
+                                            const target = e.currentTarget;
+                                            if (session.imageUrl && target.src !== session.imageUrl) {
+                                                target.src = session.imageUrl;
+                                            } else {
+                                                target.src = defaultThumbnail;
                                             }
                                         }}
-                                    >
+                                        alt={session.title}
+                                        className={styles.bgImage}
+                                    />
+                                    <div className={styles.overlay} />
+                                </div>
+
+                                <div className={styles.content}>
+                                    <h1 className={styles.title}>{session.title}</h1>
+                                    <p className={styles.description}>{session.description}</p>
+
+                                    <div className={styles.meta}>
+                                        <div className={styles.metaItem}>
+                                            <span className={styles.metaLabel}>Instructor</span>
+                                            <span className={styles.metaValue}>{session.guideName}</span>
+                                        </div>
+
+                                        <div className={styles.metaItem}>
+                                            <span className={styles.metaLabel}>Date & Time</span>
+                                            <span className={styles.metaValue}>{formatFullDateTime(session.startTime)}</span>
+                                        </div>
+
+                                        {!isFree && (
+                                            <div className={styles.metaItem}>
+                                                <span className={styles.metaLabel}>Price</span>
+                                                <span className={styles.metaValue}>
+                                                    {formatCurrency(session.price, session.currency)}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className={styles.actions}>
+                                        {/* Wrapper allows showing toast even when Button is disabled */}
+                                        <div
+                                            onClick={() => {
+                                                if (isBooked) {
+                                                    showToast(
+                                                        'Already booked. Please check your email/WhatsApp for details.',
+                                                        'info'
+                                                    );
+                                                }
+                                            }}
+                                        >
+                                            <Button
+                                                size="lg"
+                                                variant="primary"
+                                                onClick={() => {
+                                                    if (!isBooked) initiateBooking(session);
+                                                }}
+                                                disabled={disabled}
+                                                style={
+                                                    isBooked
+                                                        ? {
+                                                            backgroundColor: '#4a5568', // Gray
+                                                            borderColor: '#4a5568',
+                                                            color: '#e2e8f0',
+                                                            opacity: 0.8,
+                                                            cursor: 'not-allowed',
+                                                        }
+                                                        : { borderColor: 'white', color: 'white' }
+                                                }
+                                            >
+                                                {isBooked ? 'Session Booked' : 'Book Session'}
+
+                                            </Button>
+                                        </div>
+
                                         <Button
                                             size="lg"
-                                            variant="primary"
-                                            onClick={() => {
-                                                if (!isBooked) initiateBooking(session);
+                                            variant="secondary"
+                                            onClick={() => navigate(`/sessions/${session.id}`, { state: { session } })}
+                                            style={{
+                                                background: 'rgba(255,255,255,0.1)',
+                                                color: 'white',
+                                                border: 'none',
                                             }}
-                                            disabled={disabled}
-                                            style={
-                                                isBooked
-                                                    ? {
-                                                        backgroundColor: '#4a5568', // Gray
-                                                        borderColor: '#4a5568',
-                                                        color: '#e2e8f0',
-                                                        opacity: 0.8,
-                                                        cursor: 'not-allowed',
-                                                    }
-                                                    : { borderColor: 'white', color: 'white' }
-                                            }
                                         >
-                                            {isBooked ? 'Session Booked' : 'Book Session'}
-
+                                            View Details
                                         </Button>
                                     </div>
-
-                                    <Button
-                                        size="lg"
-                                        variant="secondary"
-                                        onClick={() => navigate(`/sessions/${session.id}`, { state: { session } })}
-                                        style={{
-                                            background: 'rgba(255,255,255,0.1)',
-                                            color: 'white',
-                                            border: 'none',
-                                        }}
-                                    >
-                                        View Details
-                                    </Button>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
 
                 <div className={styles.dots}>
                     {sessions.map((_, idx) => (
@@ -427,6 +429,13 @@ const Sessions: React.FC = () => {
                         />
                     ))}
                 </div>
+
+                <button
+                    className={styles.viewAllBtn}
+                    onClick={() => navigate('/allsessions')}
+                >
+                    View all →
+                </button>
             </div>
 
             <RetreatContentSection />

@@ -87,8 +87,8 @@ const ReviewsPage: React.FC = () => {
                                         </>
                                     )}
                                     {!review.comment && (
-                                        <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5, fontStyle: 'italic', minHeight: '80px' }}>
-                                            Rate only
+                                        <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.4, fontStyle: 'italic', minHeight: '80px', fontFamily: 'serif' }}>
+                                            Rating Provided
                                         </div>
                                     )}
 

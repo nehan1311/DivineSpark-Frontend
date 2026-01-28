@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import Home from '../pages/Home';
 import Sessions from '../pages/Sessions';
+import AllSessions from '../pages/AllSessions';
 import Login from '../pages/Login';
 import ForgotPassword from '../pages/ForgotPassword';
 import Register from '../pages/Register';
@@ -55,6 +56,7 @@ const AppRoutes: React.FC = () => {
             <Route element={<MainLayout />}>
                 <Route index element={<RootRedirect />} />
                 <Route path="sessions" element={<Sessions />} />
+                <Route path="allsessions" element={<AllSessions />} />
 
                 <Route path="sessions/:sessionId" element={<SessionDetails />} />
                 <Route path="about" element={<About />} />

@@ -24,6 +24,12 @@
     min-height: 100vh;
 }
 
+.carouselWrapper {
+    position: relative;
+    width: 100%;
+    /* Height derived from children or explicit if needed */
+}
+
 /* Full-screen horizontal scroll container */
 .horizontalSection {
     width: 100%;
@@ -346,5 +352,65 @@
     /* Adjust dots to not overlap content */
     .dots {
         bottom: 1.5rem;
+    }
+}
+
+/* Base Styles (Desktop) */
+.viewAllBtn {
+    position: absolute;
+    bottom: 2rem;
+    right: 3rem;
+
+    /* Box Styling */
+    background: rgba(20, 40, 35, 0.6);
+    /* Darker semi-transparent background */
+    border: 1px solid rgba(243, 213, 64, 0.3);
+    border-radius: 50px;
+    padding: 0.8rem 1.8rem;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+
+    /* Text & Layout */
+    color: #f3d540;
+    font-family: var(--font-family-body, sans-serif);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.viewAllBtn:hover {
+    background: rgba(243, 213, 64, 0.15);
+    /* Subtle gold tint on hover */
+    border-color: #f3d540;
+    transform: translateY(-2px);
+    color: #fff;
+    box-shadow: 0 8px 25px rgba(243, 213, 64, 0.15);
+}
+
+/* Mobile Overrides */
+@media (max-width: 600px) {
+    .viewAllBtn {
+        bottom: 4rem;
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        width: max-content;
+        font-size: 0.9rem;
+        background: rgba(0, 0, 0, 0.3);
+        /* Add subtle bg on mobile for readability over images */
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        backdrop-filter: blur(4px);
+    }
+
+    .viewAllBtn:hover {
+        transform: translateX(-50%) scale(1.05);
     }
 }
