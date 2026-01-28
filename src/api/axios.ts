@@ -33,10 +33,6 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-
-
-// ... (imports)
-
 // Response Interceptor: Handle Errors (401, 403)
 axiosInstance.interceptors.response.use(
     (response: AxiosResponse) => {

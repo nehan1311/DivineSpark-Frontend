@@ -40,6 +40,11 @@ const EventTicker: React.FC = () => {
         return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
     };
 
+    const formatTime = (isoString: string) => {
+        const date = new Date(isoString);
+        return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
+    };
+
     if (loading) {
         return <div className={styles.tickerWrapper}></div>;
     }
@@ -60,12 +65,12 @@ const EventTicker: React.FC = () => {
     return (
         <div className={styles.tickerWrapper}>
             <div className={styles.tickerTrack}>
-                <RenderItems events={events} formatDate={formatDate} formatDuration={formatDuration} />
-                <RenderItems events={events} formatDate={formatDate} formatDuration={formatDuration} />
+                <RenderItems events={events} formatDate={formatDate} formatDuration={formatDuration} formatTime={formatTime} />
+                <RenderItems events={events} formatDate={formatDate} formatDuration={formatDuration} formatTime={formatTime} />
                 {shouldCloneMore && (
                     <>
-                        <RenderItems events={events} formatDate={formatDate} formatDuration={formatDuration} />
-                        <RenderItems events={events} formatDate={formatDate} formatDuration={formatDuration} />
+                        <RenderItems events={events} formatDate={formatDate} formatDuration={formatDuration} formatTime={formatTime} />
+                        <RenderItems events={events} formatDate={formatDate} formatDuration={formatDuration} formatTime={formatTime} />
                     </>
                 )}
             </div>
@@ -73,12 +78,14 @@ const EventTicker: React.FC = () => {
     );
 };
 
-const RenderItems = ({ events, formatDate, formatDuration }: { events: PublicEvent[], formatDate: (d: string) => string, formatDuration: (m: number) => string }) => (
+const RenderItems = ({ events, formatDate, formatDuration, formatTime }: { events: PublicEvent[], formatDate: (d: string) => string, formatDuration: (m: number) => string, formatTime: (d: string) => string }) => (
     <>
         {events.map((event, index) => (
             <div key={`${event.id}-${index}`} className={styles.tickerCard}>
                 <div className={styles.cardHeader}>
                     <span className={styles.cardInfo}>📅 {formatDate(event.startTime)}</span>
+                    <span className={styles.separator}>•</span>
+                    <span className={styles.cardInfo}>⏰ {formatTime(event.startTime)}</span>
                     <span className={styles.separator}>•</span>
                     <span className={styles.cardInfo}>🕒 {formatDuration(event.durationMinutes)}</span>
                 </div>
