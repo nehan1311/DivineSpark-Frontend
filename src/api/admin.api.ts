@@ -12,7 +12,8 @@ import type {
     AdminDonation,
     DonationStats,
     AdminProgram,
-    ProgramRequest
+    ProgramRequest,
+    UserInstallmentSummary
 } from '../types/admin.types';
 
 /* ----------------------- DASHBOARD STATS ----------------------- */
@@ -124,6 +125,18 @@ export const getSessionBookings = async (
 ): Promise<AdminSessionBookingResponse[]> => {
     const response = await axiosInstance.get<AdminSessionBookingResponse[]>(
         ADMIN_ENDPOINTS.SESSION_BOOKINGS(sessionId)
+    );
+    return response.data;
+};
+
+/**
+ * Get installment details for a session
+ */
+export const getSessionInstallments = async (
+    sessionId: string
+): Promise<UserInstallmentSummary[]> => {
+    const response = await axiosInstance.get<UserInstallmentSummary[]>(
+        ADMIN_ENDPOINTS.SESSION_INSTALLMENTS(sessionId)
     );
     return response.data;
 };

@@ -58,6 +58,7 @@ export const ADMIN_ENDPOINTS = {
     SESSION_RESOURCES: (id: string) => `${API_BASE_URL}/admin/sessions/${id}/resources`,
     SESSION_USERS: (id: string) => `${API_BASE_URL}/admin/sessions/${id}/users`,
     SESSION_BOOKINGS: (id: string) => `${API_BASE_URL}/admin/sessions/${id}/bookings`,
+    SESSION_INSTALLMENTS: (id: string) => `${API_BASE_URL}/admin/sessions/${id}/installments`,
     PAST_SESSIONS: `${API_BASE_URL}/admin/sessions/past`,
 
     // Payments
