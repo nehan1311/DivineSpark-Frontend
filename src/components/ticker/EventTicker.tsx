@@ -11,11 +11,13 @@ const EventTicker: React.FC = () => {
         const fetchEvents = async () => {
             try {
                 const data = await getPublicEvents();
-                setEvents(data);
+                if (Array.isArray(data)) {
+                    setEvents(data);
+                } else {
+                    setEvents([]);
+                }
             } catch (error) {
                 console.error("Failed to fetch ticker events", error);
-                // On error, we can just show empty or previous state, or handle gracefully.
-                // For now, if error, it likely stays empty array -> shows static message.
             } finally {
                 setLoading(false);
             }
@@ -39,7 +41,6 @@ const EventTicker: React.FC = () => {
     };
 
     if (loading) {
-        // Can render empty or nothing while loading
         return <div className={styles.tickerWrapper}></div>;
     }
 
@@ -53,9 +54,7 @@ const EventTicker: React.FC = () => {
         );
     }
 
-    // Duplicate logic for seamless loop: We need at least 2 full sets for the translateX(-50%) logic to work seamlessly.
-    // We will render 2 sets. If the list is short, we might need more clones.
-    // For simplicity, we just use 4 clones if < 5 events, otherwise 2.
+    // Ensure enough duplication for seamless scrolling
     const shouldCloneMore = events.length < 5;
 
     return (
@@ -77,12 +76,14 @@ const EventTicker: React.FC = () => {
 const RenderItems = ({ events, formatDate, formatDuration }: { events: PublicEvent[], formatDate: (d: string) => string, formatDuration: (m: number) => string }) => (
     <>
         {events.map((event, index) => (
-            <div key={`${event.id}-${index}`} className={styles.tickerItem}>
-                <span className={styles.date}>📅 {formatDate(event.startTime)}</span>
-                <span className={styles.separator}>·</span>
-                <span>{event.title}</span>
-                <span className={styles.separator}>·</span>
-                <span>{formatDuration(event.durationMinutes)}</span>
+            <div key={`${event.id}-${index}`} className={styles.tickerCard}>
+                <div className={styles.cardHeader}>
+                    <span className={styles.cardInfo}>📅 {formatDate(event.startTime)}</span>
+                    <span className={styles.separator}>•</span>
+                    <span className={styles.cardInfo}>🕒 {formatDuration(event.durationMinutes)}</span>
+                </div>
+                <div className={styles.cardTitle}>{event.title}</div>
+                <div className={styles.cardDescription}>{event.description}</div>
             </div>
         ))}
     </>
