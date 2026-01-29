@@ -81,17 +81,15 @@ const SessionDetails: React.FC = () => {
             if (myBooking) {
                 setBooking(myBooking);
 
-                console.log("Checking Installment Fetch Conditions:", {
-                    status: myBooking.status,
-                    bookingId: myBooking.bookingId
-                });
-
-                // Fetch installments if status is PARTIALLY_PAID
-                if (myBooking.status === 'PARTIALLY_PAID' && myBooking.bookingId) {
+                // Always try to fetch installments if we have a booking ID
+                // This covers cases where status might be CONFIRMED but there are still future installments
+                // or where paymentType might be missing.
+                if (myBooking.bookingId) {
                     fetchInstallments(myBooking.bookingId);
                 }
             } else {
                 setBooking(null);
+                setInstallments([]);
             }
         } catch (error) {
             console.error('Error checking booking status:', error);
@@ -104,9 +102,15 @@ const SessionDetails: React.FC = () => {
             const data = await sessionApi.getBookingInstallments(bookingId);
             console.log("INSTALLMENTS FROM API 👉", data);
             setInstallments(data);
-        } catch (error) {
-            console.error('Failed to fetch installments', error);
-            showToast('Failed to load installment details', 'error');
+        } catch (error: any) {
+            // If 404, it just means no installments exist (e.g. invalid ID or fully paid without installments), so we can ignore.
+            // Only log if it's NOT a 404.
+            if (error.response?.status !== 404) {
+                console.error('Failed to fetch installments', error);
+                // Optional: showToast('Failed to load installment details', 'error'); 
+            }
+            // Ensure we clear installments on error so we don't show stale data
+            setInstallments([]);
         } finally {
             setLoadingInstallments(false);
         }
@@ -456,8 +460,8 @@ const SessionDetails: React.FC = () => {
                             )}
                         </div>
 
-                        {/* INSTALLMENT FLOW (Partially Paid) */}
-                        {booking?.status === 'PARTIALLY_PAID' && (
+                        {/* INSTALLMENT FLOW (Shown if any installments exist) */}
+                        {installments.length > 0 && booking?.status !== 'CANCELLED' && (
                             <div className={styles.installmentSection}>
                                 {loadingInstallments ? (
                                     <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>Loading plan...</div>
