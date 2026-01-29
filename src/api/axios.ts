@@ -1,60 +1,67 @@
 import axios from 'axios';
-import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import type {
+    AxiosInstance,
+    InternalAxiosRequestConfig,
+    AxiosResponse,
+    AxiosError,
+} from 'axios';
+
 import { getToken, removeToken } from '../utils/authStorage';
+import { API_BASE_URL } from './endpoints'; // /api/v1
 
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-// Endpoints from endpoints.ts now include '/api/v1', so we only need the origin for local dev
-const AXIOS_BASE = isLocal ? 'http://localhost:8080' : '';
-
+// --------------------------------------------------
+// Axios instance (Nginx / Reverse Proxy friendly)
+// --------------------------------------------------
 const axiosInstance: AxiosInstance = axios.create({
-    baseURL: AXIOS_BASE,
+    baseURL: API_BASE_URL, // e.g. /api/v1
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true, // safe for future cookie-based auth
 });
 
-// Request Interceptor: Attach Token
+// --------------------------------------------------
+// REQUEST INTERCEPTOR
+// Attach JWT only for protected routes
+// --------------------------------------------------
 axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         const token = getToken();
 
-        // Check if the URL is public; if so, we generally prefer NOT to send the token
-        // to avoid "401" if the backend is picky about tokens on public routes,
-        // or if the token is arguably invalid but the user should still see public content.
+        // Avoid attaching token to public APIs
         const isPublicEndpoint = config.url?.includes('/public/');
 
         if (token && !isPublicEndpoint) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+
         return config;
     },
-    (error: AxiosError) => {
-        return Promise.reject(error);
-    }
+    (error: AxiosError) => Promise.reject(error)
 );
 
-// Response Interceptor: Handle Errors (401, 403)
+// --------------------------------------------------
+// RESPONSE INTERCEPTOR
+// Centralized auth error handling
+// --------------------------------------------------
 axiosInstance.interceptors.response.use(
-    (response: AxiosResponse) => {
-        return response;
-    },
+    (response: AxiosResponse) => response,
     (error: AxiosError) => {
         if (error.response) {
-            const status = error.response.status;
-
-            // IGNORE 401s from public endpoints to prevent loops/auto-logout
+            const { status } = error.response;
             const isPublicEndpoint = error.config?.url?.includes('/public/');
 
+            // Handle unauthorized access for protected APIs
             if (status === 401 && !isPublicEndpoint) {
-                console.error('[Axios Debug] 401 Unauthorized for URL:', error.config?.url);
-                // Token is invalid or expired
+                console.error('[Axios] Unauthorized - logging out');
+
                 removeToken();
-                // Dispatch event so AuthProvider can handle the UI transition/state clearing
+
+                // Let AuthProvider / AppRouter handle redirect
                 window.dispatchEvent(new CustomEvent('auth:unauthorized'));
-            } else if (status === 401 && isPublicEndpoint) {
-                console.warn('[Axios Debug] Ignored 401 for public endpoint:', error.config?.url);
             }
         }
+
         return Promise.reject(error);
     }
 );
