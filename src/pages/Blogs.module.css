@@ -178,6 +178,8 @@
     overflow: hidden;
     font-weight: 400;
     max-width: 90%;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .readMore {
