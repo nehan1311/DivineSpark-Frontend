@@ -1,0 +1,437 @@
+.pageContainer {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.headerTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* KPI Cards */
+.summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.kpiCard {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpiCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.cardLabel {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cardValue {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* Specific Card Styles - Gradients */
+.cardTotal {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-color: #bae6fd;
+}
+
+.cardTotal .cardLabel {
+    color: #0284c7;
+}
+
+.cardTotal .cardValue {
+    color: #0369a1;
+}
+
+.cardFullyPaid {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: #bbf7d0;
+}
+
+.cardFullyPaid .cardLabel {
+    color: #16a34a;
+}
+
+.cardFullyPaid .cardValue {
+    color: #15803d;
+}
+
+.cardPartiallyPaid {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    border-color: #fed7aa;
+}
+
+.cardPartiallyPaid .cardLabel {
+    color: #ea580c;
+}
+
+.cardPartiallyPaid .cardValue {
+    color: #c2410c;
+}
+
+.cardPending {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-color: #fecaca;
+}
+
+.cardPending .cardLabel {
+    color: #dc2626;
+}
+
+.cardPending .cardValue {
+    color: #b91c1c;
+}
+
+.cardExpected {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-color: #cbd5e1;
+}
+
+.cardCollected {
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    border-color: #d8b4fe;
+}
+
+.cardCollected .cardLabel {
+    color: #9333ea;
+}
+
+.cardCollected .cardValue {
+    color: #7e22ce;
+}
+
+
+/* Section Headers & Filters */
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.sectionTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #334155;
+}
+
+.filterContainer {
+    display: flex;
+    gap: 0.5rem;
+    background: #f1f5f9;
+    padding: 0.25rem;
+    border-radius: 8px;
+}
+
+.filterBtn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #64748b;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filterBtn:hover {
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.filterBtnActive {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+}
+
+/* User Payment Cards */
+.cardsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.paymentCard {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.paymentCard:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.userInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.userName {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.userMeta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badgeConfirmed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badgePartiallyPaid {
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+.badgePending {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badgeCancelled {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.cardSummary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.summaryItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.summaryLabel {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.summaryValue {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Installment Timeline */
+.installmentsContainer {
+    margin-top: 1rem;
+}
+
+.installmentsTitle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 1rem;
+}
+
+.timeline {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.timelineItem {
+    flex: 0 0 auto;
+    min-width: 140px;
+    border-radius: 8px;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    position: relative;
+}
+
+.timelineItemPaid {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.timelineItemPending {
+    background: #fff;
+    border-color: #e2e8f0;
+    border-style: dashed;
+}
+
+.timelineContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.instNumber {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.instAmount {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.instStatus {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.timelineItemPaid .instStatus {
+    color: #166534;
+}
+
+.timelineItemPending .instStatus {
+    color: #94a3b8;
+}
+
+.instDate {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+
+.noInstallments {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* States */
+.errorState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    color: #ef4444;
+    text-align: center;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 2px dashed #cbd5e1;
+    color: #64748b;
+}
+
+.emptyStateIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.backBtn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: #0f172a;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .headerTop {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .cardSummary {
+        grid-template-columns: 1fr;
+    }
+
+    .timeline {
+        flex-direction: column;
+    }
+
+    .timelineItem {
+        width: 100%;
+    }
+}
