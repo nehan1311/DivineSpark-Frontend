@@ -9,7 +9,7 @@ import Button from '../components/ui/Button';
 import { formatFullDateTime, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
 import RetreatContentSection from '../components/sessions/RetreatContentSection';
-import defaultThumbnail from '../assets/defaultthumbnail.jpg';
+import defaultThumbnail from '../assets/defaultthumbnail.png';
 
 import { PUBLIC_ENDPOINTS } from '../api/endpoints';
 import { WhatsAppConfirmationModal } from '../components/ui/WhatsAppConfirmationModal';
@@ -341,7 +341,7 @@ const Sessions: React.FC = () => {
 
                                 <div className={styles.content}>
                                     <h1 className={styles.title}>{session.title}</h1>
-                                    <p className={styles.description}>{session.description}</p>
+                                    <p className={styles.description}>{session.description.slice(0, 150) + (session.description.length > 150 ? '...' : '')}</p>
 
                                     <div className={styles.meta}>
                                         <div className={styles.metaItem}>
@@ -380,7 +380,7 @@ const Sessions: React.FC = () => {
                                                 size="lg"
                                                 variant="primary"
                                                 onClick={() => {
-                                                    if (!isBooked) initiateBooking(session);
+                                                    navigate(`/sessions/${session.id}`, { state: { session } });
                                                 }}
                                                 disabled={disabled}
                                                 style={

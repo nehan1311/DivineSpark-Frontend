@@ -8,7 +8,7 @@ import styles from './AllSessions.module.css';
 import Button from '../components/ui/Button';
 import { formatFullDateTime, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
-import defaultThumbnail from '../assets/defaultthumbnail.jpg';
+import defaultThumbnail from '../assets/defaultthumbnail.png';
 import { PUBLIC_ENDPOINTS } from '../api/endpoints';
 import { WhatsAppConfirmationModal } from '../components/ui/WhatsAppConfirmationModal';
 
