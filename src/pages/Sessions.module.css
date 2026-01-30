@@ -358,7 +358,7 @@
 /* Base Styles (Desktop) */
 .viewAllBtn {
     position: absolute;
-    bottom: 2rem;
+    top: 2rem;
     right: 3rem;
 
     /* Box Styling */
