@@ -131,18 +131,18 @@ const AdminBlogs: React.FC = () => {
                     <tbody>
                         {blogs.map((blog) => (
                             <tr key={blog.id}>
-                                <td>
+                                <td data-label="Title">
                                     <div style={{ fontWeight: 500 }}>{blog.title}</div>
                                     <small style={{ color: '#888' }}>/{blog.slug}</small>
                                 </td>
-                                <td>{blog.authorName}</td>
-                                <td>
+                                <td data-label="Author">{blog.authorName}</td>
+                                <td data-label="Status">
                                     <span className={`${styles.badge} ${blog.isPublished ? styles.badgeSuccess : styles.badgeWarning}`}>
                                         {blog.isPublished ? 'Published' : 'Draft'}
                                     </span>
                                 </td>
-                                <td>{formatFullDateTime(blog.createdAt)}</td>
-                                <td>
+                                <td data-label="Created At">{formatFullDateTime(blog.createdAt)}</td>
+                                <td data-label="Actions">
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         <button
                                             className={styles.actionBtn}

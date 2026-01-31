@@ -417,6 +417,12 @@
 /* ------------------------------------------------------------------ */
 
 @media (max-width: 900px) {
+    .contentGridWithSidebar {
+        grid-template-columns: 1fr;
+        /* Stack vertically on tablet/mobile */
+        gap: 3rem;
+    }
+
     .glassPanel {
         padding: 2rem;
         gap: 2rem;
@@ -460,5 +466,9 @@
     .heroCtaButton {
         width: 100%;
         padding: 1rem;
+    }
+
+    .installmentWrapper {
+        padding: 1.5rem;
     }
 }
