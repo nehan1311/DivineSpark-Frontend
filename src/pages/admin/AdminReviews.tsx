@@ -147,7 +147,7 @@ const AdminReviews: React.FC = () => {
                                     {review.comment}
                                 </p>
 
-                                <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                                     <button
                                         className={styles.actionBtn}
                                         onClick={() => handleEditClick(review)}

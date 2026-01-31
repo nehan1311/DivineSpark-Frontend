@@ -109,18 +109,14 @@
 }
 
 .grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     gap: 2rem;
+    width: 100%;
 }
 
 .reviewCard {
-    flex: 0 1 380px;
-    /* Flexible width, max around 380px */
     width: 100%;
-    /* Ensure it fills on small screens */
-    min-width: 300px;
     background: #ffffff;
     border-radius: var(--radius-lg);
     padding: 2.5rem 2rem;
