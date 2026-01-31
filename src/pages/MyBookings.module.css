@@ -436,4 +436,13 @@
     .bookingGrid {
         grid-template-columns: 1fr;
     }
+
+    .cardDetails {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .detailRow {
+        font-size: 0.9rem;
+    }
 }

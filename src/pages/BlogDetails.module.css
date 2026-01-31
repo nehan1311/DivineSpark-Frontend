@@ -94,6 +94,12 @@
     color: var(--color-text-primary);
     white-space: pre-wrap;
     /* Preserves newlines */
+    overflow-wrap: break-word;
+    /* Prevents overflow of long words */
+    word-break: break-word;
+    /* Backwards compatibility */
+    width: 100%;
+    /* Ensures it respects container width */
 }
 
 .content p {

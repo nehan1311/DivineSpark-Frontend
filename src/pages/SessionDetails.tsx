@@ -3,6 +3,8 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
 import { sessionApi } from '../api/session.api';
+import { PUBLIC_ENDPOINTS } from '../api/endpoints';
+import defaultThumbnail from '../assets/defaultthumbnail.png';
 import type { Session } from '../types/session.types';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -81,17 +83,15 @@ const SessionDetails: React.FC = () => {
             if (myBooking) {
                 setBooking(myBooking);
 
-                console.log("Checking Installment Fetch Conditions:", {
-                    status: myBooking.status,
-                    bookingId: myBooking.bookingId
-                });
-
-                // Fetch installments if status is PARTIALLY_PAID
-                if (myBooking.status === 'PARTIALLY_PAID' && myBooking.bookingId) {
+                // Always try to fetch installments if we have a booking ID
+                // This covers cases where status might be CONFIRMED but there are still future installments
+                // or where paymentType might be missing.
+                if (myBooking.bookingId) {
                     fetchInstallments(myBooking.bookingId);
                 }
             } else {
                 setBooking(null);
+                setInstallments([]);
             }
         } catch (error) {
             console.error('Error checking booking status:', error);
@@ -104,9 +104,15 @@ const SessionDetails: React.FC = () => {
             const data = await sessionApi.getBookingInstallments(bookingId);
             console.log("INSTALLMENTS FROM API 👉", data);
             setInstallments(data);
-        } catch (error) {
-            console.error('Failed to fetch installments', error);
-            showToast('Failed to load installment details', 'error');
+        } catch (error: any) {
+            // If 404, it just means no installments exist (e.g. invalid ID or fully paid without installments), so we can ignore.
+            // Only log if it's NOT a 404.
+            if (error.response?.status !== 404) {
+                console.error('Failed to fetch installments', error);
+                // Optional: showToast('Failed to load installment details', 'error'); 
+            }
+            // Ensure we clear installments on error so we don't show stale data
+            setInstallments([]);
         } finally {
             setLoadingInstallments(false);
         }
@@ -368,158 +374,179 @@ const SessionDetails: React.FC = () => {
     if (!session) return null;
 
     const isFree = session.type === 'FREE';
-    const isExpired = new Date(session.startTime) < new Date();
+    const now = new Date();
+    const isExpired = new Date(session.endTime) < now;
+    const isOngoing = new Date(session.startTime) <= now && !isExpired;
+
+    // Image handling matching Sessions.tsx strategy
+    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+        const target = e.currentTarget;
+        // If current failed src is the thumbnail endpoint, try the stored imageUrl
+        // But verify we aren't already on the imageUrl to avoid loop
+        if (session.imageUrl && target.src !== session.imageUrl && !target.src.includes(session.imageUrl)) {
+            target.src = session.imageUrl;
+        } else {
+            // Fallback to default
+            target.src = defaultThumbnail;
+        }
+    };
 
     return (
-        <Section className={styles.pageWrapper}>
-            <div className={styles.meshContainer}></div>
-            <div className={styles.container}>
-                {/* Hero Header */}
-                <div className={styles.heroHeader}>
-                    <h1 className={styles.title}>{session.title}</h1>
-                    <div className={styles.instructorRow}>
-                        <span className={styles.instructorLabel}>with</span>
-                        <span className={styles.instructorName}>{session.guideName}</span>
-                    </div>
+        <div className={styles.pageWrapper}>
+            {/* 1. Hero Section (Full Bleed) */}
+            <section className={styles.heroSection}>
+                <div className={styles.heroBackground}>
+                    <img
+                        src={PUBLIC_ENDPOINTS.THUMBNAIL(session.id)}
+                        onError={handleImageError}
+                        alt={session.title}
+                        className={styles.bgImage}
+                    />
+                    <div className={styles.heroOverlay}></div>
                 </div>
 
-                {/* Divider */}
-                <hr className={styles.divider} />
-
-                {/* Meta Info Row */}
-                <div className={styles.metaRow}>
-                    <div className={styles.metaPill}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                        <span>{formatDate(session.startTime)}</span>
+                <div className={styles.heroContent}>
+                    {/* Badge */}
+                    <div className={`${styles.badge} ${isFree ? styles.badgeFree : styles.badgePaid}`}>
+                        {isFree ? 'Free Session' : 'Premium Session'}
                     </div>
-                    <div className={styles.metaPill}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        <span>{getDuration(session.startTime, session.endTime)}</span>
+
+                    <h1 className={styles.heroTitle}>{session.title}</h1>
+
+                    <div className={styles.heroGuide}>
+                        with {session.guideName}
                     </div>
-                    <div className={styles.metaPill}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                        </svg>
-                        <span>{session.type} Session</span>
-                    </div>
-                </div>
 
-                {/* Main Content Layout */}
-                <div className={styles.mainLayout}>
-                    {/* Left: Payment & Booking (Primary) */}
-                    <div className={styles.paymentColumn}>
-                        <div className={styles.paymentCard}>
-                            <div className={styles.priceTag}>
-                                <span className={styles.priceLabel}>{isFree ? 'Entry' : 'Price'}</span>
-                                <span className={styles.priceValue}>
-                                    {isFree ? 'Free' : formatCurrency(session.price, session.currency)}
-                                </span>
-                            </div>
-
-                            {!booking && (
-                                <Button
-                                    size="lg"
-                                    variant="primary"
-                                    onClick={handleBookClick}
-                                    disabled={actionLoading || isExpired}
-                                    className={styles.actionButton}
-                                    style={{ width: '100%' }}
-                                >
-                                    {isExpired ? 'Session Ended' : actionLoading ? 'Processing...' : 'Book Session'}
-                                </Button>
-                            )}
-
-                            {/* Booking Status Indicator */}
-                            {booking && (
-                                <Button
-                                    size="lg"
-                                    variant="primary"
-                                    disabled={true}
-                                    className={styles.actionButton}
-                                    style={{ width: '100%', cursor: 'default' }}
-                                >
-                                    Session Booked
-                                </Button>
-                            )}
-
-                            {isExpired && (
-                                <p className={styles.expiredNotice}>This session has ended</p>
-                            )}
+                    <div className={styles.heroMeta}>
+                        <div className={styles.metaItem}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            {formatDate(session.startTime)}
                         </div>
+                        <div className={styles.metaItem}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            {getDuration(session.startTime, session.endTime)}
+                        </div>
+                    </div>
 
-                        {/* INSTALLMENT FLOW (Partially Paid) */}
-                        {booking?.status === 'PARTIALLY_PAID' && (
-                            <div className={styles.installmentSection}>
-                                {loadingInstallments ? (
-                                    <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>Loading plan...</div>
-                                ) : (
-                                    <InstallmentPaymentCard
-                                        installments={installments}
-                                        currency={session.currency}
-                                        onPayInstallment={handleNextInstallmentPayment}
-                                        loadingInstallmentId={payingInstallmentId}
-                                    />
-                                )}
-                            </div>
+                    {/* Hero Buttons Container */}
+                    <div className={styles.heroButtons}>
+                        {/* Primary Hero CTA */}
+                        {!booking ? (
+                            <button
+                                className={styles.heroCtaButton}
+                                onClick={handleBookClick}
+                                disabled={actionLoading || isExpired}
+                            >
+                                {isExpired ? 'Session Ended' : isOngoing && isFree ? 'Join Now (Live)' : isFree ? 'Join Session' : 'Book Your Spot'}
+                            </button>
+                        ) : (
+                            <button
+                                className={styles.heroCtaButton}
+                                disabled={true}
+                            >
+                                ✓ Session Booked
+                            </button>
                         )}
 
-                        {/* WhatsApp CTA */}
-                        {booking && ['PARTIALLY_PAID', 'CONFIRMED'].includes(booking.status) && (
-                            <div className={styles.ctaSection}>
+                        {/* WhatsApp CTA (If booked) */}
+                        {booking && (
+                            <div className={styles.waButtonWrapper}>
                                 <Button
-                                    size="lg"
+                                    size="md"
                                     variant="outline"
                                     onClick={handleWhatsAppJoin}
                                     disabled={waLoading}
-                                    className={styles.actionButton}
-                                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                                    style={{
+                                        borderColor: 'rgba(255,255,255,0.6)',
+                                        color: '#fff',
+                                        backdropFilter: 'blur(4px)',
+                                        background: 'rgba(255,255,255,0.15)',
+                                        padding: '0.75rem 1.5rem',
+                                        fontSize: '1rem'
+                                    }}
                                 >
-                                    {waLoading ? 'Fetching Link...' : (
-                                        <>
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                                            </svg>
-                                            Join WhatsApp Group
-                                        </>
-                                    )}
+                                    {waLoading ? 'Loading Group...' : 'Access WhatsApp Group'}
                                 </Button>
                             </div>
                         )}
                     </div>
+                </div>
+            </section>
 
-                    {/* Right: Description (Secondary) */}
-                    <div className={styles.descriptionColumn}>
-                        <div className={styles.descriptionCard}>
-                            <h3 className={styles.cardTitle}>About this Session</h3>
-                            <p className={styles.descriptionText}>{session.description}</p>
+            {/* 2. Floating Info Panel (Glassmorphism) */}
+            <div className={styles.glassPanelContainer}>
+                <div className={styles.glassPanel}>
+                    <div className={styles.panelItem}>
+                        <span className={styles.panelLabel}>Price</span>
+                        <div className={styles.panelValue}>
+                            {isFree ? 'Free' : formatCurrency(session.price, session.currency)}
                         </div>
+                    </div>
 
-                        <div className={styles.contactNote}>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                            </svg>
-                            <span>
-                                Need assistance? Feel free to{' '}
-                                <button
-                                    onClick={() => setIsContactOpen(true)}
-                                    className={styles.contactLink}
-                                >
-                                    contact us directly
-                                </button>
-                            </span>
+                    <div className={styles.panelItem}>
+                        <span className={styles.panelLabel}>Availability</span>
+                        <div className={styles.statusIndicator}>
+                            <span className={styles.statusDot} style={{ backgroundColor: session.currentParticipants >= session.maxParticipants ? '#ef4444' : '#22c55e' }}></span>
+                            {session.currentParticipants >= session.maxParticipants ? 'Full' : 'Open'}
+                        </div>
+                    </div>
+
+                    <div className={styles.panelItem}>
+                        <span className={styles.panelLabel}>Format</span>
+                        <div className={styles.panelValue} style={{ fontSize: '1.25rem' }}>
+                            Live Online
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* 3. Main Content Section */}
+            <section className={styles.contentSection}>
+                <div className={`${styles.contentContainer} ${installments.length > 0 && booking?.status !== 'CANCELLED' ? styles.contentGridWithSidebar : ''}`}>
+                    <div className={styles.aboutBlock}>
+                        <h2 className={styles.sectionHeading}>About This Session</h2>
+                        <div className={styles.descriptionText}>
+                            {session.description}
+                        </div>
+                    </div>
+
+                    {/* Installment Plan (If applicable) */}
+                    {installments.length > 0 && booking?.status !== 'CANCELLED' && (
+                        <div className={styles.installmentWrapper}>
+                            <h3 className={styles.installmentTitle}>Your Payment Plan</h3>
+                            <InstallmentPaymentCard
+                                installments={installments}
+                                currency={session.currency}
+                                onPayInstallment={handleNextInstallmentPayment}
+                                loadingInstallmentId={payingInstallmentId}
+                            />
+                        </div>
+                    )}
+
+                    {/* Help / Footer */}
+                    <div className={styles.helpSection} style={{ gridColumn: '1 / -1' }}>
+                        <p className={styles.helpText}>
+                            Have questions about this session? We are here to help.
+                        </p>
+                        <button
+                            onClick={() => setIsContactOpen(true)}
+                            className={styles.contactLink}
+                        >
+                            Contact Support
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            {/* Modals */}
             <WhatsAppConfirmationModal
                 isOpen={showWhatsAppModal}
                 onClose={() => setShowWhatsAppModal(false)}
@@ -540,11 +567,11 @@ const SessionDetails: React.FC = () => {
                 onPayInstallments={handleInstallmentPayment}
                 loadingFull={paymentLoading === 'full'}
                 loadingInstallment={paymentLoading === 'installment'}
+                amount={session.price}
+                currency={session.currency}
             />
             <Contact isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
-
-
-        </Section >
+        </div>
     );
 };
 

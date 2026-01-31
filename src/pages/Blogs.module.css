@@ -178,6 +178,8 @@
     overflow: hidden;
     font-weight: 400;
     max-width: 90%;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .readMore {
@@ -235,6 +237,11 @@
     }
 
     .blogItem {
-        padding: 2rem;
+        padding: 0;
+        /* Reset wrapper padding if any, relying on contentWrapper */
+    }
+
+    .contentWrapper {
+        padding: 1.5rem;
     }
 }

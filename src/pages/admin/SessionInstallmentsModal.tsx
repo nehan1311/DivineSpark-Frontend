@@ -83,6 +83,14 @@ const SessionInstallmentsModal: React.FC<SessionInstallmentsModalProps> = ({
                             const uniqueId = userStats.bookingId || index;
                             const isExpanded = expandedUserId === uniqueId;
 
+                            // Recalculate amounts from installments to ensure accuracy
+                            const calculatedTotal = userStats.installments.reduce((sum, inst) => sum + inst.amount, 0);
+                            const calculatedPaid = userStats.installments
+                                .filter(inst => inst.status === 'PAID')
+                                .reduce((sum, inst) => sum + inst.amount, 0);
+                            const calculatedRemaining = calculatedTotal - calculatedPaid;
+                            const isFullyPaid = calculatedRemaining <= 0;
+
                             return (
                                 <div
                                     key={uniqueId}
@@ -130,9 +138,9 @@ const SessionInstallmentsModal: React.FC<SessionInstallmentsModalProps> = ({
                                                 </div>
                                             )}
                                             <div style={{ marginTop: '0.5rem' }}>
-                                                <span className={`${styles.badge} ${userStats.remainingAmount <= 0 ? styles.badgeSuccess : styles.badgeWarning
+                                                <span className={`${styles.badge} ${isFullyPaid ? styles.badgeSuccess : styles.badgeWarning
                                                     }`}>
-                                                    {userStats.remainingAmount <= 0 ? 'Fully Paid' : 'Pending Dues'}
+                                                    {isFullyPaid ? 'Fully Paid' : 'Pending Dues'}
                                                 </span>
                                             </div>
                                         </div>
@@ -149,14 +157,14 @@ const SessionInstallmentsModal: React.FC<SessionInstallmentsModalProps> = ({
                                             <div style={{ textAlign: 'center' }}>
                                                 <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, letterSpacing: '0.05em' }}>Total</div>
                                                 <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111827' }}>
-                                                    {formatCurrency(userStats.totalAmount)}
+                                                    {formatCurrency(calculatedTotal)}
                                                 </div>
                                             </div>
                                             <div style={{ width: '1px', height: '30px', backgroundColor: '#e5e7eb' }}></div>
                                             <div style={{ textAlign: 'center' }}>
                                                 <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, letterSpacing: '0.05em' }}>Paid</div>
                                                 <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#059669' }}>
-                                                    {formatCurrency(userStats.paidAmount)}
+                                                    {formatCurrency(calculatedPaid)}
                                                 </div>
                                             </div>
                                             <div style={{ width: '1px', height: '30px', backgroundColor: '#e5e7eb' }}></div>
@@ -165,9 +173,9 @@ const SessionInstallmentsModal: React.FC<SessionInstallmentsModalProps> = ({
                                                 <div style={{
                                                     fontSize: '1.1rem',
                                                     fontWeight: 700,
-                                                    color: userStats.remainingAmount > 0 ? '#dc2626' : '#9ca3af'
+                                                    color: calculatedRemaining > 0 ? '#dc2626' : '#9ca3af'
                                                 }}>
-                                                    {formatCurrency(userStats.remainingAmount)}
+                                                    {formatCurrency(calculatedRemaining)}
                                                 </div>
                                             </div>
                                         </div>
