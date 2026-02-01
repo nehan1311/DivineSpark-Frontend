@@ -86,7 +86,7 @@ export const sessionApi = {
 
     payForSession: async (
         sessionId: string
-    ): Promise<{ orderId: string; amount: number; currency: string }> => {
+    ): Promise<{ orderId: string; amount: number; currency: string; bookingId: number }> => {
 
         sessionApi._ensureAuth();
         const headers = sessionApi._authHeaders();
@@ -100,7 +100,8 @@ export const sessionApi = {
         return {
             orderId: response.data.orderId,
             amount: response.data.amount * 100,     // Razorpay amount conversion
-            currency: response.data.currency
+            currency: response.data.currency,
+            bookingId: response.data.bookingId
         };
     },
 

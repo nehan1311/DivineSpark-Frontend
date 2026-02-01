@@ -317,12 +317,7 @@ const Sessions: React.FC = () => {
                                     <img
                                         src={PUBLIC_ENDPOINTS.THUMBNAIL(session.id)}
                                         onError={(e) => {
-                                            const target = e.currentTarget;
-                                            if (session.imageUrl && target.src !== session.imageUrl) {
-                                                target.src = session.imageUrl;
-                                            } else {
-                                                target.src = defaultThumbnail;
-                                            }
+                                            e.currentTarget.src = defaultThumbnail;
                                         }}
                                         alt={session.title}
                                         className={styles.bgImage}
