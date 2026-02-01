@@ -37,7 +37,6 @@ const SessionDetails: React.FC = () => {
 
     const [booking, setBooking] = useState<UserBooking | null>(null);
     const [installments, setInstallments] = useState<Installment[]>([]);
-    const [loadingInstallments, setLoadingInstallments] = useState(false);
     const [payingInstallmentId, setPayingInstallmentId] = useState<number | null>(null);
 
     const [waLoading, setWaLoading] = useState(false);
@@ -100,7 +99,6 @@ const SessionDetails: React.FC = () => {
 
     const fetchInstallments = async (bookingId: number) => {
         try {
-            setLoadingInstallments(true);
             const data = await sessionApi.getBookingInstallments(bookingId);
             console.log("INSTALLMENTS FROM API 👉", data);
             setInstallments(data);
@@ -113,8 +111,6 @@ const SessionDetails: React.FC = () => {
             }
             // Ensure we clear installments on error so we don't show stale data
             setInstallments([]);
-        } finally {
-            setLoadingInstallments(false);
         }
     };
 

@@ -58,6 +58,14 @@ export const getAdminSessions = async (
 };
 
 /**
+     * Get session details by ID
+     */
+export const getSessionDetails = async (sessionId: string): Promise<AdminSession> => {
+    const response = await axiosInstance.get<AdminSession>(ADMIN_ENDPOINTS.SESSION_DETAILS(sessionId));
+    return response.data;
+};
+
+/**
  * List past sessions
  */
 export const getPastSessions = async (

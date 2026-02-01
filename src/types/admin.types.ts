@@ -153,3 +153,23 @@ export interface UserInstallmentSummary {
     bookingStatus: string;
     installments: InstallmentInfo[];
 }
+
+export interface AdminInstallmentItem {
+    installmentNumber: number;
+    amount: number;
+    status: 'PAID' | 'PENDING';
+    paidAt: string | null;
+}
+
+export interface AdminInstallmentResponse {
+    bookingId: number;
+    userId: number;
+    username: string;
+    email: string;
+    contactNumber?: string;
+    bookingStatus: string;
+    totalAmount: number;
+    paidAmount: number;
+    remainingAmount: number;
+    installments: AdminInstallmentItem[];
+}
