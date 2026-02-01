@@ -3,7 +3,7 @@ import { sessionApi } from '../api/session.api';
 import type { Session } from '../types/session.types';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './Sessions.module.css';
 import Button from '../components/ui/Button';
 import { formatFullDateTime, formatCurrency } from '../utils/format';
@@ -39,7 +39,6 @@ const Sessions: React.FC = () => {
     const { isAuthenticated } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
-    const location = useLocation();
 
     useEffect(() => {
         fetchSessions();
@@ -128,14 +127,6 @@ const Sessions: React.FC = () => {
         }
     };
 
-    const initiateBooking = (session: Session) => {
-        if (!isAuthenticated) {
-            showToast('Please login to join this session', 'info');
-            navigate('/login', { state: { from: location } });
-            return;
-        }
-        setConfirmationSession(session);
-    };
 
     const executeSessionBooking = async (session: Session) => {
         if (!isAuthenticated) {
