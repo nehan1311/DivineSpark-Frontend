@@ -72,10 +72,15 @@ const SessionDetails: React.FC = () => {
             console.log("ALL USER BOOKINGS 👉", bookings);
 
             // Find specific booking for this session using robust matching
-            const myBooking = bookings.find((b: any) => {
+            const sessionBookings = bookings.filter((b: any) => {
                 const bookingSessionId = b.session?.id ?? b.sessionId ?? b.session_id;
                 return Number(bookingSessionId) === Number(session?.id);
             });
+
+            // Prioritize: CONFIRMED/PARTIALLY_PAID > PENDING > CANCELLED
+            const myBooking = sessionBookings.find((b: any) => ['CONFIRMED', 'PARTIALLY_PAID'].includes(b.bookingStatus || b.status))
+                || sessionBookings.find((b: any) => (b.bookingStatus || b.status) === 'PENDING')
+                || sessionBookings[0];
 
             console.log("MATCHED BOOKING 👉", myBooking);
 
@@ -152,7 +157,7 @@ const SessionDetails: React.FC = () => {
     const handleBookClick = () => {
         if (!session) return;
 
-        if (booking) {
+        if (booking && (booking.status === 'CONFIRMED' || booking.status === 'PARTIALLY_PAID')) {
             showToast('You have already booked this session.', 'info');
             return;
         }
@@ -243,6 +248,9 @@ const SessionDetails: React.FC = () => {
                 },
                 (errorMsg) => {
                     showToast(errorMsg || 'Payment failed', 'error');
+                    if (orderData.bookingId && (errorMsg?.toLowerCase().includes('cancelled') || errorMsg?.toLowerCase().includes('canceled'))) {
+                        sessionApi.cancelBooking(orderData.bookingId).catch(err => console.error("Failed to cancel booking after payment cancellation", err));
+                    }
                 }
             );
 
@@ -260,6 +268,27 @@ const SessionDetails: React.FC = () => {
         setPaymentLoading('installment');
 
         try {
+            // HANDLE EXISTING PENDING BOOKING
+            if (booking && (booking.status === 'PENDING' || booking.bookingStatus === 'PENDING')) {
+                // If we already have a pending installment plan, resume it (pay 1st installment)
+                const pendingInst = installments.find(i => i.status === 'PENDING');
+                if (pendingInst) {
+                    setShowPaymentModal(false);
+                    setPaymentLoading(null);
+                    await handleNextInstallmentPayment(pendingInst);
+                    return;
+                }
+
+                // If pending booking exists but no installments (e.g. failed Full Payment), cancel it first
+                try {
+                    console.log("Cancelling blocking pending booking:", booking.bookingId);
+                    await sessionApi.cancelBooking(booking.bookingId);
+                } catch (e) {
+                    console.error("Failed to cancel blocking booking", e);
+                    // Continue anyway, backend might reject but we tried
+                }
+            }
+
             // Load Razorpay SDK
             const isLoaded = await razorpayService.loadRazorpay();
             if (!isLoaded) {
@@ -295,6 +324,9 @@ const SessionDetails: React.FC = () => {
                 },
                 (errorMsg) => {
                     showToast(errorMsg || 'Payment failed', 'error');
+                    if (orderData.bookingId && (errorMsg?.toLowerCase().includes('cancelled') || errorMsg?.toLowerCase().includes('canceled'))) {
+                        sessionApi.cancelBooking(orderData.bookingId).catch(err => console.error("Failed to cancel booking after payment cancellation", err));
+                    }
                 }
             );
 
@@ -376,15 +408,7 @@ const SessionDetails: React.FC = () => {
 
     // Image handling matching Sessions.tsx strategy
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-        const target = e.currentTarget;
-        // If current failed src is the thumbnail endpoint, try the stored imageUrl
-        // But verify we aren't already on the imageUrl to avoid loop
-        if (session.imageUrl && target.src !== session.imageUrl && !target.src.includes(session.imageUrl)) {
-            target.src = session.imageUrl;
-        } else {
-            // Fallback to default
-            target.src = defaultThumbnail;
-        }
+        e.currentTarget.src = defaultThumbnail;
     };
 
     return (
@@ -435,7 +459,7 @@ const SessionDetails: React.FC = () => {
                     {/* Hero Buttons Container */}
                     <div className={styles.heroButtons}>
                         {/* Primary Hero CTA */}
-                        {!booking ? (
+                        {(!booking || (booking.status !== 'CONFIRMED' && booking.status !== 'PARTIALLY_PAID')) ? (
                             <button
                                 className={styles.heroCtaButton}
                                 onClick={handleBookClick}
@@ -452,8 +476,8 @@ const SessionDetails: React.FC = () => {
                             </button>
                         )}
 
-                        {/* WhatsApp CTA (If booked) */}
-                        {booking && (
+                        {/* WhatsApp CTA (If booked and confirmed/partially paid) */}
+                        {booking && (booking.status === 'CONFIRMED' || booking.status === 'PARTIALLY_PAID') && (
                             <div className={styles.waButtonWrapper}>
                                 <Button
                                     size="md"
