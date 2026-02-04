@@ -4,6 +4,7 @@ import Button from '../ui/Button';
 import { donationApi } from '../../api/donation.api';
 import { razorpayService } from '../../services/razorpay.service';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 import styles from './DonateModal.module.css';
 
 interface DonateModalProps {
@@ -13,6 +14,7 @@ interface DonateModalProps {
 
 const DonateModal: React.FC<DonateModalProps> = ({ isOpen, onClose }) => {
     const { showToast } = useToast();
+    const { user } = useAuth();
     const [amount, setAmount] = useState<number | ''>('');
     const [note, setNote] = useState('');
     const [loading, setLoading] = useState(false);
@@ -60,6 +62,11 @@ const DonateModal: React.FC<DonateModalProps> = ({ isOpen, onClose }) => {
 
                     showToast(errorMsg || 'Payment cancelled or failed', 'error');
                     setLoading(false);
+                },
+                {
+                    name: user?.fullName || user?.username,
+                    email: user?.email,
+                    contact: user?.contactNumber
                 }
             );
 

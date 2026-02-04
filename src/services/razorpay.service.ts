@@ -31,7 +31,12 @@ export const razorpayService = {
         },
         details: Session | string,
         onSuccess: (response: any) => void,
-        onError: (error: any) => void
+        onError: (error: any) => void,
+        prefill?: {
+            name?: string;
+            email?: string;
+            contact?: string;
+        }
     ) => {
         const description = typeof details === 'string'
             ? details
@@ -45,6 +50,11 @@ export const razorpayService = {
             name: 'DivineSpark',
             description: description,
             handler: onSuccess,
+            prefill: {
+                name: prefill?.name || '',
+                email: prefill?.email || '',
+                contact: prefill?.contact || (import.meta.env.DEV ? '9000090000' : '')
+            },
             modal: {
                 ondismiss: () => onError('Payment cancelled')
             }
