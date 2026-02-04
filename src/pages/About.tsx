@@ -295,52 +295,14 @@ const About: React.FC = () => {
                     {/* Navigation Arrows */}
                     <button
                         onClick={prevSlide}
-                        style={{
-                            position: 'absolute',
-                            left: '20px',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                            backdropFilter: 'blur(4px)',
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: '40px',
-                            height: '40px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            cursor: 'pointer',
-                            zIndex: 10,
-                            transition: 'background-color 0.3s'
-                        }}
-                        className="hover:bg-white/40"
+                        className={`${styles.navButton} ${styles.prevButton}`}
                     >
                         <ChevronLeft size={24} />
                     </button>
 
                     <button
                         onClick={nextSlide}
-                        style={{
-                            position: 'absolute',
-                            right: '20px',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                            backdropFilter: 'blur(4px)',
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: '40px',
-                            height: '40px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            cursor: 'pointer',
-                            zIndex: 10,
-                            transition: 'background-color 0.3s'
-                        }}
-                        className="hover:bg-white/40"
+                        className={`${styles.navButton} ${styles.nextButton}`}
                     >
                         <ChevronRight size={24} />
                     </button>

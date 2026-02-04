@@ -53,18 +53,18 @@ const AdminEvents: React.FC<EventsTableProps> = ({ events, onEdit, onDelete, isL
 
                         return (
                             <tr key={event.id}>
-                                <td>{event.title}</td>
-                                <td style={{ maxWidth: '300px' }} className={styles.truncateCell} title={event.description}>
+                                <td data-label="Title">{event.title}</td>
+                                <td data-label="Description" style={{ maxWidth: '300px' }} className={styles.truncateCell} title={event.description}>
                                     {event.description}
                                 </td>
-                                <td>{formatFullDateTime(event.startTime)}</td>
-                                <td>{durationText}</td>
-                                <td>
+                                <td data-label="Start Time">{formatFullDateTime(event.startTime)}</td>
+                                <td data-label="Duration">{durationText}</td>
+                                <td data-label="Status">
                                     <span className={`${styles.badge} ${status === 'UPCOMING' ? styles.badgeSuccess : styles.badgeNeutral}`}>
                                         {status}
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Actions">
                                     <button className={styles.actionBtn} onClick={() => onEdit(event)}>Edit</button>
                                     <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => onDelete(event)}>Delete</button>
                                 </td>

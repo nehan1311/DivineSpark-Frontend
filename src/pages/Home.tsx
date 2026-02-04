@@ -106,7 +106,7 @@ const Home: React.FC = () => {
                                     <motion.span className={styles.maskedText} variants={revealVariant}>Spiritual way</motion.span>
                                 </span>
                                 <span className={styles.mask}>
-                                    <motion.span className={styles.maskedText} variants={revealVariant}>transform</motion.span>
+                                    <motion.span className={styles.maskedText} variants={revealVariant}>to transform</motion.span>
                                 </span>
                                 <span className={styles.mask}>
                                     <motion.span className={styles.maskedText} variants={revealVariant}>your life</motion.span>

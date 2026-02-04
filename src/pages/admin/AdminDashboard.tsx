@@ -22,6 +22,7 @@ import {
     getAdminSessions,
     createSession,
     updateSession,
+    updateSessionStatus, // Add import
     uploadSessionThumbnail,
     updateSessionThumbnail,
     cancelSession as cancelSessionApi, // Using alias to avoid conflict
@@ -78,7 +79,7 @@ const SessionsTable: React.FC<{
         <div className={styles.section}>
             <div className={styles.sectionHeader}>
                 <h3 className={styles.sectionTitle}>Sessions Overview</h3>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                     {/* Type Filter */}
                     <select
                         value={typeFilter}
@@ -133,22 +134,22 @@ const SessionsTable: React.FC<{
 
                             return (
                                 <tr key={session.id}>
-                                    <td>{session.title}</td>
-                                    <td>
+                                    <td data-label="Title">{session.title}</td>
+                                    <td data-label="Type">
                                         <span className={`${styles.badge} ${session.type === 'FREE' ? styles.badgeSuccess : styles.badgeWarning}`}>
                                             {session.type}
                                         </span>
                                     </td>
-                                    <td>{formatFullDateTime(session.startTime)}</td>
-                                    <td>
+                                    <td data-label="Date & Time">{formatFullDateTime(session.startTime)}</td>
+                                    <td data-label="Seats (Avail/Max)">
                                         {isSeatsValid ? `${availableSeats} / ${maxSeats}` : '—'}
                                     </td>
-                                    <td>
+                                    <td data-label="Status">
                                         <span className={`${styles.badge} ${styles.badgeNeutral}`}>
                                             {session.status || 'SCHEDULED'}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td data-label="Actions">
                                         <button className={styles.actionBtn} onClick={() => onAction('edit_session', session)}>Edit</button>
                                         <button
                                             type="button"
@@ -452,15 +453,15 @@ const SessionParticipants: React.FC = () => {
 
                                         return (
                                             <tr key={user.id}>
-                                                <td>{user.name}</td>
-                                                <td>{user.email}</td>
-                                                <td>{user.phoneNumber || '-'}</td>
-                                                <td>
+                                                <td data-label="Name">{user.name}</td>
+                                                <td data-label="Email">{user.email}</td>
+                                                <td data-label="Contact Number">{user.phoneNumber || '-'}</td>
+                                                <td data-label="Booking Type">
                                                     <span className={`${styles.badge} ${user.bookingType === 'FREE' ? styles.badgeSuccess : styles.badgeWarning}`}>
                                                         {user.bookingType}
                                                     </span>
                                                 </td>
-                                                <td>
+                                                <td data-label="Installment Summary">
                                                     {installmentInfo ? (
                                                         <div style={{ fontSize: '0.85em' }}>
                                                             <div>
@@ -483,7 +484,7 @@ const SessionParticipants: React.FC = () => {
                                                         <span style={{ color: 'var(--color-text-light)' }}>-</span>
                                                     )}
                                                 </td>
-                                                <td>
+                                                <td data-label="Booking Status">
                                                     <span className={`${styles.badge} ${user.bookingStatus === 'CONFIRMED' ? styles.badgeSuccess :
                                                         user.bookingStatus === 'CANCELLED' ? styles.badgeError :
                                                             styles.badgeWarning
@@ -491,7 +492,7 @@ const SessionParticipants: React.FC = () => {
                                                         {user.bookingStatus}
                                                     </span>
                                                 </td>
-                                                <td>{formatFullDateTime(user.joinedDate)}</td>
+                                                <td data-label="Joined Date">{formatFullDateTime(user.joinedDate)}</td>
                                             </tr>
                                         );
                                     })}
@@ -610,7 +611,7 @@ const PaymentsTable: React.FC = () => {
             <div className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <h3 className={styles.sectionTitle}>Payments</h3>
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                         {/* Status Filter */}
                         <select
                             value={statusFilter}
@@ -669,13 +670,13 @@ const PaymentsTable: React.FC = () => {
                                             onClick={() => handleRowClick(payment)}
                                             style={{ cursor: 'pointer' }}
                                         >
-                                            <td style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                                            <td data-label="ID" style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
                                                 {payment.orderId || payment.paymentId || payment.id}
                                             </td>
-                                            <td>{payment.userEmail}</td>
-                                            <td>{payment.sessionTitle}</td>
-                                            <td>{formatCurrency(payment.amount, payment.currency)}</td>
-                                            <td>
+                                            <td data-label="User Email">{payment.userEmail}</td>
+                                            <td data-label="Session">{payment.sessionTitle}</td>
+                                            <td data-label="Amount">{formatCurrency(payment.amount, payment.currency)}</td>
+                                            <td data-label="Status">
                                                 <span className={`${styles.badge} ${payment.status === 'SUCCESS' ? styles.badgeSuccess :
                                                     payment.status === 'FAILED' ? styles.badgeError :
                                                         styles.badgeWarning
@@ -683,7 +684,7 @@ const PaymentsTable: React.FC = () => {
                                                     {payment.status}
                                                 </span>
                                             </td>
-                                            <td>{formatDateTime(payment.createdAt)}</td>
+                                            <td data-label="Paid On">{formatDateTime(payment.createdAt)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -868,9 +869,15 @@ const AdminDashboard: React.FC = () => {
                 const allSessions = response.sessions || [];
 
                 if (sessionTab === 'Upcoming') {
-                    setSessions(allSessions.filter(s => s.status === 'UPCOMING' || !s.status));
+                    // Show UPCOMING, SCHEDULED, or any active status
+                    setSessions(allSessions.filter(s =>
+                        !s.status ||
+                        ['UPCOMING', 'SCHEDULED', 'ACTIVE', 'OPEN'].includes(s.status.toUpperCase())
+                    ));
                 } else {
-                    setSessions(allSessions.filter(s => s.status === 'COMPLETED' || s.status === 'CANCELLED'));
+                    setSessions(allSessions.filter(s =>
+                        ['COMPLETED', 'CANCELLED', 'EXPIRED'].includes(s.status?.toUpperCase() || '')
+                    ));
                 }
 
             } else if (activeView === 'events') {
@@ -908,8 +915,21 @@ const AdminDashboard: React.FC = () => {
                 showToast('Session updated successfully', 'success');
             } else {
                 const newSession = await createSession(sessionData);
+
+                // Explicitly activate the session to ensure it appears in user views
+                try {
+                    // Some backends might not default to UPCOMING
+                    await updateSessionStatus(newSession.id, 'UPCOMING');
+                } catch (e) { console.warn("Could not set status explicitly", e); }
+
                 if (thumbnailFile && newSession.id) {
-                    await uploadSessionThumbnail(newSession.id, thumbnailFile);
+                    try {
+                        await uploadSessionThumbnail(newSession.id, thumbnailFile);
+                    } catch (uploadErr) {
+                        console.error("Thumbnail upload failed", uploadErr);
+                        showToast('Session created but thumbnail upload failed', 'info');
+                        // Continue so we refresh the list
+                    }
                 }
                 showToast('Session created successfully', 'success');
             }

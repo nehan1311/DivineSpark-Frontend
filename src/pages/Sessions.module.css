@@ -307,7 +307,7 @@
     }
 
     .content {
-        padding: 2rem 1.5rem 5rem;
+        padding: 2rem 1.5rem 8rem;
         /* Add bottom padding for dots */
         justify-content: flex-end;
         /* Align to bottom usually looks better on mobile with image bg */
@@ -358,7 +358,7 @@
 /* Base Styles (Desktop) */
 .viewAllBtn {
     position: absolute;
-    bottom: 2rem;
+    top: 2rem;
     right: 3rem;
 
     /* Box Styling */
@@ -398,6 +398,7 @@
 @media (max-width: 600px) {
     .viewAllBtn {
         bottom: 4rem;
+        top: auto;
         right: auto;
         left: 50%;
         transform: translateX(-50%);

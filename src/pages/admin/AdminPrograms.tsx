@@ -106,16 +106,16 @@ const AdminPrograms: React.FC = () => {
                     <tbody>
                         {programs.map(program => (
                             <tr key={program.id}>
-                                <td>{program.title}</td>
-                                <td>
+                                <td data-label="Title">{program.title}</td>
+                                <td data-label="Category">
                                     <span className={`${styles.badge} ${program.category === 'ENERGY_WORKSHOPS' ? styles.badgeSuccess : styles.badgeWarning}`}>
                                         {program.category === 'ENERGY_WORKSHOPS' ? 'Energy Workshop' : 'Spiritual Trip'}
                                     </span>
                                 </td>
-                                <td style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <td data-label="Description" style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {program.description}
                                 </td>
-                                <td>
+                                <td data-label="Actions">
                                     <button className={styles.actionBtn} onClick={() => handleEdit(program)}>Edit</button>
                                     <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => handleDeleteClick(program)}>Delete</button>
                                 </td>

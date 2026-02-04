@@ -86,7 +86,7 @@ export const sessionApi = {
 
     payForSession: async (
         sessionId: string
-    ): Promise<{ orderId: string; amount: number; currency: string }> => {
+    ): Promise<{ orderId: string; amount: number; currency: string; bookingId: number }> => {
 
         sessionApi._ensureAuth();
         const headers = sessionApi._authHeaders();
@@ -100,7 +100,8 @@ export const sessionApi = {
         return {
             orderId: response.data.orderId,
             amount: response.data.amount * 100,     // Razorpay amount conversion
-            currency: response.data.currency
+            currency: response.data.currency,
+            bookingId: response.data.bookingId
         };
     },
 
@@ -148,16 +149,25 @@ export const sessionApi = {
         );
     },
 
-    verifyInstallmentPayment: async (orderId: string): Promise<void> => {
+    verifyInstallmentPayment: async (paymentData: {
+        razorpay_payment_id: string;
+        razorpay_order_id: string;
+        razorpay_signature: string;
+    }): Promise<void> => {
+
         sessionApi._ensureAuth();
         const headers = sessionApi._authHeaders();
 
         await axiosInstance.post(
-            `/api/v1/payments/installment/verify?razorpayOrderId=${orderId}`,
+            `/api/v1/payments/installment/verify` +
+            `?razorpayOrderId=${paymentData.razorpay_order_id}` +
+            `&razorpayPaymentId=${paymentData.razorpay_payment_id}` +
+            `&razorpaySignature=${paymentData.razorpay_signature}`,
             {},
             { headers }
         );
     },
+
 
     /* -------------------- CANCEL BOOKING -------------------- */
 

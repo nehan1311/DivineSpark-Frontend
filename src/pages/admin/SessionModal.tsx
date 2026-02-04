@@ -232,6 +232,7 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                 // If creating, this might be empty initially
                 startTime: new Date(formData.startTime!).toISOString(),
                 endTime: new Date(formData.endTime!).toISOString(),
+                status: session ? session.status : 'UPCOMING', // Ensure default status is UPCOMING for new sessions
             };
 
             // If creating, ensure availableSeats matches maxSeats (since input is hidden)

@@ -7,10 +7,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './AllSessions.module.css';
 import Button from '../components/ui/Button';
 import { formatFullDateTime, formatCurrency } from '../utils/format';
-import { razorpayService } from '../services/razorpay.service';
-import defaultThumbnail from '../assets/defaultthumbnail.jpg';
+
+import defaultThumbnail from '../assets/defaultthumbnail.png';
 import { PUBLIC_ENDPOINTS } from '../api/endpoints';
-import { WhatsAppConfirmationModal } from '../components/ui/WhatsAppConfirmationModal';
+
 
 type BookingLike = {
     id?: any;
@@ -24,13 +24,11 @@ const AllSessions: React.FC = () => {
     const [sessions, setSessions] = useState<Session[]>([]);
     const [userBookings, setUserBookings] = useState<BookingLike[]>([]);
     const [loading, setLoading] = useState(true);
-    const [actionLoading, setActionLoading] = useState<string | null>(null);
-    const [confirmationSession, setConfirmationSession] = useState<Session | null>(null);
 
     const { isAuthenticated } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
-    const location = useLocation();
+
 
     // Fetch Bookings
     useEffect(() => {
@@ -88,77 +86,7 @@ const AllSessions: React.FC = () => {
         fetchSessions();
     }, [showToast]);
 
-    // Booking Logic (Reused)
-    const initiateBooking = (session: Session) => {
-        if (!isAuthenticated) {
-            showToast('Please login to join this session', 'info');
-            navigate('/login', { state: { from: location } });
-            return;
-        }
-        setConfirmationSession(session);
-    };
 
-    const executeSessionBooking = async (session: Session) => {
-        if (!isAuthenticated) {
-            showToast('Please login to join this session', 'info');
-            return;
-        }
-
-        setActionLoading(session.id);
-
-        try {
-            // Fresh check
-            const bookings = await sessionApi.getUserBookings();
-            const normalizedBookings = (bookings || []).map((b: any) => ({
-                ...b,
-                sessionId: Number(b.sessionId ?? b.session_id ?? b.session?.id),
-                status: String(b.status ?? '').toUpperCase().trim(),
-            }));
-            setUserBookings(normalizedBookings);
-
-            const booking = normalizedBookings.find(b => b.sessionId === Number(session.id));
-            if (booking && ['CONFIRMED', 'PARTIALLY_PAID'].includes(booking.status)) {
-                showToast('Session already Booked! Please check details.', 'info');
-                setActionLoading(null);
-                return;
-            }
-        } catch (ignored) { }
-
-        try {
-            if (session.type === 'FREE') {
-                await sessionApi.joinSession(session.id);
-                showToast(`Successfully joined "${session.title}"`, 'success');
-                await fetchUserBookings();
-                navigate(`/sessions/${session.id}`, { state: { session } });
-            } else {
-                const isLoaded = await razorpayService.loadRazorpay();
-                if (!isLoaded) {
-                    showToast('Razorpay SDK failed to load. Are you online?', 'error');
-                    return;
-                }
-                const orderData = await sessionApi.payForSession(session.id);
-                razorpayService.initializePayment(
-                    {
-                        orderId: orderData.orderId,
-                        amount: orderData.amount,
-                        currency: orderData.currency,
-                    },
-                    session,
-                    async () => {
-                        showToast('Payment successful!', 'success');
-                        await fetchUserBookings();
-                        navigate(`/sessions/${session.id}`, { state: { session } });
-                    },
-                    (errorMsg) => showToast(errorMsg || 'Payment failed', 'error')
-                );
-            }
-        } catch (error: any) {
-            const msg = error.response?.data?.message || 'Unable to book session.';
-            showToast(msg, 'error');
-        } finally {
-            setActionLoading(null);
-        }
-    };
 
     return (
         <div className={styles.pageWrapper}>
@@ -180,17 +108,19 @@ const AllSessions: React.FC = () => {
                         const isExpired = new Date(session.startTime) < new Date();
                         const booking = bookingBySessionId.get(Number(session.id));
                         const isBooked = isConfirmedBooking(booking);
-                        const disabled = actionLoading === session.id || isExpired || isBooked;
+                        const disabled = isExpired || isBooked;
 
                         return (
                             <div key={session.id} className={styles.card}>
                                 <img
-                                    src={PUBLIC_ENDPOINTS.THUMBNAIL(session.id)}
+                                    src={
+                                        session.imageUrl ||
+                                        (session.thumbnailData ? `data:image/png;base64,${session.thumbnailData}` : undefined) ||
+                                        PUBLIC_ENDPOINTS.THUMBNAIL(session.id) + `?t=${Date.now()}`
+                                    }
                                     onError={(e) => {
                                         const target = e.currentTarget;
-                                        if (session.imageUrl && target.src !== session.imageUrl) {
-                                            target.src = session.imageUrl;
-                                        } else {
+                                        if (target.src !== defaultThumbnail) {
                                             target.src = defaultThumbnail;
                                         }
                                     }}
@@ -224,7 +154,7 @@ const AllSessions: React.FC = () => {
                                         </Button>
                                         <Button
                                             variant="primary"
-                                            onClick={() => !isBooked && initiateBooking(session)}
+                                            onClick={() => navigate(`/sessions/${session.id}`, { state: { session } })}
                                             disabled={disabled}
                                             style={isBooked ? { backgroundColor: '#4a5568', borderColor: '#4a5568', cursor: 'not-allowed' } : {}}
                                         >
@@ -238,16 +168,7 @@ const AllSessions: React.FC = () => {
                 </div>
             )}
 
-            <WhatsAppConfirmationModal
-                isOpen={!!confirmationSession}
-                onClose={() => setConfirmationSession(null)}
-                onConfirm={() => {
-                    if (confirmationSession) {
-                        executeSessionBooking(confirmationSession);
-                        setConfirmationSession(null);
-                    }
-                }}
-            />
+
         </div>
     );
 };

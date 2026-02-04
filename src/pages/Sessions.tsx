@@ -3,13 +3,13 @@ import { sessionApi } from '../api/session.api';
 import type { Session } from '../types/session.types';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './Sessions.module.css';
 import Button from '../components/ui/Button';
 import { formatFullDateTime, formatCurrency } from '../utils/format';
 import { razorpayService } from '../services/razorpay.service';
 import RetreatContentSection from '../components/sessions/RetreatContentSection';
-import defaultThumbnail from '../assets/defaultthumbnail.jpg';
+import defaultThumbnail from '../assets/defaultthumbnail.png';
 
 import { PUBLIC_ENDPOINTS } from '../api/endpoints';
 import { WhatsAppConfirmationModal } from '../components/ui/WhatsAppConfirmationModal';
@@ -36,10 +36,9 @@ const Sessions: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const observerRef = useRef<IntersectionObserver | null>(null);
 
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
-    const location = useLocation();
 
     useEffect(() => {
         fetchSessions();
@@ -114,12 +113,17 @@ const Sessions: React.FC = () => {
     const fetchSessions = async () => {
         try {
             setLoading(true);
-            const data: any = await sessionApi.getSessions({ page: 0, size: 20 });
+            const data: any = await sessionApi.getSessions({ page: 0, size: 100 });
 
-            if (Array.isArray(data)) setSessions(data.slice(0, 6));
-            else if (data?.sessions) setSessions(data.sessions.slice(0, 6));
-            else if (data?.content) setSessions(data.content.slice(0, 6));
-            else setSessions([]);
+            let allSessions = [];
+            if (Array.isArray(data)) allSessions = data;
+            else if (data?.sessions) allSessions = data.sessions;
+            else if (data?.content) allSessions = data.content;
+            else allSessions = [];
+
+            // Client-side filter to ensure we show UPCOMING first
+            const upcoming = allSessions.filter((s: Session) => new Date(s.startTime) > new Date());
+            setSessions(upcoming.slice(0, 10)); // Show up to 10 upcoming sessions
         } catch (error) {
             showToast('Failed to load upcoming sessions', 'error');
             setSessions([]);
@@ -128,14 +132,6 @@ const Sessions: React.FC = () => {
         }
     };
 
-    const initiateBooking = (session: Session) => {
-        if (!isAuthenticated) {
-            showToast('Please login to join this session', 'info');
-            navigate('/login', { state: { from: location } });
-            return;
-        }
-        setConfirmationSession(session);
-    };
 
     const executeSessionBooking = async (session: Session) => {
         if (!isAuthenticated) {
@@ -199,6 +195,11 @@ const Sessions: React.FC = () => {
                     },
                     (errorMsg) => {
                         showToast(errorMsg || 'Payment failed', 'error');
+                    },
+                    {
+                        name: user?.fullName || user?.username,
+                        email: user?.email,
+                        contact: user?.contactNumber
                     }
                 );
             }
@@ -324,12 +325,15 @@ const Sessions: React.FC = () => {
                             >
                                 <div className={styles.background}>
                                     <img
-                                        src={PUBLIC_ENDPOINTS.THUMBNAIL(session.id)}
+                                        src={
+                                            session.imageUrl ||
+                                            (session.thumbnailData ? `data:image/png;base64,${session.thumbnailData}` : undefined) ||
+                                            PUBLIC_ENDPOINTS.THUMBNAIL(session.id) + `?t=${Date.now()}`
+                                        }
                                         onError={(e) => {
                                             const target = e.currentTarget;
-                                            if (session.imageUrl && target.src !== session.imageUrl) {
-                                                target.src = session.imageUrl;
-                                            } else {
+                                            // Fallback to default if load fails
+                                            if (target.src !== defaultThumbnail) {
                                                 target.src = defaultThumbnail;
                                             }
                                         }}
@@ -341,7 +345,7 @@ const Sessions: React.FC = () => {
 
                                 <div className={styles.content}>
                                     <h1 className={styles.title}>{session.title}</h1>
-                                    <p className={styles.description}>{session.description}</p>
+                                    <p className={styles.description}>{session.description.slice(0, 150) + (session.description.length > 150 ? '...' : '')}</p>
 
                                     <div className={styles.meta}>
                                         <div className={styles.metaItem}>
@@ -380,7 +384,7 @@ const Sessions: React.FC = () => {
                                                 size="lg"
                                                 variant="primary"
                                                 onClick={() => {
-                                                    if (!isBooked) initiateBooking(session);
+                                                    navigate(`/sessions/${session.id}`, { state: { session } });
                                                 }}
                                                 disabled={disabled}
                                                 style={
