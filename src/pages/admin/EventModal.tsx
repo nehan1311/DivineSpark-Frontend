@@ -46,7 +46,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSave, event 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.title || !formData.startTime || !formData.durationMinutes) {
+        if (!formData.title || !formData.startTime) {
             showToast('Please fill in all required fields.', 'error');
             return;
         }
@@ -79,10 +79,21 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSave, event 
 
         setIsSubmitting(true);
         try {
-            const payload = {
-                ...formData,
-                startTime: selectedDate.toISOString(),
+            // Default to 1 minute to satisfy potential backend @Min(1) validation
+            // while effectively ending the event "immediately" after start for the ticker.
+            const durationToSend = (formData.durationMinutes && formData.durationMinutes > 0)
+                ? typeof formData.durationMinutes === 'string' ? parseInt(formData.durationMinutes, 10) : formData.durationMinutes
+                : 1;
+
+            const payload: EventRequest = {
+                title: formData.title,
+                description: formData.description,
+                // Send standard ISO 8601 with Z (UTC) for OffsetDateTime
+                // Removing milliseconds to be safe: "2024-05-10T15:30:00Z"
+                startTime: selectedDate.toISOString().split('.')[0] + 'Z',
+                durationMinutes: durationToSend
             };
+
             await onSave(payload);
             onClose();
         } catch (error) {
@@ -139,15 +150,14 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onSave, event 
                         />
                     </div>
                     <div className={styles.formGroup}>
-                        <label className={styles.formLabel}>Duration (mins) <span className={styles.required}>*</span></label>
+                        <label className={styles.formLabel}>Duration (mins)</label>
                         <input
                             type="number"
                             className={styles.formInput}
-                            value={formData.durationMinutes}
+                            value={formData.durationMinutes || ''}
                             onChange={(e) => setFormData({ ...formData, durationMinutes: parseInt(e.target.value) || 0 })}
-                            min={1}
-                            placeholder="90"
-                            required
+                            min={0}
+                            placeholder="Optional"
                         />
                         <small className={styles.helperText}>e.g. 90 = 1h 30m</small>
                     </div>
