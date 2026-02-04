@@ -36,7 +36,7 @@ const Sessions: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const observerRef = useRef<IntersectionObserver | null>(null);
 
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
 
@@ -190,6 +190,11 @@ const Sessions: React.FC = () => {
                     },
                     (errorMsg) => {
                         showToast(errorMsg || 'Payment failed', 'error');
+                    },
+                    {
+                        name: user?.fullName || user?.username,
+                        email: user?.email,
+                        contact: user?.contactNumber
                     }
                 );
             }

@@ -30,7 +30,7 @@ const SessionDetails: React.FC = () => {
     // If we have initial data, we aren't "loading" in the visual sense, but we still fetch fresh data
     const [loading, setLoading] = useState(!initialSession);
     const [actionLoading, setActionLoading] = useState(false);
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
 
@@ -251,6 +251,11 @@ const SessionDetails: React.FC = () => {
                     if (orderData.bookingId && (errorMsg?.toLowerCase().includes('cancelled') || errorMsg?.toLowerCase().includes('canceled'))) {
                         sessionApi.cancelBooking(orderData.bookingId).catch(err => console.error("Failed to cancel booking after payment cancellation", err));
                     }
+                },
+                {
+                    name: user?.fullName || user?.username,
+                    email: user?.email,
+                    contact: user?.contactNumber
                 }
             );
 
@@ -307,12 +312,12 @@ const SessionDetails: React.FC = () => {
                     currency: 'INR' // Assuming INR as per requirements
                 },
                 session,
-                async () => {
+                async (response: any) => {
                     showToast('First installment paid. You have access.', 'success');
                     setShowPaymentModal(false);
 
-                    // Verify payment first
-                    await sessionApi.verifyInstallmentPayment(orderData.razorpayOrderId);
+                    // Verify payment
+                    await sessionApi.verifyInstallmentPayment(response);
 
                     // Fetch plan immediately using the new booking ID
                     if (orderData.bookingId) {
@@ -327,6 +332,11 @@ const SessionDetails: React.FC = () => {
                     if (orderData.bookingId && (errorMsg?.toLowerCase().includes('cancelled') || errorMsg?.toLowerCase().includes('canceled'))) {
                         sessionApi.cancelBooking(orderData.bookingId).catch(err => console.error("Failed to cancel booking after payment cancellation", err));
                     }
+                },
+                {
+                    name: user?.fullName || user?.username,
+                    email: user?.email,
+                    contact: user?.contactNumber
                 }
             );
 
@@ -359,8 +369,11 @@ const SessionDetails: React.FC = () => {
                     currency: 'INR'
                 },
                 session,
-                () => {
+                async (response: any) => {
                     showToast(`Installment #${inst.installmentNumber} paid successfully`, 'success');
+
+                    // Verify payment
+                    await sessionApi.verifyInstallmentPayment(response);
 
                     // Force refresh installments and booking status
                     if (booking?.bookingId) {
@@ -368,7 +381,12 @@ const SessionDetails: React.FC = () => {
                     }
                     checkBookingStatus();
                 },
-                (err) => showToast(err || 'Payment failed', 'error')
+                (err) => showToast(err || 'Payment failed', 'error'),
+                {
+                    name: user?.fullName || user?.username,
+                    email: user?.email,
+                    contact: user?.contactNumber
+                }
             );
         } catch (error: any) {
             showToast(error.response?.data?.message || 'Payment failed', 'error');

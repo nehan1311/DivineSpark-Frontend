@@ -305,4 +305,17 @@
     .programTitle {
         font-size: 2rem;
     }
+
+    .navButton {
+        width: 36px;
+        height: 36px;
+    }
+
+    .prevButton {
+        left: 8px;
+    }
+
+    .nextButton {
+        right: 8px;
+    }
 }
