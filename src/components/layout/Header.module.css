@@ -218,6 +218,17 @@
     /* Slight gap from header */
 }
 
+/* Invisible bridge to prevent dropdown from closing when crossing the gap */
+.dropdown::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: transparent;
+}
+
 .dropdownItem {
     display: block;
     /* CRITICAL FIX: Forces separate lines */
@@ -314,7 +325,7 @@
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(-5px);
     }
 
     to {

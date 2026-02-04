@@ -269,7 +269,7 @@ const Header: React.FC = () => {
                         to="/donate"
                         className={`${styles.mobileNavLink} ${location.pathname === '/donate' ? styles.active : ''}`}
                     >
-                        Donate
+                        Contribute
                     </Link>
                     <Link
                         to="/reviews"

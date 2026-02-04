@@ -117,16 +117,16 @@
     /* Small */
 
     /* Gradient Badge Style - Custom Soft Gold Palette */
-    background: linear-gradient(45deg, #f7e6a5, #e8d076);
-    /* Soft Champagne -> Muted Gold */
+    /* Use theme accent to match nav tabs */
+    background: var(--color-accent);
     color: #1a2e29;
     /* Dark text for better contrast on gold */
     padding: 4px 12px;
     border-radius: 30px;
     font-weight: 800;
     /* Extra bold for clarity */
-    box-shadow: 0 4px 15px rgba(232, 208, 118, 0.4);
-    /* Softer Gold Shadow */
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    /* Shadow based on #D4AF37 */
 
     text-transform: uppercase;
     letter-spacing: 0.05em;

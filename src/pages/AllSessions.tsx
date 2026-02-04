@@ -3,7 +3,7 @@ import { sessionApi } from '../api/session.api';
 import type { Session } from '../types/session.types';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './AllSessions.module.css';
 import Button from '../components/ui/Button';
 import { formatFullDateTime, formatCurrency } from '../utils/format';
@@ -120,7 +120,9 @@ const AllSessions: React.FC = () => {
                                     }
                                     onError={(e) => {
                                         const target = e.currentTarget;
-                                        if (target.src !== defaultThumbnail) {
+                                        if (session.imageUrl && target.src !== session.imageUrl) {
+                                            target.src = session.imageUrl;
+                                        } else {
                                             target.src = defaultThumbnail;
                                         }
                                     }}
