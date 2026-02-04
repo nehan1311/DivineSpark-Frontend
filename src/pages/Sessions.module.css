@@ -321,7 +321,7 @@
     }
 
     .title {
-        font-size: 2rem;
+        font-size: 1.75rem;
         margin-bottom: 0.75rem;
     }
 
@@ -409,9 +409,10 @@
         padding: 0.5rem 1rem;
         border-radius: 20px;
         backdrop-filter: blur(4px);
+        border: 1px solid rgba(243, 213, 64, 0.3);
     }
 
     .viewAllBtn:hover {
-        transform: translateX(-50%) scale(1.05);
+        transform: translateY(-2px);
     }
 }

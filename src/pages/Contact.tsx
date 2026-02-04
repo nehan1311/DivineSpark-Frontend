@@ -66,13 +66,13 @@ const Contact: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
                 <h2 className={styles.modalTitle}>Contact Us</h2>
                 <div className={styles.contactInfoSection}>
                     {/* Mobile */}
-                    <a href="tel:+912345678901" className={styles.infoItem}>
+                    <a href="tel:+917821049429" className={styles.infoItem}>
                         <div className={styles.iconWrapper} style={{ color: '#007AFF', borderColor: 'currentColor' }}>
                             <PhoneIcon />
                         </div>
                         <div className={styles.infoContent}>
                             <span className={styles.infoTitle}>Mobile</span>
-                            <span className={styles.infoValue}>+91 2345678901</span>
+                            <span className={styles.infoValue}>+91 7821049429</span>
                         </div>
                     </a>
 

@@ -4,16 +4,15 @@ import ProgramGalleryLayout from '../../components/programs/ProgramGalleryLayout
 import { getProgramsFn } from '../../api/programs.api';
 import type { Program } from '../../types/program.types';
 
-// Placeholder Images
-import slide1 from '../../assets/slide-1.png';
-import slide2 from '../../assets/slide-2.png';
-import slide3 from '../../assets/slide-3.png';
+// Assets
+import workshop1 from '../../assets/energy _workshop.jpeg';
+import workshop2 from '../../assets/energyworkshop1.jpeg';
 
 const EnergyWorkshops: React.FC = () => {
     const [programs, setPrograms] = useState<Program[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const placeholderImages = [slide1, slide2, slide3];
+    const placeholderImages = [workshop1, workshop2];
 
     useEffect(() => {
         const fetchPrograms = async () => {
