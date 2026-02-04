@@ -22,6 +22,7 @@ import {
     getAdminSessions,
     createSession,
     updateSession,
+    updateSessionStatus, // Add import
     uploadSessionThumbnail,
     updateSessionThumbnail,
     cancelSession as cancelSessionApi, // Using alias to avoid conflict
@@ -868,9 +869,15 @@ const AdminDashboard: React.FC = () => {
                 const allSessions = response.sessions || [];
 
                 if (sessionTab === 'Upcoming') {
-                    setSessions(allSessions.filter(s => s.status === 'UPCOMING' || !s.status));
+                    // Show UPCOMING, SCHEDULED, or any active status
+                    setSessions(allSessions.filter(s =>
+                        !s.status ||
+                        ['UPCOMING', 'SCHEDULED', 'ACTIVE', 'OPEN'].includes(s.status.toUpperCase())
+                    ));
                 } else {
-                    setSessions(allSessions.filter(s => s.status === 'COMPLETED' || s.status === 'CANCELLED'));
+                    setSessions(allSessions.filter(s =>
+                        ['COMPLETED', 'CANCELLED', 'EXPIRED'].includes(s.status?.toUpperCase() || '')
+                    ));
                 }
 
             } else if (activeView === 'events') {
@@ -908,8 +915,21 @@ const AdminDashboard: React.FC = () => {
                 showToast('Session updated successfully', 'success');
             } else {
                 const newSession = await createSession(sessionData);
+
+                // Explicitly activate the session to ensure it appears in user views
+                try {
+                    // Some backends might not default to UPCOMING
+                    await updateSessionStatus(newSession.id, 'UPCOMING');
+                } catch (e) { console.warn("Could not set status explicitly", e); }
+
                 if (thumbnailFile && newSession.id) {
-                    await uploadSessionThumbnail(newSession.id, thumbnailFile);
+                    try {
+                        await uploadSessionThumbnail(newSession.id, thumbnailFile);
+                    } catch (uploadErr) {
+                        console.error("Thumbnail upload failed", uploadErr);
+                        showToast('Session created but thumbnail upload failed', 'info');
+                        // Continue so we refresh the list
+                    }
                 }
                 showToast('Session created successfully', 'success');
             }

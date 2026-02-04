@@ -425,9 +425,7 @@ const SessionDetails: React.FC = () => {
     const isOngoing = new Date(session.startTime) <= now && !isExpired;
 
     // Image handling matching Sessions.tsx strategy
-    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-        e.currentTarget.src = defaultThumbnail;
-    };
+
 
     return (
         <div className={styles.pageWrapper}>
@@ -435,8 +433,17 @@ const SessionDetails: React.FC = () => {
             <section className={styles.heroSection}>
                 <div className={styles.heroBackground}>
                     <img
-                        src={PUBLIC_ENDPOINTS.THUMBNAIL(session.id)}
-                        onError={handleImageError}
+                        src={
+                            session.imageUrl ||
+                            (session.thumbnailData ? `data:image/png;base64,${session.thumbnailData}` : undefined) ||
+                            PUBLIC_ENDPOINTS.THUMBNAIL(session.id) + `?t=${Date.now()}`
+                        }
+                        onError={(e) => {
+                            const target = e.currentTarget;
+                            if (target.src !== defaultThumbnail) {
+                                target.src = defaultThumbnail;
+                            }
+                        }}
                         alt={session.title}
                         className={styles.bgImage}
                     />
