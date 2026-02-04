@@ -113,12 +113,17 @@ const Sessions: React.FC = () => {
     const fetchSessions = async () => {
         try {
             setLoading(true);
-            const data: any = await sessionApi.getSessions({ page: 0, size: 20 });
+            const data: any = await sessionApi.getSessions({ page: 0, size: 100 });
 
-            if (Array.isArray(data)) setSessions(data.slice(0, 6));
-            else if (data?.sessions) setSessions(data.sessions.slice(0, 6));
-            else if (data?.content) setSessions(data.content.slice(0, 6));
-            else setSessions([]);
+            let allSessions = [];
+            if (Array.isArray(data)) allSessions = data;
+            else if (data?.sessions) allSessions = data.sessions;
+            else if (data?.content) allSessions = data.content;
+            else allSessions = [];
+
+            // Client-side filter to ensure we show UPCOMING first
+            const upcoming = allSessions.filter((s: Session) => new Date(s.startTime) > new Date());
+            setSessions(upcoming.slice(0, 10)); // Show up to 10 upcoming sessions
         } catch (error) {
             showToast('Failed to load upcoming sessions', 'error');
             setSessions([]);
@@ -315,9 +320,17 @@ const Sessions: React.FC = () => {
                             >
                                 <div className={styles.background}>
                                     <img
-                                        src={PUBLIC_ENDPOINTS.THUMBNAIL(session.id)}
+                                        src={
+                                            session.imageUrl ||
+                                            (session.thumbnailData ? `data:image/png;base64,${session.thumbnailData}` : undefined) ||
+                                            PUBLIC_ENDPOINTS.THUMBNAIL(session.id) + `?t=${Date.now()}`
+                                        }
                                         onError={(e) => {
-                                            e.currentTarget.src = defaultThumbnail;
+                                            const target = e.currentTarget;
+                                            // Fallback to default if load fails
+                                            if (target.src !== defaultThumbnail) {
+                                                target.src = defaultThumbnail;
+                                            }
                                         }}
                                         alt={session.title}
                                         className={styles.bgImage}

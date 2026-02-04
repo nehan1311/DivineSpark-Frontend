@@ -156,9 +156,8 @@ export const uploadSessionResources = async (
     sessionId: string,
     formData: FormData
 ): Promise<void> => {
-    await axiosInstance.post(ADMIN_ENDPOINTS.SESSION_RESOURCES(sessionId), formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    // Axios auto-detects FormData and sets the correct Content-Type with boundary
+    await axiosInstance.post(ADMIN_ENDPOINTS.SESSION_RESOURCES(sessionId), formData);
 };
 
 /**
@@ -169,7 +168,9 @@ export const uploadSessionThumbnail = async (sessionId: string, file: File): Pro
     formData.append('thumbnail', file);
 
     await axiosInstance.post(ADMIN_ENDPOINTS.THUMBNAIL(sessionId), formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
     });
 };
 
@@ -181,7 +182,9 @@ export const updateSessionThumbnail = async (sessionId: string, file: File): Pro
     formData.append('thumbnail', file);
 
     await axiosInstance.put(ADMIN_ENDPOINTS.THUMBNAIL(sessionId), formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
     });
 };
 
