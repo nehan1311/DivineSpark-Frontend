@@ -27,7 +27,7 @@ import slide6Img from '../assets/slide-6.png';
 import slide7Img from '../assets/slide-7.png';
 import divineSparkLogo from '../assets/divinespark logo.png';
 import suvirImg from '../assets/SuvirSabnis.jpeg';
-import healingImg from '../assets/healing.jpg';
+import healingImg from '../assets/energy _workshop.jpeg';
 
 // SVGs removed as they are no longer used in the layout
 

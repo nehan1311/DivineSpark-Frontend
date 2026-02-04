@@ -4,16 +4,15 @@ import ProgramGalleryLayout from '../../components/programs/ProgramGalleryLayout
 import { getProgramsFn } from '../../api/programs.api';
 import type { Program } from '../../types/program.types';
 
-// Placeholder Images
-import slide4 from '../../assets/slide-4.png';
-import slide5 from '../../assets/slide-5.png';
-import slide6 from '../../assets/slide-6.png';
+// Assets
+import trip1 from '../../assets/Spiritualtrips (2).jpeg';
+import trip2 from '../../assets/spiritualtrips.jpeg';
 
 const SpiritualTrips: React.FC = () => {
     const [programs, setPrograms] = useState<Program[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const placeholderImages = [slide4, slide5, slide6];
+    const placeholderImages = [trip1, trip2];
 
     useEffect(() => {
         const fetchPrograms = async () => {

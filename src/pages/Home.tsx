@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform, useMotionValue, useSpring, type Varian
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
 import styles from './Home.module.css';
-import homePageImage from '../assets/home_page_image.jpg';
+import homePageImage from '../assets/Padmasambhavan .jpeg';
 import { Flower, Activity, Sparkles, ArrowRight } from 'lucide-react';
 import EventTicker from '../components/ticker/EventTicker';
 
