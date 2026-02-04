@@ -54,8 +54,31 @@ axiosInstance.interceptors.response.use(
             } else if (status === 401 && isPublicEndpoint) {
                 console.warn('[Axios Debug] Ignored 401 for public endpoint:', error.config?.url);
             }
+        } else if (error.message === 'Network Error' && !error.response) {
+            // Sometimes 302 redirects to CORS-blocked URLs appear as Network Error
+            console.warn('[Axios] Network Error - possibly a CORS blocked redirect.');
         }
         return Promise.reject(error);
+    }
+);
+
+// Add a specific interceptor for 200 OK responses that are actually HTML (redirects)
+axiosInstance.interceptors.response.use(
+    (response: AxiosResponse) => {
+        const contentType = response.headers['content-type'];
+        if (
+            contentType &&
+            (contentType.includes('text/html') || contentType.includes('application/xhtml+xml')) &&
+            response.config.url?.startsWith('/api/') &&
+            response.config.responseType !== 'blob' &&
+            response.config.responseType !== 'text'
+        ) {
+            console.error('[Axios] Received HTML response for API request. Likely an auth redirect.');
+            removeToken();
+            window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+            return Promise.reject(new axios.AxiosError('Session expired (HTML response)', '401', response.config, response.request, response));
+        }
+        return response;
     }
 );
 

@@ -12,7 +12,14 @@ const EventTicker: React.FC = () => {
             try {
                 const data = await getPublicEvents();
                 if (Array.isArray(data)) {
-                    setEvents(data);
+                    const now = new Date();
+                    const pendingEvents = data.filter(event => {
+                        const start = new Date(event.startTime);
+                        const durationMs = (event.durationMinutes || 0) * 60 * 1000;
+                        const end = new Date(start.getTime() + durationMs);
+                        return end > now;
+                    });
+                    setEvents(pendingEvents);
                 } else {
                     setEvents([]);
                 }
@@ -86,8 +93,12 @@ const RenderItems = ({ events, formatDate, formatDuration, formatTime }: { event
                     <span className={styles.cardInfo}>📅 {formatDate(event.startTime)}</span>
                     <span className={styles.separator}>•</span>
                     <span className={styles.cardInfo}>⏰ {formatTime(event.startTime)}</span>
-                    <span className={styles.separator}>•</span>
-                    <span className={styles.cardInfo}>🕒 {formatDuration(event.durationMinutes)}</span>
+                    {event.durationMinutes > 1 && (
+                        <>
+                            <span className={styles.separator}>•</span>
+                            <span className={styles.cardInfo}>🕒 {formatDuration(event.durationMinutes)}</span>
+                        </>
+                    )}
                 </div>
                 <div className={styles.cardTitle}>{event.title}</div>
                 <div className={styles.cardDescription}>{event.description}</div>
