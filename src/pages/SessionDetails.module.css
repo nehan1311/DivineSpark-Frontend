@@ -299,14 +299,16 @@
 
 /* This class will be applied when installments exist */
 .contentGridWithSidebar {
-    grid-template-columns: 1.8fr 1fr;
-    /* About (Highlighted) | Installment (Smaller) */
+    grid-template-columns: minmax(0, 1fr) 380px;
+    /* About (Flexible) | Installment (Fixed ~380px) */
     align-items: start;
 }
 
 .aboutBlock {
     animation: fadeUp 0.8s ease-out 0.2s forwards;
     opacity: 0;
+    width: 100%;
+    /* Ensure it respects parent width */
 }
 
 .sectionHeading {
@@ -335,6 +337,8 @@
     line-height: 1.8;
     color: #374151;
     white-space: pre-line;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 /* Installment Section in Content */
@@ -347,6 +351,12 @@
     box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
     /* Stronger shadow/card feel */
     border: 1px solid rgba(0, 0, 0, 0.04);
+
+    /* Make it sticky */
+    position: sticky;
+    top: 6rem;
+    /* Adjust based on header height */
+    z-index: 5;
 }
 
 .installmentTitle {

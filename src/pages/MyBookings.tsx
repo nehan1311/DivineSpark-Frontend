@@ -95,14 +95,17 @@ const MyBookings: React.FC = () => {
                 const isCompleted = b.bookingStatus === 'COMPLETED';
                 const isCancelled = b.bookingStatus === 'CANCELLED';
                 const endTime = new Date(b.endTime);
-                return !isCompleted && !isCancelled && endTime > now;
+
+                // Keep installment sessions in upcoming regardless of time (unless completed/cancelled)
+                // Also keep partially paid sessions
+                const isInstallmentOrPartial = b.paymentType === 'INSTALLMENT' || b.bookingStatus === 'PARTIALLY_PAID';
+
+                return !isCompleted && !isCancelled && (endTime > now || isInstallmentOrPartial);
             });
 
             const past = data.filter(b => {
-                const isCompleted = b.bookingStatus === 'COMPLETED';
-                const isCancelled = b.bookingStatus === 'CANCELLED';
-                const endTime = new Date(b.endTime);
-                return isCompleted || isCancelled || endTime <= now;
+                const isUpcoming = upcoming.find(u => u.bookingId === b.bookingId);
+                return !isUpcoming;
             });
 
             setBookings({ upcoming, past });

@@ -22,19 +22,22 @@
 }
 
 .summaryGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
 }
 
 .summaryItem {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 90px;
 }
 
 .summaryLabel {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -45,21 +48,25 @@
     font-family: var(--font-heading);
     font-weight: 700;
     color: var(--text-primary);
-    font-size: 1.25rem;
+    font-size: 1.15rem;
+    /* Slightly reduced */
+    word-break: break-all;
 }
 
 .summaryValuePaid {
     font-family: var(--font-heading);
     font-weight: 700;
     color: #4caf50;
-    font-size: 1.25rem;
+    font-size: 1.15rem;
+    word-break: break-all;
 }
 
 .summaryValueRemaining {
     font-family: var(--font-heading);
     font-weight: 700;
     color: var(--text-primary);
-    font-size: 1.25rem;
+    font-size: 1.15rem;
+    word-break: break-all;
 }
 
 /* Timeline Section */
@@ -251,22 +258,43 @@
 
 /* Responsive */
 @media (max-width: 600px) {
+    .container {
+        gap: 1.5rem;
+    }
+
     .summaryGrid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
+        flex-direction: column;
+        gap: 0;
     }
 
     .summaryItem {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        padding-bottom: 0.75rem;
+        width: 100%;
+        padding: 0.75rem 0;
         border-bottom: 1px solid rgba(139, 195, 74, 0.15);
+        min-width: 100%;
     }
 
     .summaryItem:last-child {
         border-bottom: none;
         padding-bottom: 0;
+    }
+
+    .summaryItem:first-child {
+        padding-top: 0;
+    }
+
+    .summaryLabel {
+        font-size: 0.8rem;
+    }
+
+    .summaryValue,
+    .summaryValuePaid,
+    .summaryValueRemaining {
+        font-size: 1rem;
+        text-align: right;
     }
 
     .timelineItem {
@@ -287,5 +315,10 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 0.25rem;
+    }
+
+    .installmentAction {
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 }
