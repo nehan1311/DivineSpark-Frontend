@@ -9,6 +9,8 @@ export interface AdminBlogPost {
     excerpt: string;
     authorName: string;
     isPublished: boolean;
+    published?: boolean; // potential backend variation
+    status?: string;     // potential backend variation ("DRAFT", "PUBLISHED")
     publishedAt?: string;
     createdAt: string;
     updatedAt: string;
