@@ -85,7 +85,11 @@ const SessionDetails: React.FC = () => {
             console.log("MATCHED BOOKING 👉", myBooking);
 
             if (myBooking) {
-                setBooking(myBooking);
+                const normalizedBooking = {
+                    ...myBooking,
+                    status: (myBooking.status || myBooking.bookingStatus)
+                };
+                setBooking(normalizedBooking);
 
                 // Always try to fetch installments if we have a booking ID
                 // This covers cases where status might be CONFIRMED but there are still future installments
@@ -157,7 +161,9 @@ const SessionDetails: React.FC = () => {
     const handleBookClick = () => {
         if (!session) return;
 
-        if (booking && (booking.status === 'CONFIRMED' || booking.status === 'PARTIALLY_PAID')) {
+        const currentStatus = booking?.status || booking?.bookingStatus;
+
+        if (booking && (currentStatus === 'CONFIRMED' || currentStatus === 'PARTIALLY_PAID')) {
             showToast('You have already booked this session.', 'info');
             return;
         }
@@ -209,6 +215,8 @@ const SessionDetails: React.FC = () => {
             await sessionApi.joinSession(session.id);
             showToast(`Successfully joined "${session.title}"`, 'success');
             setShowWhatsAppModal(false);
+            // Refresh booking status to update UI immediately
+            checkBookingStatus();
         } catch (error: any) {
             const data = error.response?.data;
             const message = data?.message || 'Unable to join session';
@@ -425,7 +433,8 @@ const SessionDetails: React.FC = () => {
     const isOngoing = new Date(session.startTime) <= now && !isExpired;
 
     // Image handling matching Sessions.tsx strategy
-
+    const bookingStatus = booking?.status || booking?.bookingStatus;
+    const isBooked = booking && (bookingStatus === 'CONFIRMED' || bookingStatus === 'PARTIALLY_PAID');
 
     return (
         <div className={styles.pageWrapper}>
@@ -484,7 +493,7 @@ const SessionDetails: React.FC = () => {
                     {/* Hero Buttons Container */}
                     <div className={styles.heroButtons}>
                         {/* Primary Hero CTA */}
-                        {(!booking || (booking.status !== 'CONFIRMED' && booking.status !== 'PARTIALLY_PAID')) ? (
+                        {!isBooked ? (
                             <button
                                 className={styles.heroCtaButton}
                                 onClick={handleBookClick}
@@ -502,7 +511,7 @@ const SessionDetails: React.FC = () => {
                         )}
 
                         {/* WhatsApp CTA (If booked and confirmed/partially paid) */}
-                        {booking && (booking.status === 'CONFIRMED' || booking.status === 'PARTIALLY_PAID') && (
+                        {isBooked && (
                             <div className={styles.waButtonWrapper}>
                                 <Button
                                     size="md"
