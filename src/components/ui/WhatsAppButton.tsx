@@ -13,7 +13,7 @@ const WhatsAppIcon = () => (
 
 const WhatsAppButton: React.FC = () => {
     // Replace with your actual WhatsApp number (no spaces or special chars)
-    const phoneNumber = "918692993228";
+    const phoneNumber = "917821049429";
     const message = "Hello! I would like to know more about DivineSpark.";
 
     const handleClick = () => {
