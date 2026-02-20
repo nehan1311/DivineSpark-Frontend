@@ -161,6 +161,8 @@
     line-height: 1.25;
     padding-right: 80px;
     /* Space for badge */
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 /* Status Badge - More prominent */
