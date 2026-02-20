@@ -372,25 +372,96 @@
     color: var(--color-text-primary);
 }
 
+/* Scrollable table wrapper — prevents overflow on small screens */
+.tableWrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+}
+
 .table {
     width: 100%;
-    border-collapse: separate;
+    border-collapse: collapse;
     border-spacing: 0;
+    min-width: 700px;
+    /* force horizontal scroll before columns collapse */
 }
 
 .table th {
     text-align: left;
-    padding: var(--space-4);
+    padding: 0.625rem 0.875rem;
     color: var(--color-text-body);
     font-weight: 600;
     font-size: var(--font-size-sm);
+    background-color: var(--color-bg-main);
     border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
 }
 
 .table td {
-    padding: var(--space-4);
+    padding: 0.625rem 0.875rem;
     border-bottom: 1px solid var(--color-bg-main);
     color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Clickable row with hover highlight */
+.clickableRow {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.clickableRow:hover {
+    background-color: #f8fafc;
+}
+
+/* Truncated ID cell — monospace, ellipsis */
+.idCell {
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    color: var(--color-text-body);
+}
+
+.idCell span {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Truncated email cell */
+.emailCell {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Truncated session title cell */
+.sessionCell {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Small/row number cell */
+.compactCell {
+    width: 2.5rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--color-text-body);
+    font-weight: 500;
 }
 
 .emptyState {
