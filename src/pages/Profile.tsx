@@ -6,6 +6,8 @@ import type { User } from '../types/auth.types';
 import { useToast } from '../context/ToastContext';
 import styles from './Profile.module.css';
 import Button from '../components/ui/Button';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 interface ProfileModalProps {
     isOpen: boolean;
@@ -79,10 +81,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
         setError(null);
         setSuccessMsg(null);
 
-        // Validation: 10 digit phone number
-        const phoneRegex = /^\d{10}$/;
-        if (formData.contactNumber && !phoneRegex.test(formData.contactNumber)) {
-            setError('Please enter a valid 10-digit phone number');
+        // Validation: Global phone number
+        // PhoneInput returns clean digits (country code + number)
+        if (formData.contactNumber && formData.contactNumber.length < 8) {
+            setError('Please enter a valid phone number');
             return;
         }
 
@@ -185,18 +187,21 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
                         <div className={styles.fieldGroup}>
                             <label className={styles.label}>Contact Number</label>
                             {isEditing ? (
-                                <input
-                                    type="tel"
-                                    className={styles.input}
+                                <PhoneInput
+                                    country={'in'}
                                     value={formData.contactNumber}
-                                    maxLength={10}
-                                    onChange={(e) => {
-                                        const val = e.target.value;
-                                        if (val === '' || /^\d+$/.test(val)) {
-                                            setFormData({ ...formData, contactNumber: val });
-                                        }
+                                    onChange={(phone: string) => {
+                                        setFormData({ ...formData, contactNumber: phone });
                                     }}
-                                    placeholder="Enter phone number"
+                                    inputStyle={{
+                                        width: '100%',
+                                        height: '42px',
+                                        fontSize: '1rem',
+                                        paddingLeft: '48px',
+                                        borderRadius: '0.375rem',
+                                        borderColor: 'var(--color-border)'
+                                    }}
+                                    containerStyle={{ width: '100%' }}
                                 />
                             ) : (
                                 <div className={styles.valueDisplay}>

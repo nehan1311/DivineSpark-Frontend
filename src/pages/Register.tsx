@@ -5,6 +5,8 @@ import styles from './Auth.module.css';
 import bgVideo from '../assets/grok-video-05d66eef-eed8-46c2-80bd-0577b1b2d8f4.mp4';
 import { requestOtp, verifyOtp, register } from '../api/auth.api';
 import { useAuth } from '../context/AuthContext';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 import type { AxiosError } from 'axios';
 
@@ -70,37 +72,7 @@ const Register: React.FC = () => {
         }
     };
 
-    const validateContactNumber = (value: string): boolean => {
-        setContactNumberError(null);
 
-        if (!value) {
-            setContactNumberError('Contact number is required');
-            return false;
-        }
-
-        if (!/^\d+$/.test(value)) {
-            setContactNumberError('Contact number must contain only digits');
-            return false;
-        }
-
-        if (value.length !== 10) {
-            setContactNumberError('Contact number must be exactly 10 digits');
-            return false;
-        }
-
-        return true;
-    };
-
-    const handleContactNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        // Only allow digits and limit to 10 characters
-        if (value === '' || /^\d{0,10}$/.test(value)) {
-            setContactNumber(value);
-            if (contactNumberError) {
-                validateContactNumber(value);
-            }
-        }
-    };
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -113,9 +85,14 @@ const Register: React.FC = () => {
             return;
         }
 
-        // Validate contact number before submission
-        if (!validateContactNumber(contactNumber)) {
-            showToast(contactNumberError || 'Invalid contact number', 'error');
+        // Validate contact number
+        // PhoneInput returns string of digits including country code.
+        // E.g. 919876543210. 
+        // We enforce min length 8 to account for shortest international numbers
+        if (!contactNumber || contactNumber.length < 8) {
+            const msg = 'Please enter a valid phone number';
+            setContactNumberError(msg);
+            showToast(msg, 'error');
             return;
         }
 
@@ -242,17 +219,22 @@ const Register: React.FC = () => {
                 required
             />
             <div style={{ width: '100%' }}>
-                <input
-                    type="tel"
-                    placeholder="10-digit mobile number"
-                    className={styles.input}
+                <PhoneInput
+                    country={'in'}
                     value={contactNumber}
-                    onChange={handleContactNumberChange}
-                    maxLength={10}
-                    required
-                    style={{
-                        borderColor: contactNumberError ? '#ff4444' : undefined,
+                    onChange={(phone: string) => {
+                        setContactNumber(phone);
+                        if (contactNumberError) setContactNumberError(null);
                     }}
+                    inputStyle={{
+                        width: '100%',
+                        height: '46px', // Matches styling approximately
+                        fontSize: '1rem',
+                        paddingLeft: '48px',
+                        borderRadius: '0.375rem',
+                        borderColor: contactNumberError ? '#ff4444' : 'var(--color-border)'
+                    }}
+                    containerStyle={{ width: '100%' }}
                 />
                 {contactNumberError && (
                     <div style={{
