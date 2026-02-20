@@ -77,24 +77,24 @@ const Contact: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
                     </a>
 
                     {/* WhatsApp */}
-                    <a href="https://wa.me/8692993228" target="_blank" rel="noopener noreferrer" className={styles.infoItem}>
+                    <a href="https://wa.me/917821049429" target="_blank" rel="noopener noreferrer" className={styles.infoItem}>
                         <div className={styles.iconWrapper} style={{ color: '#25D366', borderColor: 'currentColor' }}>
                             <WhatsAppIcon />
                         </div>
                         <div className={styles.infoContent}>
                             <span className={styles.infoTitle}>WhatsApp</span>
-                            <span className={styles.infoValue}>+91 8692993228</span>
+                            <span className={styles.infoValue}>+91 7821049429</span>
                         </div>
                     </a>
 
                     {/* Email */}
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@divinespark.com" target="_blank" rel="noopener noreferrer" className={styles.infoItem}>
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=divinesparksadhak@gmail.com" target="_blank" rel="noopener noreferrer" className={styles.infoItem}>
                         <div className={styles.iconWrapper} style={{ color: '#EA4335', borderColor: 'currentColor' }}>
                             <MailIcon />
                         </div>
                         <div className={styles.infoContent}>
                             <span className={styles.infoTitle}>Email</span>
-                            <span className={styles.infoValue}>hello@divinespark.com</span>
+                            <span className={styles.infoValue}>divinesparksadhak@gmail.com</span>
                         </div>
                     </a>
 
