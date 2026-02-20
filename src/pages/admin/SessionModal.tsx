@@ -102,13 +102,8 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                 } else if (end.diff(start, 'minute') < 30) {
                     setFieldErrors(prev => ({ ...prev, endTime: "Duration must be at least 30 min." }));
                 } else {
-                    // Check if start and end are on the same local date
-                    if (!start.isSame(end, 'day')) {
-                        setFieldErrors(prev => ({ ...prev, endTime: "Must be same date as start." }));
-                    } else {
-                        // If all good, clear end time error
-                        setFieldErrors(prev => { const { endTime, ...rest } = prev; return rest; });
-                    }
+                    // All good — clear end time error
+                    setFieldErrors(prev => { const { endTime, ...rest } = prev; return rest; });
                 }
             } else if (!value && currentFormData.endTime) {
                 // If start time is cleared but end time exists, end time is invalid
@@ -127,11 +122,6 @@ const SessionModal: React.FC<SessionModalProps> = ({ isOpen, onClose, onSave, se
                     const duration = end.diff(start, 'minute');
                     if (duration < 30) {
                         err = "Duration must be at least 30 min.";
-                    } else {
-                        // Same date check for local dates
-                        if (!start.isSame(end, 'day')) {
-                            err = "Must be same date as start.";
-                        }
                     }
                 }
             } else if (value && !startStr) {

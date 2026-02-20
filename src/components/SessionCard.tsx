@@ -44,7 +44,14 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onAction, loading = 
             </div>
 
             <div className={styles.content}>
-                <div className={styles.date}>{formatDate(session.startTime)}</div>
+                <div className={styles.date}>
+                    {formatDate(session.startTime)}
+                    {session.endTime && (
+                        <div style={{ fontSize: '0.8em', opacity: 0.7, marginTop: '0.1rem' }}>
+                            Ends: {formatDate(session.endTime)}
+                        </div>
+                    )}
+                </div>
                 <h3 className={styles.title}>{session.title}</h3>
                 <p className={styles.description}>{session.description}</p>
 

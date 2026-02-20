@@ -606,6 +606,14 @@ const PaymentsTable: React.FC = () => {
         setPagination(prev => ({ ...prev, page: newPage }));
     };
 
+    const formatCompactDate = (dateString?: string) => {
+        if (!dateString) return '—';
+        return new Date(dateString).toLocaleDateString('en-IN', {
+            day: '2-digit', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', hour12: true
+        });
+    };
+
     return (
         <>
             <div className={styles.section}>
@@ -652,43 +660,55 @@ const PaymentsTable: React.FC = () => {
                 {!isLoading && !error && (
                     payments.length > 0 ? (
                         <>
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th>Payment ID / Order ID</th>
-                                        <th>User Email</th>
-                                        <th>Session Title</th>
-                                        <th>Amount</th>
-                                        <th>Payment Status</th>
-                                        <th>Paid On</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {payments.filter(p => statusFilter === 'ALL' || p.status === statusFilter).map(payment => (
-                                        <tr
-                                            key={payment.id || payment.paymentId}
-                                            onClick={() => handleRowClick(payment)}
-                                            style={{ cursor: 'pointer' }}
-                                        >
-                                            <td data-label="ID" style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                                                {payment.orderId || payment.paymentId || payment.id}
-                                            </td>
-                                            <td data-label="User Email">{payment.userEmail}</td>
-                                            <td data-label="Session">{payment.sessionTitle}</td>
-                                            <td data-label="Amount">{formatCurrency(payment.amount, payment.currency)}</td>
-                                            <td data-label="Status">
-                                                <span className={`${styles.badge} ${payment.status === 'SUCCESS' ? styles.badgeSuccess :
-                                                    payment.status === 'FAILED' ? styles.badgeError :
-                                                        styles.badgeWarning
-                                                    }`}>
-                                                    {payment.status}
-                                                </span>
-                                            </td>
-                                            <td data-label="Paid On">{formatDateTime(payment.createdAt)}</td>
+                            <div className={styles.tableWrapper}>
+                                <table className={styles.table}>
+                                    <thead>
+                                        <tr>
+                                            <th style={{ whiteSpace: 'nowrap' }}>#</th>
+                                            <th style={{ whiteSpace: 'nowrap' }}>Order / Payment ID</th>
+                                            <th style={{ whiteSpace: 'nowrap' }}>User Email</th>
+                                            <th style={{ whiteSpace: 'nowrap' }}>Session</th>
+                                            <th style={{ whiteSpace: 'nowrap' }}>Amount</th>
+                                            <th style={{ whiteSpace: 'nowrap' }}>Status</th>
+                                            <th style={{ whiteSpace: 'nowrap' }}>Paid On</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {payments.filter(p => statusFilter === 'ALL' || p.status === statusFilter).map((payment, idx) => (
+                                            <tr
+                                                key={payment.id || payment.paymentId}
+                                                onClick={() => handleRowClick(payment)}
+                                                className={styles.clickableRow}
+                                            >
+                                                <td data-label="#" className={styles.compactCell}>
+                                                    {idx + 1 + pagination.page * pagination.size}
+                                                </td>
+                                                <td data-label="Order / Payment ID" className={styles.idCell}>
+                                                    <span title={payment.orderId || payment.paymentId || payment.id}>
+                                                        {payment.orderId || payment.paymentId || payment.id}
+                                                    </span>
+                                                </td>
+                                                <td data-label="User Email" className={styles.emailCell}>{payment.userEmail}</td>
+                                                <td data-label="Session" className={styles.sessionCell}>{payment.sessionTitle}</td>
+                                                <td data-label="Amount" style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>
+                                                    {formatCurrency(payment.amount, payment.currency)}
+                                                </td>
+                                                <td data-label="Status">
+                                                    <span className={`${styles.badge} ${payment.status === 'SUCCESS' ? styles.badgeSuccess :
+                                                            payment.status === 'FAILED' ? styles.badgeError :
+                                                                styles.badgeWarning
+                                                        }`}>
+                                                        {payment.status}
+                                                    </span>
+                                                </td>
+                                                <td data-label="Paid On" style={{ whiteSpace: 'nowrap', fontSize: '0.85rem' }}>
+                                                    {formatCompactDate(payment.createdAt)}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
 
                             {/* Pagination */}
                             {pagination.totalPages > 1 && (
@@ -701,7 +721,7 @@ const PaymentsTable: React.FC = () => {
                                     borderTop: '1px solid var(--color-border)'
                                 }}>
                                     <div style={{ color: 'var(--color-text-body)', fontSize: '0.9rem' }}>
-                                        Showing {pagination.page * pagination.size + 1} to {Math.min((pagination.page + 1) * pagination.size, pagination.totalElements)} of {pagination.totalElements} payments
+                                        Showing {pagination.page * pagination.size + 1}–{Math.min((pagination.page + 1) * pagination.size, pagination.totalElements)} of {pagination.totalElements} payments
                                     </div>
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         <button
@@ -709,14 +729,14 @@ const PaymentsTable: React.FC = () => {
                                             onClick={() => handlePageChange(pagination.page - 1)}
                                             disabled={pagination.page === 0}
                                         >
-                                            Previous
+                                            ← Previous
                                         </button>
                                         <button
                                             className={styles.actionBtn}
                                             onClick={() => handlePageChange(pagination.page + 1)}
                                             disabled={pagination.page >= pagination.totalPages - 1}
                                         >
-                                            Next
+                                            Next →
                                         </button>
                                     </div>
                                 </div>
