@@ -61,7 +61,7 @@ const Sessions: React.FC = () => {
             const normalized: BookingLike[] = (bookings || []).map((b: any) => ({
                 ...b,
                 sessionId: Number(b.sessionId ?? b.session_id ?? b.session?.id),
-                status: String(b.status ?? '').toUpperCase().trim(),
+                status: String(b.status ?? b.bookingStatus ?? '').toUpperCase().trim(),
             }));
 
             setUserBookings(normalized);
@@ -147,7 +147,7 @@ const Sessions: React.FC = () => {
             const normalizedBookings = (bookings || []).map((b: any) => ({
                 ...b,
                 sessionId: Number(b.sessionId ?? b.session_id ?? b.session?.id),
-                status: String(b.status ?? '').toUpperCase().trim(),
+                status: String(b.status ?? b.bookingStatus ?? '').toUpperCase().trim(),
             }));
 
             // Update state too so UI reflects it
