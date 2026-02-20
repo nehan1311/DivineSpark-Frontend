@@ -102,7 +102,7 @@ const Login: React.FC = () => {
             </video>
 
             <div className={styles.authBox}>
-                <h2 className={styles.title}>Welcome Back</h2>
+                <h2 className={styles.title}>Welcome</h2>
                 {error && <div style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
 
                 <form className={styles.form} onSubmit={handleLogin}>

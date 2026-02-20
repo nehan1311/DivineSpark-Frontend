@@ -161,7 +161,7 @@ const Home: React.FC = () => {
                             variants={staggerContainerVariant}
                         >
                             <motion.div className={styles.statItem} variants={fadeInUpVariant}>
-                                <span className={styles.statNumber}>5000+</span>
+                                <span className={styles.statNumber}>7000+</span>
                                 <span className={styles.statLabel}>Lives Touched</span>
                             </motion.div>
                             <motion.div className={styles.statItem} variants={fadeInUpVariant}>
