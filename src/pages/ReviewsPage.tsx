@@ -61,11 +61,7 @@ const ReviewsPage: React.FC = () => {
                                 <span className={styles.trustValue}>{reviews.length}</span>
                                 <span className={styles.trustLabel}>Total Reviews</span>
                             </div>
-                            <div className={styles.divider}></div>
-                            <div className={styles.trustItem}>
-                                <span className={styles.trustValue}>500+</span>
-                                <span className={styles.trustLabel}>Community Members</span>
-                            </div>
+
                         </div>
                     )}
                 </div>
