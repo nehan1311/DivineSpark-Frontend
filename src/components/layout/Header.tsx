@@ -67,7 +67,7 @@ const Header: React.FC = () => {
                             to="/sessions"
                             className={`${styles.navLink} ${location.pathname === '/sessions' ? styles.active : ''}`}
                         >
-                            Meditation Sessions
+                            Explore Our Programs
                         </Link>
 
                         {/* Programs Dropdown */}
@@ -81,7 +81,7 @@ const Header: React.FC = () => {
                                 onClick={() => setProgramsOpen(!programsOpen)}
                                 style={{ display: 'flex', alignItems: 'center' }}
                             >
-                                Explore Our Programs
+                                Gallery
                                 <span className={`${styles.chevron} ${programsOpen ? styles.rotate180 : ''}`}>▾</span>
                             </button>
 
@@ -260,7 +260,7 @@ const Header: React.FC = () => {
                     </Link>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
-                        <span className={styles.mobileNavLink} style={{ fontSize: '1.2rem', opacity: 0.8 }}>Programs</span>
+                        <span className={styles.mobileNavLink} style={{ fontSize: '1.2rem', opacity: 0.8 }}>Gallery</span>
                         <Link to="/programs/energy-workshops" className={styles.mobileNavLink} style={{ fontSize: '1.1rem' }}>Energy Workshops</Link>
                         <Link to="/programs/spiritual-trips" className={styles.mobileNavLink} style={{ fontSize: '1.1rem' }}>Spiritual Trips</Link>
                     </div>
