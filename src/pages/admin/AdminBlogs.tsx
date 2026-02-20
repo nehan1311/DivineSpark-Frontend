@@ -28,6 +28,7 @@ const AdminBlogs: React.FC = () => {
         setIsLoading(true);
         try {
             const data = await adminBlogApi.getAllBlogs();
+            console.log('✅ API RESPONSE (All Blogs):', data); // Debugging Log
             setBlogs(data);
         } catch (error) {
             console.error(error);
@@ -74,8 +75,9 @@ const AdminBlogs: React.FC = () => {
             await adminBlogApi.publishBlog(id);
 
             // Update local state immediately for instant UI feedback
+            // Set all potential "published" flags to true so the UI updates correctly
             setBlogs(prevBlogs => prevBlogs.map(blog =>
-                blog.id === id ? { ...blog, isPublished: true } : blog
+                blog.id === id ? { ...blog, isPublished: true, published: true, status: 'PUBLISHED', publishedAt: new Date().toISOString() } : blog
             ));
 
             showToast('Blog published successfully', 'success');
@@ -129,48 +131,68 @@ const AdminBlogs: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {blogs.map((blog) => (
-                            <tr key={blog.id}>
-                                <td data-label="Title">
-                                    <div style={{ fontWeight: 500 }}>{blog.title}</div>
-                                    <small style={{ color: '#888' }}>/{blog.slug}</small>
-                                </td>
-                                <td data-label="Author">{blog.authorName}</td>
-                                <td data-label="Status">
-                                    <span className={`${styles.badge} ${blog.isPublished ? styles.badgeSuccess : styles.badgeWarning}`}>
-                                        {blog.isPublished ? 'Published' : 'Draft'}
-                                    </span>
-                                </td>
-                                <td data-label="Created At">{formatFullDateTime(blog.createdAt)}</td>
-                                <td data-label="Actions">
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <button
-                                            className={styles.actionBtn}
-                                            onClick={() => handleEdit(blog)}
-                                            title="Edit"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            className={styles.actionBtn}
-                                            onClick={() => handlePublishToggle(blog.id)}
-                                            disabled={blog.isPublished}
-                                            style={blog.isPublished ? { opacity: 0.5, cursor: 'not-allowed', borderColor: 'transparent' } : {}}
-                                            title={blog.isPublished ? 'Already Published' : 'Publish Blog'}
-                                        >
-                                            {blog.isPublished ? 'Published' : 'Publish'}
-                                        </button>
-                                        <button
-                                            className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                                            onClick={() => handleDeleteClick(blog.id)}
-                                            title="Delete"
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
+                        {blogs.map((blog) => {
+                            // Aggressive check for published status
+                            const isPublished = ((b: any) => {
+                                // Check standard booleans and their string/number variants
+                                if (b.isPublished === true || String(b.isPublished) === 'true' || b.isPublished === 1) return true;
+                                if (b.published === true || String(b.published) === 'true' || b.published === 1) return true;
+
+                                // Check snake_case common in databases
+                                if (b.is_published === true || String(b.is_published) === 'true' || b.is_published === 1) return true;
+
+                                // Check status strings
+                                if (b.status && typeof b.status === 'string' && ['PUBLISHED', 'LIVE', 'ACTIVE'].includes(b.status.toUpperCase())) return true;
+
+                                // Check existence of published date
+                                if (b.publishedAt && b.publishedAt !== '') return true;
+
+                                return false;
+                            })(blog);
+
+                            return (
+                                <tr key={blog.id}>
+                                    <td data-label="Title">
+                                        <div style={{ fontWeight: 500 }}>{blog.title}</div>
+                                        <small style={{ color: '#888' }}>/{blog.slug}</small>
+                                    </td>
+                                    <td data-label="Author">{blog.authorName}</td>
+                                    <td data-label="Status">
+                                        <span className={`${styles.badge} ${isPublished ? styles.badgeSuccess : styles.badgeWarning}`}>
+                                            {isPublished ? 'Published' : 'Draft'}
+                                        </span>
+                                    </td>
+                                    <td data-label="Created At">{formatFullDateTime(blog.createdAt)}</td>
+                                    <td data-label="Actions">
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <button
+                                                className={styles.actionBtn}
+                                                onClick={() => handleEdit(blog)}
+                                                title="Edit"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className={styles.actionBtn}
+                                                onClick={() => handlePublishToggle(blog.id)}
+                                                disabled={isPublished}
+                                                style={isPublished ? { opacity: 0.5, cursor: 'not-allowed', borderColor: 'transparent' } : {}}
+                                                title={isPublished ? 'Already Published' : 'Publish Blog'}
+                                            >
+                                                {isPublished ? 'Published' : 'Publish'}
+                                            </button>
+                                            <button
+                                                className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                                                onClick={() => handleDeleteClick(blog.id)}
+                                                title="Delete"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             )}
