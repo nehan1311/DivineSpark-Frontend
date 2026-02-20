@@ -358,6 +358,13 @@ const Sessions: React.FC = () => {
                                             <span className={styles.metaValue}>{formatFullDateTime(session.startTime)}</span>
                                         </div>
 
+                                        {session.endTime && (
+                                            <div className={styles.metaItem}>
+                                                <span className={styles.metaLabel}>Ends On</span>
+                                                <span className={styles.metaValue}>{formatFullDateTime(session.endTime)}</span>
+                                            </div>
+                                        )}
+
                                         {!isFree && (
                                             <div className={styles.metaItem}>
                                                 <span className={styles.metaLabel}>Price</span>
