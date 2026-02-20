@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ReviewForm } from '../components/reviews/ReviewForm';
+import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 
 import { type PlatformReview, reviewApi } from '../api/review.api';
 import styles from '../components/reviews/Reviews.module.css';
@@ -9,6 +11,10 @@ const ReviewsPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [showForm, setShowForm] = useState(false);
+
+    // Carousel State
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const itemsPerView = 2; // Default to 2 items visible
 
     useEffect(() => {
         const loadReviews = async () => {
@@ -25,95 +31,122 @@ const ReviewsPage: React.FC = () => {
         loadReviews();
     }, [refreshTrigger]);
 
-    // Show all reviews
-    const displayReviews = reviews;
+    const nextSlide = () => {
+        if (currentIndex < reviews.length - itemsPerView) {
+            setCurrentIndex(prev => prev + 1);
+        } else {
+            // Loop back to start or stop? Let's loop for infinite feel
+            setCurrentIndex(0);
+        }
+    };
 
+    const prevSlide = () => {
+        if (currentIndex > 0) {
+            setCurrentIndex(prev => prev - 1);
+        } else {
+            // Loop to end
+            setCurrentIndex(Math.max(0, reviews.length - itemsPerView));
+        }
+    };
+
+    // Calculate effective average rating
     const averageRating = reviews.length
         ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length).toFixed(1)
         : '0.0';
 
+    const numStars = Math.round(Number(averageRating));
+
     return (
         <div className={styles.pageWrapper}>
+            {/* Background Mesh */}
             <div className={styles.meshContainer}></div>
-            <div className={styles.pageContainer} style={{ paddingTop: 'calc(var(--header-height) + 4rem)' }}>
 
-                {/* 1. Hero & Trust Section */}
-                <div className={styles.heroSection}>
-                    <div className={styles.headerContent}>
-                        <h1 className={styles.pageTitle}>Community Reviews</h1>
-                        <p className={styles.pageDescription}>
-                            Discover the stories of healing, growth, and transformation from our community.
-                            Your journey to inner peace starts here.
-                        </p>
+            <div className={styles.pageContainer} style={{ paddingTop: 'calc(var(--header-height) + 2rem)' }}>
+
+                {/* 1. Header Section */}
+                <div className={styles.feedbackHeader}>
+                    <span className={styles.label}>FEEDBACK</span>
+                    <h2 className={styles.mainTitle}>What our clients are saying</h2>
+                </div>
+
+                {/* 2. Main Widget */}
+                <div className={styles.widgetContainer}>
+                    {/* Left: Summary */}
+                    <div className={styles.widgetLeft}>
+                        <div className={styles.excellentText}>EXCELLENT</div>
+                        <div className={styles.aggregateStars}>
+                            {'★'.repeat(numStars)}
+                            <span style={{ color: '#e2e8f0' }}>{'★'.repeat(5 - numStars)}</span>
+                        </div>
+                        <div className={styles.reviewCount}>
+                            Based on <strong>{reviews.length} reviews</strong>
+                        </div>
+                        {/* Removed Google Logo as requested */}
                     </div>
 
-                    {/* Trust/Stats Bar */}
-                    {!loading && (
-                        <div className={styles.trustBar}>
-                            <div className={styles.trustItem}>
-                                <span className={styles.trustValue}>
-                                    {Number(averageRating) === 0 ? '5.0' : averageRating}
-                                </span>
-                                <span className={styles.trustLabel}>Average Rating</span>
-                            </div>
-                            <div className={styles.divider}></div>
-                            <div className={styles.trustItem}>
-                                <span className={styles.trustValue}>{reviews.length}</span>
-                                <span className={styles.trustLabel}>Total Reviews</span>
-                            </div>
-                            <div className={styles.divider}></div>
-                            <div className={styles.trustItem}>
-                                <span className={styles.trustValue}>500+</span>
-                                <span className={styles.trustLabel}>Community Members</span>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                    {/* Right: Carousel */}
+                    <div className={styles.widgetRight}>
+                        {!loading && reviews.length > 0 ? (
+                            <>
+                                <button className={`${styles.navButton} ${styles.navPrev}`} onClick={prevSlide}>
+                                    <ChevronLeft size={20} />
+                                </button>
 
-                {/* 2. Reviews Grid */}
-                <div className={styles.reviewsSection}>
-                    {loading ? (
-                        <div style={{ textAlign: 'center', padding: '4rem', color: '#64748b' }}>
-                            Loading community stories...
-                        </div>
-                    ) : (
-                        <div className={styles.grid}>
-                            {displayReviews.map((review, index) => (
-                                <div key={review.id || index} className={styles.reviewCard}>
-                                    {review.comment && (
-                                        <>
-                                            <div className={styles.quoteIcon}>“</div>
-                                            <p className={styles.cardComment}>{review.comment}</p>
-                                        </>
-                                    )}
-                                    {!review.comment && (
-                                        <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.4, fontStyle: 'italic', minHeight: '80px', fontFamily: 'serif' }}>
-                                            Rating Provided
-                                        </div>
-                                    )}
+                                <div className={styles.carouselContainer}>
+                                    <motion.div
+                                        className={styles.carouselTrack}
+                                        animate={{ x: `-${currentIndex * (300 + 24)}px` }} // 300px card width + 1.5rem gap (24px)
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                    >
+                                        {reviews.map((review, index) => (
+                                            <div key={review.id || index} className={styles.googleStyleCard}>
+                                                <div className={styles.cardHeader}>
+                                                    <div className={styles.avatarDisplay}>
+                                                        {review.userName ? review.userName.charAt(0).toUpperCase() : 'A'}
+                                                    </div>
+                                                    <div className={styles.headerInfo}>
+                                                        <span className={styles.reviewerName}>{review.userName || 'Anonymous'}</span>
+                                                        <span className={styles.reviewTime}>
+                                                            {/* Convert date to 'time ago' roughly or just date */}
+                                                            {new Date(review.createdAt).getFullYear() === new Date().getFullYear()
+                                                                ? new Date(review.createdAt).toLocaleDateString()
+                                                                : `${new Date().getFullYear() - new Date(review.createdAt).getFullYear()} years ago`}
+                                                        </span>
+                                                    </div>
+                                                    {/* Google G Logo REMOVED here */}
+                                                </div>
 
-                                    <div className={styles.cardFooter}>
-                                        <div className={styles.reviewerInfo}>
-                                            <div className={styles.userAvatar}>
-                                                {review.userName ? review.userName.charAt(0).toUpperCase() : 'A'}
+                                                <div className={styles.cardStarsRow}>
+                                                    {'★'.repeat(review.rating)}
+                                                    <span style={{ color: '#e2e8f0' }}>{'★'.repeat(5 - review.rating)}</span>
+                                                    {/* Blue Verified Check */}
+                                                    <span className={styles.verifiedBadge}><CheckCircle size={14} fill="currentColor" color="white" /></span>
+                                                </div>
+
+                                                <p className={styles.reviewText}>
+                                                    {review.comment}
+                                                </p>
+
+                                                {/* Read more link (visual only for now) */}
+                                                <span className={styles.readMore}>Read more</span>
                                             </div>
-                                            <div className={styles.reviewerMeta}>
-                                                <span className={styles.reviewerName}>{review.userName || 'Anonymous'}</span>
-                                                <span className={styles.reviewDate}>{new Date(review.createdAt).toLocaleDateString()}</span>
-                                            </div>
-                                        </div>
-                                        <div className={styles.cardStars}>
-                                            {'★'.repeat(review.rating)}
-                                            <span style={{ opacity: 0.3 }}>{'★'.repeat(5 - review.rating)}</span>
-                                        </div>
-                                    </div>
+                                        ))}
+                                    </motion.div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+
+                                <button className={`${styles.navButton} ${styles.navNext}`} onClick={nextSlide}>
+                                    <ChevronRight size={20} />
+                                </button>
+                            </>
+                        ) : (
+                            <div style={{ width: '100%', textAlign: 'center', color: '#94a3b8' }}>
+                                {loading ? 'Loading reviews...' : 'No reviews yet.'}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {/* 3. Call to Action Section */}
+                {/* 3. Call to Action Section (Keep existing functional part) */}
                 <div className={styles.ctaSection}>
                     <div className={styles.ctaContent}>
                         <h2 className={styles.ctaTitle}>Share Your Experience</h2>
