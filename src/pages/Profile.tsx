@@ -64,7 +64,9 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
             const data = await getUserProfile();
             setUser(data);
             setFormData({
-                contactNumber: data.contactNumber || '',
+                contactNumber: data.contactNumber
+                    ? "91" + data.contactNumber
+                    : '',
                 username: data.username || ''
             });
             setError(null);
@@ -77,30 +79,39 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        // Reset messages
         setError(null);
         setSuccessMsg(null);
 
-        // Validation: Global phone number
-        // PhoneInput returns clean digits (country code + number)
-        if (formData.contactNumber && formData.contactNumber.length < 8) {
+        // ✅ Clean phone number
+        let cleaned = formData.contactNumber.replace(/\D/g, '');
+
+        if (cleaned.startsWith("91") && cleaned.length === 12) {
+            cleaned = cleaned.substring(2);
+        }
+
+        if (cleaned.length !== 10) {
             setError('Please enter a valid phone number');
             return;
         }
 
         setSaving(true);
         try {
-            await updateUserProfile(formData);
+            await updateUserProfile({
+                ...formData,
+                contactNumber: cleaned
+            });
+
             setSuccessMsg('Profile updated successfully!');
             showToast('Profile updated successfully', 'success');
             setIsEditing(false);
+
             if (user) {
-                setUser({ ...user, ...formData });
+                setUser({ ...user, ...formData, contactNumber: cleaned });
             }
+
         } catch (err: any) {
             const msg = err.response?.data?.message || 'Failed to update profile';
             setError(msg);
-            // showToast(msg, 'error'); // Optional: duplicate
         } finally {
             setSaving(false);
         }

@@ -334,30 +334,6 @@ const About: React.FC = () => {
                 </motion.div>
             </Section>
 
-            {/* 5. REGULAR MEDITATION ACTIVITY */}
-            <Section bg="surface">
-                <motion.div
-                    className={styles.welcomeGrid}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={staggerContainer}
-                >
-                    <motion.div className={styles.welcomeContent} variants={fadeUp}>
-                        <h2 className={styles.heading}>Meditation on Peace & Illumination</h2>
-                        <p className={styles.bodyText}>
-                            Every Sunday, we conduct a guided meditation session focused on peace and illumination. This session is open for all and encourages collective healing and inner harmony.
-                        </p>
-                    </motion.div>
-                    <motion.div className={styles.welcomeImageWrapper} variants={fadeUp}>
-                        <img
-                            src="https://images.unsplash.com/photo-1512438248247-f0f2a5a8b7f0?q=80&w=1000&auto=format&fit=crop"
-                            alt="Meditation"
-                            className={styles.welcomeImage}
-                        />
-                    </motion.div>
-                </motion.div>
-            </Section>
 
             {/* 6. MISSION / PURPOSE STATEMENT */}
             <Section>
