@@ -1050,7 +1050,7 @@ const AdminDashboard: React.FC = () => {
         { label: 'Sessions', path: '/admin/sessions', icon: '🧘' },
         { label: 'Users', path: '/admin/users', icon: '👥' },
         { label: 'Payments', path: '/admin/payments', icon: '💳' },
-        { label: 'Donations', path: '/admin/donations', icon: '❤️' },
+        { label: 'Contributions', path: '/admin/donations', icon: '❤️' },
         { label: 'Reviews', path: '/admin/reviews', icon: '⭐' },
         { label: 'Events', path: '/admin/events', icon: '📢' },
         { label: 'Programs', path: '/admin/programs', icon: '📸' },
@@ -1116,7 +1116,7 @@ const AdminDashboard: React.FC = () => {
                             {activeView === 'sessions' && 'Manage Sessions'}
                             {activeView === 'users' && 'Session Participants'}
                             {activeView === 'payments' && 'Financial Overview'}
-                            {activeView === 'donations' && 'Donations Overview'}
+                            {activeView === 'donations' && 'Contributions Overview'}
                             {activeView === 'reviews' && 'Reviews Moderation'}
                             {activeView === 'events' && 'Events Management'}
                             {activeView === 'blogs' && 'Manage Blogs'}
@@ -1128,7 +1128,7 @@ const AdminDashboard: React.FC = () => {
                             {activeView === 'sessions' && 'Create, edit, and oversee all healing sessions.'}
                             {activeView === 'users' && 'View participants enrolled in each session.'}
                             {activeView === 'payments' && 'Track revenue and transaction history.'}
-                            {activeView === 'donations' && 'Track all donations and donor details.'}
+                            {activeView === 'donations' && 'Track all contributions and contributor details.'}
                             {activeView === 'reviews' && 'Moderate user reviews and testimonials.'}
                             {activeView === 'events' && 'Create and manage workshops & events shown on the home page ticker.'}
                             {activeView === 'blogs' && 'Create and manage blog posts.'}

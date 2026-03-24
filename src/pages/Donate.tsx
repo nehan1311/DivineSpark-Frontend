@@ -84,10 +84,6 @@ const Donate: React.FC = () => {
                         Your contribution empowers us to bring mindfulness, wellness, and holistic health to communities worldwide.
                         Join us in creating a more conscious and connected world.
                     </p>
-                    <blockquote className={styles.quote}>
-                        "It is in giving that we receive." <br />
-                        — St. Francis of Assisi
-                    </blockquote>
                 </div>
             </div>
 

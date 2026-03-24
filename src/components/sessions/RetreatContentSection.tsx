@@ -1,28 +1,30 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import styles from './RetreatContentSection.module.css';
-import peacefullMomentImg from '../../assets/image.png';
+import yogaRetreatImg from '../../assets/yoga_retreat.jpg';
+import trueSelfImg from '../../assets/true_self.jpg';
+import energyHealingImg from '../../assets/energy_healing.jpg';
 
 const CONTENT = [
     {
         title: "Every Arhatic Yoga Retreat is a Time for Renewal.",
         subtitle: "\"The purpose of the retreat is to purify your vehicles, to recharge your body, and to clarify your mind. It is a sacred time to reconnect with your higher soul and the divine spark within.\"",
         author: null,
-        img: "https://images.unsplash.com/photo-1545389336-cf090694435e?auto=format&fit=crop&w=800&q=80",
+        img: yogaRetreatImg,
         alt: "Meditation Retreat"
     },
     {
         title: "Immerse Yourself in Divine Energy.",
         subtitle: "Experience the profound stillness of nature combined with intensive spiritual practice. Our retreats are designed to accelerate your development in a safe, nurturing environment surrounded by like-minded souls.",
         author: null,
-        img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+        img: energyHealingImg,
         alt: "Nature Yoga"
     },
     {
         title: "A Journey Back to Your True Self.",
         subtitle: "Leave behind the noise of the daily world. Step into a space of serenity where you can focus entirely on your inner growth, healing, and spiritual realization.",
         author: null,
-        img: peacefullMomentImg,
+        img: trueSelfImg,
         alt: "Peaceful Moment"
     }
 ];
