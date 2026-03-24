@@ -221,14 +221,13 @@ const Home: React.FC = () => {
                             <p className={styles.serviceDesc}>Guided sessions that focus on restoring balance, improving well-being, and supporting inner harmony through mindful healing practices.</p>
 
                             <div className={styles.cardFooter}>
-                                <motion.a
-                                    href="/about"
-                                    onClick={(e) => { e.preventDefault(); navigate('/about'); }}
+                                <motion.button
+                                    onClick={() => { window.scrollTo(0, 0); navigate('/about'); }}
                                     className={styles.textLink}
                                 >
                                     <span>View more</span>
                                     <ArrowRight size={16} className={styles.linkArrow} />
-                                </motion.a>
+                                </motion.button>
                             </div>
                         </div>
                         <div className={styles.cardAccent} />
@@ -249,14 +248,13 @@ const Home: React.FC = () => {
                             <p className={styles.serviceDesc}>Interactive workshops for individuals, children, and communities that introduce healing awareness, mindfulness, and spiritual growth.</p>
 
                             <div className={styles.cardFooter}>
-                                <motion.a
-                                    href="/about"
-                                    onClick={(e) => { e.preventDefault(); navigate('/about'); }}
+                                <motion.button
+                                    onClick={() => { window.scrollTo(0, 0); navigate('/about'); }}
                                     className={styles.textLink}
                                 >
                                     <span>View more</span>
                                     <ArrowRight size={16} className={styles.linkArrow} />
-                                </motion.a>
+                                </motion.button>
                             </div>
                         </div>
                         <div className={styles.cardAccent} />
@@ -277,14 +275,13 @@ const Home: React.FC = () => {
                             <p className={styles.serviceDesc}>Regular meditation sessions designed to cultivate peace, clarity, emotional stability, and collective well-being.</p>
 
                             <div className={styles.cardFooter}>
-                                <motion.a
-                                    href="/about"
-                                    onClick={(e) => { e.preventDefault(); navigate('/about'); }}
+                                <motion.button
+                                    onClick={() => { window.scrollTo(0, 0); navigate('/about'); }}
                                     className={styles.textLink}
                                 >
                                     <span>View more</span>
                                     <ArrowRight size={16} className={styles.linkArrow} />
-                                </motion.a>
+                                </motion.button>
                             </div>
                         </div>
                         <div className={styles.cardAccent} />
