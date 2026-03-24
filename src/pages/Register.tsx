@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import styles from './Auth.module.css';
 import bgVideo from '../assets/grok-video-05d66eef-eed8-46c2-80bd-0577b1b2d8f4.mp4';
-import { requestOtp, verifyOtp, register } from '../api/auth.api';
+import { requestOtp, verifyOtp, register, login as loginApi } from '../api/auth.api';
 import { useAuth } from '../context/AuthContext';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
@@ -20,6 +20,7 @@ const Register: React.FC = () => {
     const [step, setStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [userAlreadyExists, setUserAlreadyExists] = useState(false);
 
     // Form State
     const [email, setEmail] = useState('');
@@ -34,19 +35,77 @@ const Register: React.FC = () => {
     // Strict Password Regex
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
 
+    /**
+     * Probe login endpoint with blank password to detect if email is already registered.
+     * - If backend says "wrong password / invalid credentials" → user EXISTS
+     * - If backend says "user not found / no account" → user does NOT exist
+     * - Any 2xx (shouldn't happen with blank pwd) → treat as EXISTS
+     */
+    const checkEmailExists = async (emailToCheck: string): Promise<boolean> => {
+        try {
+            await loginApi({ email: emailToCheck, password: '' });
+            // 200 with blank password would mean user exists (edge case)
+            return true;
+        } catch (err) {
+            const axiosErr = err as AxiosError<{ message: string }>;
+            const msg = (axiosErr.response?.data?.message || '').toLowerCase();
+            const status = axiosErr.response?.status;
+
+            // 404 / "not found" / "no account" / "does not exist" → user doesn't exist
+            if (
+                status === 404 ||
+                /not found|no account|does not exist|no user|user not found/i.test(msg)
+            ) {
+                return false;
+            }
+
+            // 401 / "invalid credentials" / "wrong password" / "bad credentials" → user EXISTS
+            if (
+                status === 401 ||
+                status === 400 ||
+                /invalid|wrong|incorrect|bad credential|password/i.test(msg)
+            ) {
+                return true;
+            }
+
+            // 409 → definitely exists
+            if (status === 409) return true;
+
+            // Anything else (network error etc.) → assume doesn't exist, let OTP flow handle it
+            return false;
+        }
+    };
+
     const handleRequestOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        setUserAlreadyExists(false);
         setIsLoading(true);
         try {
+            // Check if email is already registered BEFORE sending OTP
+            const exists = await checkEmailExists(email);
+            if (exists) {
+                setUserAlreadyExists(true);
+                showToast('This email is already registered. Please log in.', 'error');
+                setIsLoading(false);
+                return;
+            }
+
             await requestOtp({ email, purpose: 'VERIFY_EMAIL' });
             showToast('OTP sent to your email', 'success');
             setStep(2);
         } catch (err) {
-            const error = err as AxiosError<{ message: string }>;
-            const errorMessage = error.response?.data?.message || 'Failed to request OTP';
-            setError(errorMessage);
-            showToast(errorMessage, 'error');
+            const axiosErr = err as AxiosError<{ message: string }>;
+            const errorMessage = axiosErr.response?.data?.message || 'Failed to request OTP';
+            const statusCode = axiosErr.response?.status;
+
+            if (statusCode === 409) {
+                setUserAlreadyExists(true);
+                showToast('This email is already registered. Please log in.', 'error');
+            } else {
+                setError(errorMessage);
+                showToast(errorMessage, 'error');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -63,10 +122,18 @@ const Register: React.FC = () => {
             showToast('Email verified successfully', 'success');
             setStep(3);
         } catch (err) {
-            const error = err as AxiosError<{ message: string }>;
-            const errorMessage = error.response?.data?.message || 'Invalid OTP';
-            setError(errorMessage);
-            showToast(errorMessage, 'error');
+            const axiosErr = err as AxiosError<{ message: string }>;
+            const statusCode = axiosErr.response?.status;
+            const errorMessage = axiosErr.response?.data?.message || 'Invalid OTP';
+
+            if (statusCode === 409) {
+                setUserAlreadyExists(true);
+                setStep(1); // back to start with banner
+                showToast('This email is already registered. Please log in.', 'error');
+            } else {
+                setError(errorMessage);
+                showToast(errorMessage, 'error');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -120,10 +187,18 @@ const Register: React.FC = () => {
             showToast('Registration successful! Welcome.', 'success');
             navigate('/sessions'); // Or wherever you want to send them
         } catch (err) {
-            const error = err as AxiosError<{ message: string }>;
-            const errorMessage = error.response?.data?.message || 'Registration failed';
-            setError(errorMessage);
-            showToast(errorMessage, 'error');
+            const axiosErr = err as AxiosError<{ message: string }>;
+            const statusCode = axiosErr.response?.status;
+            const errorMessage = axiosErr.response?.data?.message || 'Registration failed';
+
+            if (statusCode === 409) {
+                setUserAlreadyExists(true);
+                setStep(1); // back to start with banner
+                showToast('This email is already registered. Please log in.', 'error');
+            } else {
+                setError(errorMessage);
+                showToast(errorMessage, 'error');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -315,7 +390,35 @@ const Register: React.FC = () => {
                     {step === 3 && 'Complete Profile'}
                 </h2>
 
-                {error && <div style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
+                {userAlreadyExists && (
+                    <div style={{
+                        backgroundColor: 'rgba(255, 200, 0, 0.12)',
+                        border: '1px solid rgba(255, 200, 0, 0.5)',
+                        borderRadius: '0.5rem',
+                        padding: '0.75rem 1rem',
+                        marginBottom: '1rem',
+                        textAlign: 'center',
+                        color: '#ffe066',
+                        fontSize: '0.9rem',
+                        lineHeight: '1.5'
+                    }}>
+                        ⚠️ An account with this email already exists.{' '}
+                        <Link
+                            to="/login"
+                            style={{
+                                color: '#ffd700',
+                                fontWeight: 700,
+                                textDecoration: 'underline'
+                            }}
+                        >
+                            Login to your account
+                        </Link>
+                    </div>
+                )}
+
+                {error && !userAlreadyExists && (
+                    <div style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>
+                )}
 
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
