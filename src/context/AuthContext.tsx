@@ -91,7 +91,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Fetch profile immediately
         fetchUserProfile();
 
-        showToast('Welcome back!', 'success');
+        showToast('Welcome!', 'success');
     };
 
     useEffect(() => {
