@@ -148,7 +148,7 @@ const DonationsTable: React.FC = () => {
         <div className={styles.section} style={{ paddingBottom: '2rem' }}>
             <div className={styles.sectionHeader}>
                 <div>
-                    <h3 className={styles.sectionTitle}>Donations Overview</h3>
+                    <h3 className={styles.sectionTitle}>Contributions Overview</h3>
                     <p style={{ opacity: 0.7, fontSize: '0.9rem', marginTop: '0.25rem' }}>
                         Track your spiritual community's contributions.
                     </p>
@@ -168,21 +168,21 @@ const DonationsTable: React.FC = () => {
                 ) : stats ? (
                     <>
                         <MetricCard
-                            label="Total Amount Donated"
+                            label="Total Amount Contributed"
                             value={stats.totalAmount}
                             icon={Heart}
                             prefix="₹"
                             gradientClass={styles.statCardGradient1}
                             iconColor="#e11d48"
-                            helperText="No successful donations yet"
+                            helperText="No successful contributions yet"
                         />
                         <MetricCard
-                            label="Total Donors"
+                            label="Total Contributors"
                             value={stats.totalDonors}
                             icon={Users}
                             gradientClass={styles.statCardGradient2}
                             iconColor="#7c3aed"
-                            helperText="Be the first to donate!"
+                            helperText="Be the first to contribute!"
                         />
                     </>
                 ) : null}
@@ -203,7 +203,7 @@ const DonationsTable: React.FC = () => {
                 ) : (
                     <div className={styles.chartEmptyState}>
                         <TrendingUp size={24} />
-                        <p>No donation activity yet</p>
+                        <p>No contribution activity yet</p>
                     </div>
                 )}
             </div>
@@ -215,7 +215,7 @@ const DonationsTable: React.FC = () => {
                         <thead>
                             <tr>
 
-                                <th>Donor</th>
+                                <th>Contributor</th>
                                 <th>Amount</th>
                                 <th>Note</th>
                                 <th>Date</th>
@@ -239,7 +239,7 @@ const DonationsTable: React.FC = () => {
                         </tbody>
                     </table>
                 ) : (
-                    <div className={styles.emptyState}>No donations found.</div>
+                    <div className={styles.emptyState}>No contributions found.</div>
                 )}
             </div>
         </div>
