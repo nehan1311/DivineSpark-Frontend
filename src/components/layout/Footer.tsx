@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
             <div className={`container ${styles.footerContainer}`}>
                 <div className={styles.brand}>
                     <h3>DivineSpark</h3>
-                    <p>© 2024 Wellness Platform.</p>
+                    <p>© 2025 Wellness Platform.</p>
                     <div className={styles.socialRow}>
                         {/* Instagram - Official Color #E4405F */}
                         <a

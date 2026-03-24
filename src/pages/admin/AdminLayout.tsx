@@ -28,7 +28,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         { label: 'Sessions', path: '/admin/sessions', icon: '🧘' },
         { label: 'Users', path: '/admin/users', icon: '👥' },
         { label: 'Payments', path: '/admin/payments', icon: '💳' },
-        { label: 'Donations', path: '/admin/donations', icon: '❤️' },
+        { label: 'Contributions', path: '/admin/donations', icon: '❤️' },
         { label: 'Reviews', path: '/admin/reviews', icon: '⭐' },
         { label: 'Events', path: '/admin/events', icon: '📢' },
         { label: 'Programs', path: '/admin/programs', icon: '📸' },
