@@ -7,7 +7,7 @@ interface WhatsAppConfirmationModalProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: () => void;
-    whatsappNumber?: string; // Default: 918692993228
+    whatsappNumber?: string; // Default: 917821049429
 }
 
 const WhatsAppIcon = () => (
@@ -29,7 +29,7 @@ export const WhatsAppConfirmationModal: React.FC<WhatsAppConfirmationModalProps>
     isOpen,
     onClose,
     onConfirm,
-    whatsappNumber = '918692993228'
+    whatsappNumber = '917821049429'
 }) => {
     const [step, setStep] = useState<1 | 2>(1);
 
