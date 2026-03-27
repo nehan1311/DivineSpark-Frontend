@@ -22,6 +22,10 @@ import Blogs from '../pages/Blogs';
 import BlogDetails from '../pages/BlogDetails';
 import EnergyWorkshops from '../pages/programs/EnergyWorkshops';
 import SpiritualTrips from '../pages/programs/SpiritualTrips';
+import TermsAndConditions from '../pages/TermsAndConditions';
+import PrivacyPolicy from '../pages/PrivacyPolicy';
+import RefundPolicy from '../pages/RefundPolicy';
+import ContactPage from '../pages/ContactPage';
 
 
 
@@ -67,6 +71,12 @@ const AppRoutes: React.FC = () => {
                 {/* Programs */}
                 <Route path="programs/energy-workshops" element={<EnergyWorkshops />} />
                 <Route path="programs/spiritual-trips" element={<SpiritualTrips />} />
+
+                {/* Legal & Contact */}
+                <Route path="terms-and-conditions" element={<TermsAndConditions />} />
+                <Route path="privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="refund-policy" element={<RefundPolicy />} />
+                <Route path="contact" element={<ContactPage />} />
 
 
 

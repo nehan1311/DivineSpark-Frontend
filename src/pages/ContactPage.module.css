@@ -1,0 +1,170 @@
+.wrapper {
+    min-height: 100vh;
+    background-color: var(--color-bg-main);
+    padding: var(--space-16) 0;
+}
+
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+}
+
+.header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-8);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.badge {
+    display: inline-block;
+    background-color: var(--color-accent-light);
+    color: var(--color-primary);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 0.35rem 1rem;
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-4);
+}
+
+.title {
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-2xl);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-2);
+    line-height: 1.2;
+}
+
+.subtitle {
+    font-size: var(--font-size-md);
+    color: var(--color-text-body);
+    margin-top: var(--space-2);
+    line-height: 1.7;
+}
+
+.grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.contactCard {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.contactCard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background-color: #fff;
+}
+
+.iconCircle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background-color: var(--color-bg-main);
+}
+
+.cardContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cardLabel {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-body);
+}
+
+.cardValue {
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.divider {
+    margin: var(--space-8) 0;
+    height: 1px;
+    background-color: var(--color-border);
+}
+
+.socialSection {
+    text-align: center;
+}
+
+.socialTitle {
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-6);
+}
+
+.socialRow {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.socialCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-width: 100px;
+}
+
+.socialCard:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.socialLabel {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-body);
+}
+
+@media (max-width: 640px) {
+    .title {
+        font-size: var(--font-size-xl);
+    }
+
+    .wrapper {
+        padding: var(--space-8) 0;
+    }
+
+    .socialRow {
+        gap: var(--space-2);
+    }
+
+    .socialCard {
+        padding: var(--space-4);
+        min-width: 80px;
+    }
+}
