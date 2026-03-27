@@ -52,6 +52,13 @@ const Footer: React.FC = () => {
                         <h4>Community</h4>
                         <Link to="/about">About Us</Link>
                         <Link to="/donate">Contribute</Link>
+                        <Link to="/contact">Contact Us</Link>
+                    </div>
+                    <div className={styles.column}>
+                        <h4>Legal</h4>
+                        <Link to="/terms-and-conditions">Terms &amp; Conditions</Link>
+                        <Link to="/privacy-policy">Privacy Policy</Link>
+                        <Link to="/refund-policy">Refund Policy</Link>
                     </div>
                 </div>
             </div>
